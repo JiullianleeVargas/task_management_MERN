@@ -1348,16 +1348,16 @@
                 try {
 
                     // Grabing the ID cookie from browser
-                    const employeeId = document.cookie
-                    //Parsing the cookie
+                    const employeeId = document.cookie          
                         .split('; ')
                         .find(row => row.startsWith('employeeID='))
                         .split('=')[1];
                     
-                    // console.log(employeeId)
+                    console.log(employeeId)
 
                     // Sending the cookie in the header for the teq in /getEmployeeTasks
-                    const response = await fetch("/employee/getEmployeeTasks", {
+                    const response = await fetch("/employee/getEmployeeTasks",
+                     {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',

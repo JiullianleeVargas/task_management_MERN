@@ -78,9 +78,12 @@ user.post('/login', async function(req, res) {
           if(result)
           {
             console.log("Succesful log in!");
-            res.cookie("employeeID", employeeID, { path: '/employee/getEmployeeTasks', secure: true })
+            res.cookie("employeeID", employeeID, { path: '/employee' })
             console.log("employeeID stored in res.cookie")
+            
+
             res.json({ redirect: '/employee/new-route'});
+           
            
         
           }
@@ -142,7 +145,7 @@ user.get('/getEmployeeTasks', async (req, res) => {
         return;
       }
 
-      //Spliting the id from "employeeID="
+      // Spliting the id from "employeeID="
       const employeeID = employeeIdCookie.split('=')[1];
     
       await client.connect();
@@ -152,6 +155,7 @@ user.get('/getEmployeeTasks', async (req, res) => {
       const taskCollection = database.collection('tasks');
 
       // Convert the employeeID into an object ID so the database can use it
+      // const employeeId = new ObjectId("655a5b8c70fc2aea0f9a523a");
       const employeeId = new ObjectId(employeeID);
       // console.log(employeeId)
 

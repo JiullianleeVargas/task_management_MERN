@@ -275,10 +275,7 @@ user.post('/createAdmin', async function(req, res) {
 user.get('/editadmin:id', (req, res) => {
   const adminID = req.params.id;
   console.log("admin id:", adminID);
-
-  //res.type('html').sendFile(path.join(__dirname, '..', `editadmin2.html?id=${adminID}`));
-  res.sendFile(path.join(__dirname, '..', 'editadmin.html'));
-  
+  res.sendFile(path.join(__dirname, '..', 'editadmin.html'));  
 });
 
 user.get('/getAdmin/:id', async (req, res) => {
@@ -294,7 +291,7 @@ user.get('/getAdmin/:id', async (req, res) => {
       console.log('DB connected');
 
       //get admins
-      const admins = await usersCollection.find({}).toArray();
+      //const admins = await usersCollection.find({}).toArray();
       const admin = await usersCollection.find({adminID: adminID}).toArray();
       console.log("admin:", admin);
       res.json(admin);
@@ -308,43 +305,53 @@ user.get('/getAdmin/:id', async (req, res) => {
 
 user.post('/updateAdmin', async function(req, res) {
 
-  let email = req.body.email;
-  let password = req.body.password;
-  email = email.trim();
-  password = password.trim();
+  let adminID = req.body.adminID;
+  const adminData = {};
+  adminData.email = req.body.email;
+  adminData.password = req.body.password;
+  adminData.status = req.body.status;
+  console.log("admindata: ", adminData);  
+  adminID = adminID.trim();
+  console.log("id: ", adminID);
 
-  if (!email || !password) {
-      console.log("No email or password provided");
-      res.status(400).json({ error: "Both email and password are required." });
-  } else {
-    const client = new MongoClient('mongodb://0.0.0.0:27017');
-    try{
-
-        await client.connect();
-        const database = client.db('task_management');
-        const usersCollection = database.collection('admins');
-        console.log("DB connect");
-
-        const employee = await usersCollection.findOne({ email });
-
-        if(!employee)
-        {
-          console.log('no existe el email.');
-          const adminToInsert = { "email": email, "password": password, "status":"active"};
-          console.log('data: ', adminToInsert);
-          // Insert the data into the collection
-          const result = await usersCollection.insertOne(adminToInsert);
-          console.log(`Inserted ${result.insertedCount} document(s)`);
+  const client = new MongoClient('mongodb://0.0.0.0:27017');
+  try{
+      await client.connect();
+      const database = client.db('task_management');
+      const usersCollection = database.collection('admins');
+      console.log("DB connect");
+      const admin = await usersCollection.find({adminID: parseInt(adminID)}).toArray();
+      console.log("admin db:", admin);
+      //res.json({admin});
+      if(!admin)
+      {
+        console.log("not admin");
+        //await client.close();
+        return res.status(404).json({ error: 'User not found' });
+      }
+      else {
+        //chaeck if optional fields exists
+        await console.log("admin exists", admin);
+        for (const field in adminData) {
+          if (adminData.hasOwnProperty(field) && admin.hasOwnProperty(field)) {
+              admin[field] = adminData[field].trim();
+          }
         }
-        else {
-          console.log("Email already exists");
-        }
-    } finally {
-      // Close the MongoDB connection
-      await client.close();
-      console.log('Connection closed');
-    }
 
+        // Update the user in the database
+        const updatedAdmin = await usersCollection.updateOne({adminID: parseInt(adminID)}, { $set: {email: adminData.email, password: adminData.password, status: adminData.status} });
+
+        if(updatedAdmin.modifiedCount > 0){
+          console.log("updatedAdmin: ", adminData);
+          res.json({adminData});
+        }
+      }
+  } catch (error) {
+    console.error('Error retrieving admins:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }finally {
+    // Close the MongoDB connection
+    await client.close();
+    console.log('Connection closed');
   }
-
 })

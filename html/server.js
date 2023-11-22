@@ -26,7 +26,7 @@ app.use("/assets", express.static(path.join(__dirname, "employee", "assets")));
 
 
 app.get('/admin/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin', 'login2.html'));
+    res.sendFile(path.join(__dirname, 'admin', 'login.html'));
   });
 
 // Handle a GET request to the '/employee/' route. 

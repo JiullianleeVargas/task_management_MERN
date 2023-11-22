@@ -1411,14 +1411,14 @@
                     // this.searchTasks();
                     // this.initEditor();
                     console.log("inside the init")
-                    let tasks = await fetchData();
-                    console.log(tasks)
+                    let task = await fetchData();
+                    console.log(task)
 
-                    //Add to tasks array from tasks cookie
-                    for (var i = 0; i < tasks.length; i++) {
-                        this.addTask(tasks[i]['_id'], tasks[i]['title'], tasks[i]['due_date'],
-                            tasks[i]['description'], tasks[i]['priority'], tasks[i]['status'],
-                            tasks[i]['655a5b8c70fc2aea0f9a523a']);
+                    //Add to task array from task cookie
+                    for (var i = 0; i < task.length; i++) {
+                        this.addTask(task[i]['_id'], task[i]['title'], task[i]['due_date'],
+                            task[i]['description'], task[i]['priority'], task[i]['status'],
+                            task[i]['655a5b8c70fc2aea0f9a523a']);
                             
                     }
 
@@ -1503,15 +1503,15 @@
                     item.status = item.status === 'Completed' ? '' : 'Completed';
                     this.updateStatus(item, item.status)
 
-                    let user = users.find(user => user.id == userID);
-                    let admin = admins.find(admin => admin.id == adminID);
+                    // let user = users.find(user => user.id == userID);
+                    // let admin = admins.find(admin => admin.id == adminID);
 
-                        if(admin)
-                        {
-                            notif = `${user.email} has changed the task titled "${tasks[task.id-1]['task_name']}" to status: Completed.`;
-                            admins[adminID-1]['notifications'].push(notif);
-                            setCookie("admins", admins);
-                        }
+                    //     if(admin)
+                    //     {
+                    //         notif = `${user.email} has changed the task titled "${tasks[task.id-1]['task_name']}" to status: Completed.`;
+                    //         admins[adminID-1]['notifications'].push(notif);
+                    //         setCookie("admins", admins);
+                    //     }
 
                     this.searchTasks(false);
                 },

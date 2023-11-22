@@ -42,7 +42,24 @@ user.get('/new-route', (req, res) => {
   //console.log('entered new route');
   //res.type('html').sendFile(path.join(__dirname, '..', 'test.html'));
   //console.log(path.join(__dirname, '..', 'admins2.html'));
-  res.type('html').sendFile(path.join(__dirname, '..', 'admins2.html'));
+  res.type('html').sendFile(path.join(__dirname, '..', 'accounts.html'));
+})
+
+//navbar routes
+user.get('/admins', (req, res) => {
+  res.type('html').sendFile(path.join(__dirname, '..', 'admins.html'));
+})
+
+user.get('/tasks', (req, res) => {
+  res.type('html').sendFile(path.join(__dirname, '..', 'tasks.html'));
+})
+
+user.get('/accounts', (req, res) => {
+  res.type('html').sendFile(path.join(__dirname, '..', 'accounts.html'));
+})
+
+user.get('/reports', (req, res) => {
+  res.type('html').sendFile(path.join(__dirname, '..', 'reports.html'));
 })
 
 user.post('/login', async function(req, res) {
@@ -254,51 +271,80 @@ user.post('/createAdmin', async function(req, res) {
 
 })
 
-// user.post('/register', async (req, res) => {
 
-//   //const client = new MongoClient('mongodb://localhost:27017');
+user.get('/editadmin:id', (req, res) => {
+  const adminID = req.params.id;
+  console.log("admin id:", adminID);
 
-//   try {
-
-//       let email = req.body.email; 
-//       let password = req.body.password;
-
-//       email = email.trim();
-//       password = password.trim();
-
-//       if(email != "" && password != "")
-//       {
-//           // client.connect();
-//           // const database = client.db('test');
-//           // const usersCollection = database.collection('users');
-
-//           // const user = await usersCollection.findOne({ email });
-
-//           if (user) {
-
-//               //if user found, cookie message = username/email already exists
-//               res.send('Email already exists!');
-//               //res.cookie('message', 'Email already exists!');
-//           } else {
-//               //insert query
-//               res.send('Account created!');
-//           }
-//       }
-//       else
-//       {
-//           res.send('Email and password cannot be empty!');
-//           //res.cookie('message', 'Email and password cannot be empty!');
-//       }
-
-//       //res.redirect('/landingPage.html');
-      
-
-//   } catch (err) {
-//       res.send(err);
-//       //console.error(err);
-//    } //finally {
-//       //await client.close();
-//   //}
+  //res.type('html').sendFile(path.join(__dirname, '..', `editadmin2.html?id=${adminID}`));
+  res.sendFile(path.join(__dirname, '..', 'editadmin.html'));
   
-// })
+});
 
+user.get('/getAdmin/:id', async (req, res) => {
+  const adminID = parseInt(req.params.id);
+
+  const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+  try {
+      //conncet to db
+      await client.connect();
+      const database = client.db('task_management');
+      const usersCollection = database.collection('admins');
+      console.log('DB connected');
+
+      //get admins
+      const admins = await usersCollection.find({}).toArray();
+      const admin = await usersCollection.find({adminID: adminID}).toArray();
+      console.log("admin:", admin);
+      res.json(admin);
+  } catch (error) {
+      console.error('Error retrieving admins:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  } finally {
+      await client.close();
+  }
+});
+
+user.post('/updateAdmin', async function(req, res) {
+
+  let email = req.body.email;
+  let password = req.body.password;
+  email = email.trim();
+  password = password.trim();
+
+  if (!email || !password) {
+      console.log("No email or password provided");
+      res.status(400).json({ error: "Both email and password are required." });
+  } else {
+    const client = new MongoClient('mongodb://0.0.0.0:27017');
+    try{
+
+        await client.connect();
+        const database = client.db('task_management');
+        const usersCollection = database.collection('admins');
+        console.log("DB connect");
+
+        const employee = await usersCollection.findOne({ email });
+
+        if(!employee)
+        {
+          console.log('no existe el email.');
+          const adminToInsert = { "email": email, "password": password, "status":"active"};
+          console.log('data: ', adminToInsert);
+          // Insert the data into the collection
+          const result = await usersCollection.insertOne(adminToInsert);
+          console.log(`Inserted ${result.insertedCount} document(s)`);
+        }
+        else {
+          console.log("Email already exists");
+        }
+    } finally {
+      // Close the MongoDB connection
+      await client.close();
+      console.log('Connection closed');
+    }
+
+  }
+
+})

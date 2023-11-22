@@ -871,8 +871,8 @@
                     },
 
                     saveadmin() {
-                        //let admins = await fetchData();
-                        //await console.log("init admins: ", admins); 
+                        // let admins = await fetchData();
+                        // await console.log("init admins: ", admins); 
 
                         if (!this.params.email) {
                             this.showMessage('Email is required.', 'error');
@@ -921,6 +921,7 @@
                               body: JSON.stringify({
                                 email: this.params.email,
                                 password: this.params.password,
+                                adminID: maxadminId + 1,
                               }),
                             })
                             .then((response) => {

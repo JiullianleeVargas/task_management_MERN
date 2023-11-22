@@ -36,10 +36,32 @@ user.use(express.json());
 
 user.get('/new-route', (req, res) => {
   console.log("inside the new route function")
-  //console.log('entered new route');
-  //res.type('html').sendFile(path.join(__dirname, '..', 'test.html'));
-  //console.log(path.join(__dirname, '..', 'admins2.html'));
   res.type('html').sendFile(path.join(__dirname, '..', 'index2.html'));
+  console.log(__dirname);
+})
+
+user.get('/index.html', (req, res) => {
+  console.log("inside the new route function")
+  res.type('html').sendFile(path.join(__dirname, '..', 'index2.html'));
+  console.log(__dirname);
+})
+
+
+user.get('/login.html', (req, res) => {
+  console.log("inside the new route function")
+  res.type('html').sendFile(path.join(__dirname, '..', 'login2.html'));
+  console.log(__dirname);
+})
+
+user.get('/apps-calendar.html', (req, res) => {
+  console.log("inside the new route function")
+  res.type('html').sendFile(path.join(__dirname, '..', 'apps-calendar.html'));
+  console.log(__dirname);
+})
+
+user.get('/reports.html', (req, res) => {
+  console.log("inside the new route function")
+  res.type('html').sendFile(path.join(__dirname, '..', 'reports.html'));
   console.log(__dirname);
 })
 

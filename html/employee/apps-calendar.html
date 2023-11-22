@@ -1044,19 +1044,41 @@
                 // },
                 }));
                 
+                async function fetchData() {
+                try {
+
+                    // Grabing the ID cookie from browser
+                    const employeeId = document.cookie          
+                        .split('; ')
+                        .find(row => row.startsWith('employeeID='))
+                        .split('=')[1];
+                    
+                    console.log(employeeId)
+
+                    // Sending the cookie in the header for the teq in /getEmployeeTasks
+                    const response = await fetch("/employee/getEmployeeTasks",
+                     {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Include the cookie in the headers
+                            'Cookie': `employeeID=${employeeId}`
+                          
+                        },
+                    });
+
+                    console.log("inside the fetch in the index", response);
+                    const data = await response.json();
+                    return data;
+
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            }
 
                 // Grab user cookies
-                let users = JSON.parse(getCookie('users'));
+                let employeeID = JSON.parse(getCookie('employeeeID'));
 
-                // Grab userID from session storage
-                let userID = JSON.parse(sessionStorage.getItem('userID'));
-
-                // Grab cookies tasks
-                let taskCookie = JSON.parse(getCookie('tasks'));
-                
-                // Grab cookies from only that user
-                let tasks = taskCookie.filter(task => task.task_user === userID);
-                // console.log('tasks:', tasks);
                 
                 //calendar
                 Alpine.data('calendar', () => ({
@@ -1085,7 +1107,7 @@
                     calendar: null,
                     now: new Date(),
                     events: [],
-                    init() {
+                    async init() {
                     
                         //Initialization of the calendar, this will be called everytime the page is loaded
                         //This is a default initialization, for some reason if i removed it, the calendar didnt work
@@ -1093,13 +1115,13 @@
                             {
 
 
-                                id: 1,
-                                title: '',
-                                start: this.now.getFullYear() + '-' + this.getMonth(this.now) + '-01T14:30:00',
-                                end: this.now.getFullYear() + '-' + this.getMonth(this.now) + '-02T14:30:00',
-                                className: '',
-                                description:
-                                    '',
+                                // id: 1,
+                                // title: '',
+                                // start: this.now.getFullYear() + '-' + this.getMonth(this.now) + '-01T14:30:00',
+                                // end: this.now.getFullYear() + '-' + this.getMonth(this.now) + '-02T14:30:00',
+                                // className: '',
+                                // description:
+                                //     '',
                             }
                         ];
                     
@@ -1120,15 +1142,28 @@
                             droppable: true,
                             events: this.events,
                         });
+                        
+                        console.log("inside the init")
+                        let tasks = await fetchData();
+                        console.log(tasks)
+
 
                         for (var i = 0; i < tasks.length; i++) {
-                            
-                            // Adding tasksto event []
-                            if (tasks[i]['task_user'] == userID) {
-                                this.addEvent(tasks[i]['taskID'], tasks[i]['task_name'], tasks[i]['due_date'],
-                                    tasks[i]['task_description'],  tasks[i]['task_status']);
-                            }
+                                this.addEvent(tasks[i]['_id'], tasks[i]['title'], tasks[i]['due_date'],
+                                    tasks[i]['description'],  tasks[i]['status']);
+
                         }
+                        
+
+                        // this.searchTasks();
+                        // this.initEditor();
+                       
+
+
+
+
+
+                        
 
                         this.calendar.render();
 

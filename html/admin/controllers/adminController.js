@@ -273,13 +273,13 @@ user.post('/createAdmin', async function(req, res) {
 
 
 user.get('/editadmin:id', (req, res) => {
-  const adminID = req.params.id;
-  console.log("admin id:", adminID);
+  const id = req.params.id;
+  console.log("admin id:", id);
   res.sendFile(path.join(__dirname, '..', 'editadmin.html'));  
 });
 
 user.get('/getAdmin/:id', async (req, res) => {
-  const adminID = parseInt(req.params.id);
+  const id = req.params.id;
 
   const client = new MongoClient('mongodb://0.0.0.0:27017');
 
@@ -288,15 +288,15 @@ user.get('/getAdmin/:id', async (req, res) => {
       await client.connect();
       const database = client.db('task_management');
       const usersCollection = database.collection('admins');
-      console.log('DB connected');
+      //console.log('DB connected');
 
       //get admins
       //const admins = await usersCollection.find({}).toArray();
-      const admin = await usersCollection.find({adminID: adminID}).toArray();
-      console.log("admin:", admin);
+      const admin = await usersCollection.find({_id: new ObjectId(id)}).toArray();
+      //console.log("admin getAdmin:", admin);
       res.json(admin);
   } catch (error) {
-      console.error('Error retrieving admins:', error);
+      //console.error('Error retrieving admins:', error);
       res.status(500).json({ error: 'Internal Server Error' });
   } finally {
       await client.close();
@@ -305,14 +305,14 @@ user.get('/getAdmin/:id', async (req, res) => {
 
 user.post('/updateAdmin', async function(req, res) {
 
-  let adminID = req.body.adminID;
+  let id = req.body.id;
   const adminData = {};
   adminData.email = req.body.email;
   adminData.password = req.body.password;
   adminData.status = req.body.status;
   console.log("admindata: ", adminData);  
   adminID = adminID.trim();
-  console.log("id: ", adminID);
+  console.log("id: ", id);
 
   const client = new MongoClient('mongodb://0.0.0.0:27017');
   try{
@@ -320,13 +320,12 @@ user.post('/updateAdmin', async function(req, res) {
       const database = client.db('task_management');
       const usersCollection = database.collection('admins');
       console.log("DB connect");
-      const admin = await usersCollection.find({adminID: parseInt(adminID)}).toArray();
+      const admin = await usersCollection.find({_id: new ObjectId(id)}).toArray();
       console.log("admin db:", admin);
       //res.json({admin});
       if(!admin)
       {
-        console.log("not admin");
-        //await client.close();
+        //console.log("not admin");
         return res.status(404).json({ error: 'User not found' });
       }
       else {
@@ -339,7 +338,7 @@ user.post('/updateAdmin', async function(req, res) {
         }
 
         // Update the user in the database
-        const updatedAdmin = await usersCollection.updateOne({adminID: parseInt(adminID)}, { $set: {email: adminData.email, password: adminData.password, status: adminData.status} });
+        const updatedAdmin = await usersCollection.updateOne({_id: new ObjectId(id)}, { $set: {email: adminData.email, password: adminData.password, status: adminData.status} });
 
         if(updatedAdmin.modifiedCount > 0){
           console.log("updatedAdmin: ", adminData);

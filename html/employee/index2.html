@@ -873,12 +873,19 @@
                                                 <template x-for="task in pagedTasks">
                                                     <tr :key="task.id" class="group cursor-pointer"
                                                         :class="{ 'bg-white-light/30 dark:bg-[#1a2941]' : task.status === 'Completed' }">
-                                                        <td class="w-1">
+                                                        <td class="w-1"  x-data="{ status: 'Completed' }">
                                                             <input type="checkbox" :id="`chk-${task.id}`"
                                                                 class="form-checkbox"
-                                                                :checked="task.status === 'Completed'"
-                                                                @click.stop="taskComplete(task)"
+                                                                :checked="task.status === status"
+                                                                @click.stop="updateStatus(task, status)"
                                                                 :disabled="selectedTab === 'trash'" />
+                                                                <!-- 
+                                                                    For personal reference: 
+                                                                    x-data = Sets the status the completed
+                                                                    :checked = Checks if the current status of the tasks is equal to completed
+                                                                    if its the same then it checks the box, then calls the function if theres a click event
+
+                                                                -->
                                                         </td>
                                                         <td>
                                                             <div @click="viewTask(task)">
@@ -971,8 +978,8 @@
 
                                                                             </li>
                                                                             <li>
-                                                                                <a href="javascript:;"
-                                                                                    @click="toggle, setPending(task)">
+                                                                                <a href="javascript:;" 
+                                                                                    @click="toggle, updateStatus(task, 'Pending')">
 
                                                                                     <svg width="20px" height="20px"
                                                                                         viewBox="0 0 20 20" id="icon"
@@ -1006,8 +1013,8 @@
                                                                                 </a>
                                                                             </li>
                                                                             <li>
-                                                                                <a href="javascript:;"
-                                                                                    @click="toggle, setInProgress(task)">
+                                                                                <a href="javascript:;" 
+                                                                                    @click="toggle, updateStatus(task, 'In-Progress')">
                                                                                     <svg fill="#000000"
                                                                                         class="h-5 w-5 shrink-0 ltr:mr-2 rtl:ml-2"
                                                                                         height="24px" width="24px"
@@ -1337,7 +1344,6 @@
 
         
      
-          
             
           // Function tha fetches the data from the database so igt can be used down bellow in the alpine
             async function fetchData() {
@@ -1373,10 +1379,52 @@
             }
 
 
-          
+            //Asyncronous function for updating the status 
+            async function setStatusFetch(taskID, newStatus) {
+                try {
+                    // Grab the employee ID from the browser's cookies
+                    const employeeId = document.cookie
+                        .split('; ')
+                        .find(row => row.startsWith('employeeID='))
+                        .split('=')[1];
 
-           
-           
+                    // console.log(employeeId)
+
+                    // Send a POST request to "/employee/setStatus" with taskID and newStatus in the request body
+                    const response = await fetch("/employee/setStatus", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Include the employeeID cookie in the request headers
+                            'Cookie': `employeeID=${employeeId}`
+                        },
+                        body: JSON.stringify({
+                            taskID: taskID,
+                            newStatus: newStatus
+                        })
+                    });
+
+                    console.log("inside the fetch setStatus", response);
+
+                    // Parse the response body as JSON
+                    const data = await response.json();
+
+                    // Return the parsed JSON data
+                    return data;
+
+                } catch (error) {
+                    // Log any errors that occur during the execution of the try block
+                    console.error("Error:", error);
+                }
+            }
+
+            
+
+
+
+
+
+
 
             Alpine.data('todolist', () => ({
                 selectedTab: '',
@@ -1421,33 +1469,14 @@
                             task[i]['655a5b8c70fc2aea0f9a523a']);
                             
                     }
-
                 },
-
-                // init() {
-
-                   
-                //     // this.searchTasks();
-                //     // this.initEditor();
-
-                //     // //Add to tasks array from tasks cookie
-                //     // for (var i = 0; i < tasks.length; i++) {
-                //     //     if (tasks[i]['task_user'] == userID) {
-                //     //         this.addTask(tasks[i]['taskID'], tasks[i]['task_name'], tasks[i]['due_date'],
-                //     //             tasks[i]['task_description'], tasks[i]['task_priority'], tasks[i]['task_status'],
-                //     //             tasks[i]['task_user']);
-                //     //     }
-                //     // }
-
-
-                // },
-
               
                 initEditor() {
                     this.quillEditor = new Quill(this.$refs.editor, {
                         theme: 'snow',
                     });
                 },
+
                 //Filter in tasks array by status or priority
                 searchTasks(isResetPage = true) {
                     if (isResetPage) {
@@ -1497,25 +1526,6 @@
                 },
 
 
-                //Update array and cookie if task is completed. Notify admin.
-                taskComplete(task) {
-                    let item = this.filteredTasks.find((d) => d.id === task.id);
-                    item.status = item.status === 'Completed' ? '' : 'Completed';
-                    this.updateStatus(item, item.status)
-
-                    // let user = users.find(user => user.id == userID);
-                    // let admin = admins.find(admin => admin.id == adminID);
-
-                    //     if(admin)
-                    //     {
-                    //         notif = `${user.email} has changed the task titled "${tasks[task.id-1]['task_name']}" to status: Completed.`;
-                    //         admins[adminID-1]['notifications'].push(notif);
-                    //         setCookie("admins", admins);
-                    //     }
-
-                    this.searchTasks(false);
-                },
-
                 //Generate tasks report
                 generatePDF() {
 
@@ -1545,62 +1555,36 @@
                     });
 
                     // Save the PDF 
+
                     doc.save('task-report.pdf');
                 },
 
-                //Update array and cookie if task is set to pending or not pending. Notify admin.
-                setPending(task) {
-                    let item = this.filteredTasks.find((d) => d.id === task.id);
-                    item.status = item.status === 'Pending' ? '' : 'Pending';
-                    this.updateStatus(item, item.status)
 
-                    let user = users.find(user => user.id == userID);
-                    let admin = admins.find(admin => admin.id == adminID);
+                // Function for changing the status
+                // recieves from the html/alpine the task object and the newStatus
+                
+                updateStatus(task, newStatusString) {
+                    // Grabing the taskID
+                    const taskID = task.id
 
-                        if(admin)
-                        {
-                            notif = `${user[0].email} has changed the task titled "${tasks[task.id-1]['task_name']}" to priority: ${name}.`;
-                            admins[adminID-1]['notifications'].push(notif);
-                            setCookie("admins", admins);
-                        }
+                    // This is to change local and make the alpine rerender
+                    task.status = newStatusString
+                    // Storing the status recieved from the html/alpine
 
-                    this.searchTasks(false);
-                },
+                    const newStatus = newStatusString
+                    // console.log(taskID)
+                    // console.log(newStatus)
+                   
 
-                //Update array and cookies if task is set to In Progress. Notify admin.
-                setInProgress(task) {
-                    let item = this.filteredTasks.find((d) => d.id === task.id);
-                    item.status = item.status === 'In-Progress' ? 'Completed' : 'In-Progress';
-                    this.updateStatus(item, item.status) // el item es el task que seleccionaste y el status se le pasa
-                    let user = users.find(user => user.id == userID);
-
-                    let admin = admins.find(admin => admin.id == adminID);
-
-                        if(admin)
-                        {
-                            notif = `${user.email} has changed the task titled "${tasks[task.id-1]['task_name']}" to status: In Progress.`;
-                            admins[adminID-1]['notifications'].push(notif);
-                            setCookie("admins", admins);
-                        }
-
-                    this.searchTasks(false);
-                },
-
-                updateStatus(task, status) {
-                    let userID = JSON.parse(sessionStorage.getItem('userID')); // Buscamos el userID que esta en el session storage
-                    let taskCookie = JSON.parse(getCookie('tasks')); // Buscamos todos los cookies
-
-                    const filterByTitle = task.title // Filtramos por el titulo
-                    const filterByDueDate = task.date // Filtramos por el due date
-
-                    const updatedCookies = taskCookie.map(task => {
-                        if (task.task_name === filterByTitle && task.due_date === filterByDueDate) {
-                            task.task_status = status;
-                        }
-                        return task; // Devuelve un Array, itera por todos los cookies y busca el filtro de title y date. Si el task hace match con el titulo y la fecha, se actualiza el status.
-                    });
-
-                    setCookie("tasks", updatedCookies) // Se guarda
+                    // Calling the fetch/controller to change the data
+                    setStatusFetch(taskID, newStatus)
+                        .then(data => {
+                            // Handle the response data if needed
+                            console.log(data);
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                        });
                 },
 
                 viewTask(item) {
@@ -1633,14 +1617,16 @@
                 },
 
                 addTask(id, name, date, desc, priority, status, userID) {
-                    let maxid = 0;
-                    if (this.allTasks.length > 0)
-                        maxid = this.allTasks.reduce((max, obj) => (obj.id > max ? obj.id : max), this.allTasks[0].id);
-                    if (isNaN(maxid) || maxid === undefined)
-                        maxid = 0;
+                    console.log("Inside the addTask function")
+
+                    // let maxid = 0;
+                    // if (this.allTasks.length > 0)
+                    //     maxid = this.allTasks.reduce((max, obj) => (obj.id > max ? obj.id : max), this.allTasks[0].id);
+                    // if (isNaN(maxid) || maxid === undefined)
+                    //     maxid = 0;
 
                     let task = {
-                        id: maxid + 1,
+                        id: id,
                         title: name,
                         description: desc,
                         descriptionText: desc,
@@ -1649,6 +1635,7 @@
                         status: status,
                     };
 
+                    console.log("Task ID in the addTask:",task.id)
                     this.allTasks.splice(0, 0, task);
                     this.searchTasks();
                 },
@@ -1665,19 +1652,19 @@
                     this.searchTasks(false);
                 },
 
-                showMessage(msg = '', type = 'success') {
-                    const toast = window.Swal.mixin({
-                        toast: true,
-                        position: 'top',
-                        showConfirmButton: false,
-                        timer: 3000,
-                    });
-                    toast.fire({
-                        icon: type,
-                        title: msg,
-                        padding: '10px 20px',
-                    });
-                },
+                // showMessage(msg = '', type = 'success') {
+                //     const toast = window.Swal.mixin({
+                //         toast: true,
+                //         position: 'top',
+                //         showConfirmButton: false,
+                //         timer: 3000,
+                //     });
+                //     toast.fire({
+                //         icon: type,
+                //         title: msg,
+                //         padding: '10px 20px',
+                //     });
+                // },
             }));
         });
     </script>

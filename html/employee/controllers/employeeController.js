@@ -40,6 +40,8 @@ user.get('/new-route', (req, res) => {
   console.log(__dirname);
 })
 
+
+
 user.get('/index.html', (req, res) => {
   console.log("inside the new route function")
   res.type('html').sendFile(path.join(__dirname, '..', 'index2.html'));
@@ -193,6 +195,64 @@ user.get('/getEmployeeTasks', async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
   } finally {
       await client.close();
+  }
+});
+
+
+// Controller that changes the status in the database
+// Recieves in the req the userID, taskID and newStatus
+user.post('/setStatus', async (req, res) => {
+  const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+  try {
+    // Extracking the userID from the request headers
+    const cookies = req.headers.cookie.split(';').map(cookie => cookie.trim());
+    const employeeIdCookie = cookies.find(cookie => cookie.startsWith('employeeID='));
+
+    // Extracting the taskID of the task to change and the new status
+    const taskID = req.body.taskID;
+    const newStatus = req.body.newStatus;
+
+    if (!employeeIdCookie) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    // Here I have the parsed ID
+    const employeeID = employeeIdCookie.split('=')[1];
+
+    await client.connect();
+
+    // Grabing the database
+    const database = client.db('task_management');
+
+    //Grabing the collection to search for the user
+    const employeeCollection = database.collection('employees');
+
+    // Grabing the task collection to search for the users tasks
+    const taskCollection = database.collection('tasks');
+
+    // Converting the userID into an obejctID so I can search in the database
+    const employeeId = new ObjectId(employeeID);
+    const employee = await employeeCollection.findOne({ "_id": employeeId });
+
+    // Update the status of the specified task
+    // Also converting the ID to objectID
+    await taskCollection.updateOne(
+      { "_id": new ObjectId(taskID) },
+      { $set: { "status": newStatus } }
+    );
+
+    // Retrieve updated task information if needed
+    const updatedTaskIds = employee.tasks.map(taskId => new ObjectId(taskId));
+    const updatedEmployeeTasks = await taskCollection.find({ "_id": { $in: updatedTaskIds } }).toArray();
+
+    res.json(updatedEmployeeTasks);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  } finally {
+    await client.close();
   }
 });
 

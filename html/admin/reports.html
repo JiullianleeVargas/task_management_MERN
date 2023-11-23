@@ -855,7 +855,7 @@
                                 }
                             }
                         }
-                        this.addMessages();
+                       // this.addMessages();
                     },
 
                     //notifications array
@@ -864,27 +864,27 @@
                     ],
 
                     //add notifications from cookie onto ara
-                    addMessages() {
-                        var admins = JSON.parse(getCookie("admins"));
-                        var adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                    // addMessages() {
+                    //     var admins = JSON.parse(getCookie("admins"));
+                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
                         
-                        list = admins[adminID-1]['notifications'];
+                    //     list = admins[adminID-1]['notifications'];
 
-                        for(var i = 0; i < list.length; i++)
-                        {
-                            let maxUserId = this.messages.length
-                                    ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
-                                    : 0;
+                    //     for(var i = 0; i < list.length; i++)
+                    //     {
+                    //         let maxUserId = this.messages.length
+                    //                 ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
+                    //                 : 0;
 
-                            let message = {
-                                id: maxUserId + 1,
-                                message: list[i],
-                            }
+                    //         let message = {
+                    //             id: maxUserId + 1,
+                    //             message: list[i],
+                    //         }
 
-                            this.messages.unshift(message);
-                        }
+                    //         this.messages.unshift(message);
+                    //     }
                             
-                    },
+                    // },
 
                     removeMessage(value) {
                         this.messages = this.messages.filter((d) => d.id !== value);
@@ -905,8 +905,8 @@
                     },
                 }));
 
-                var tasks = JSON.parse(getCookie("tasks"));
-                let adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                //var tasks = JSON.parse(getCookie("tasks"));
+                //let adminID = JSON.parse(sessionStorage.getItem("adminID"));
 
                 const categoryCount = {
                     "Pending": 0,

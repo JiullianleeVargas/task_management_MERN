@@ -868,8 +868,8 @@
                 // },
                 }));
 
-                var taskCookie = JSON.parse(getCookie("tasks"));
-                let userID = JSON.parse(sessionStorage.getItem("userID"));
+                //var taskCookie = JSON.parse(getCookie("tasks"));
+                //let userID = JSON.parse(sessionStorage.getItem("userID"));
 
                 let tasks = taskCookie.filter(task => task.task_user === userID);
                 const categoryCount = {

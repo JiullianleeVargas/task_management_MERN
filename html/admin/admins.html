@@ -768,7 +768,7 @@
         const editAccount = (id) => {  
             var uid = id;
 
-            const newUrl = `editadmin2.html?id=${uid}`;
+            const newUrl = `editadmin.html?id=${uid}`;
             console.log("admin id: ", uid);
             console.log("newUrl: ", newUrl);
             window.location.href = newUrl;
@@ -806,6 +806,20 @@
             }
           }  
 
+          async function fetchAdmin(adminID) {
+            try {
+              const response = await fetch(`/admin/getAdmin/${adminID}`); 
+              if (!response.ok) {
+                throw new Error(`Error: ${response.status}`);
+              }
+              let data = await response.json();
+              await console.log("admins: ", data[0]);
+              return data[0];
+            } catch (error) {
+              console.error('Error fetching data:', error);
+              throw error;
+            }
+          }  
 
             //contacts
             Alpine.data('contacts', () => ({
@@ -835,8 +849,9 @@
                         let admins = await fetchData();
                         await console.log("init admins: ", admins);                 
 
-                        for(var i = 0; i < admins.length; i++)
-                            this.addadmin(i, admins[i]['email'], admins[i]['password'], admins[i]['status']);
+                        for(var i = 0; i < admins.length; i++){
+                            this.addadmin(admins[i]['_id'], admins[i]['email'], admins[i]['password'], admins[i]['status']);
+                        }
                     },
 
                     setCookie(name, value) {
@@ -862,7 +877,7 @@
                                 : 0;
 
                             let admin = {
-                                id: maxadminId + 1,
+                                id: id,
                                 path: 'profile-35.png',
                                 email: themail,
                                 password: password,
@@ -872,7 +887,7 @@
                             this.searchContacts();
                     },
 
-                    saveadmin() {
+                    async saveadmin() {
                         // let admins = await fetchData();
                         // await console.log("init admins: ", admins); 
 
@@ -902,15 +917,6 @@
                             //admins.push(admin1);
                             console.log("email: ", this.params.email);
                             console.log("pass: ", this.params.password);
-                            let admin = {
-                                id: maxadminId + 1,
-                                path: 'profile-35.png',
-                                email: this.params.email,
-                                password: this.params.password,
-                                status: 'active',
-                            };
-                            this.contactList.splice(0, 0, admin);
-                            this.searchContacts();
 
                             //this.setCookie("admins", JSON.stringify(admins));
 
@@ -943,6 +949,20 @@
                             .catch((error) => {
                               console.error("Error:", error);
                             });
+
+
+                            let admin_ = await fetchAdmin(id);
+                            await console.log("init admins: ", admin_); 
+
+                            let admin = {
+                                id: admin_._id,
+                                path: 'profile-35.png',
+                                email: this.params.email,
+                                password: this.params.password,
+                                status: 'active',
+                            };
+                            this.contactList.splice(0, 0, admin);
+                            this.searchContacts();
                         }
 
                         this.showMessage('admin has been saved successfully.');

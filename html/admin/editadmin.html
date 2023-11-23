@@ -455,7 +455,7 @@
                                                             </select>
                                                         </div>
                                                         <div class="mt-3 sm:col-span-2">
-                                                            <button id='saveBtnA' type="button" class="btn btn-primary">Save</button>
+                                                            <button id='saveBtnA' onclick="saveAdmin()" type="button" class="btn btn-primary">Save</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -709,7 +709,7 @@
             const queryParams = new URLSearchParams(window.location.search);
 
             let adminID = new URLSearchParams(window.location.search).get('id');
-            console.log("adminID: ", adminID);
+            //console.log("adminID: ", adminID);
 
             loadInfo(adminID);
         });
@@ -734,9 +734,9 @@
             await console.log("init admins: ", admin); 
 
             $("#uid").val(id);
-            $("#email").val(admin['email']);
-            $("#password").val(admin['password']);
-            let status = admin['status'];
+            $("#email").val(admin.email);
+            $("#password").val(admin.password);
+            let status = admin.status;
             let html = "";
 
             if (status === 'active') {
@@ -749,6 +749,42 @@
 
             $("#status").html(html);
         }
+
+      async function saveAdmin(){         
+            console.log("email:", $("#email").val());
+            
+            // Send the data to the server using Fetch API
+            fetch("/admin/updateAdmin", {
+             method: "POST",
+             headers: {
+               "Content-Type": "application/json",
+             },
+             body: JSON.stringify({
+               email: $("#email").val(),
+               password: $("#password").val(),
+               id: $("#uid").val(),
+               status: $("#status").val().toLowerCase()
+             }),
+           })
+           .then((response) => {            
+             return response.json();
+           })
+           .then((data) => {
+             // Handle the response from the server
+             if (data.redirect) {
+         // Redirect to the specified URL
+               window.location.href = data.redirect;
+             }
+             else{
+               // Display the response in a window.alert
+               window.alert(data.error || "The admin info has been updated");
+             }
+           })
+           .catch((error) => {
+             console.error("Error:", error);
+           });
+        
+        };
         
         </script>
     </body>

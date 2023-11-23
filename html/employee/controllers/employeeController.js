@@ -34,11 +34,11 @@ async function comparePassword(plaintextPassword, hash) {
 
 user.use(express.json());
 
-user.get('/new-route', (req, res) => {
-  console.log("inside the new route function")
-  res.type('html').sendFile(path.join(__dirname, '..', 'index2.html'));
-  console.log(__dirname);
-})
+// user.get('/new-route', (req, res) => {
+//   console.log("inside the new route function")
+//   res.type('html').sendFile(path.join(__dirname, '..', 'index2.html'));
+//   console.log(__dirname);
+// })
 
 
 
@@ -106,7 +106,7 @@ user.post('/login', async function(req, res) {
             console.log("employeeID stored in res.cookie")
             
 
-            res.json({ redirect: '/employee/new-route'});
+            res.json({ redirect: '/employee/index.html'});
            
            
         

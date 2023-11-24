@@ -1418,6 +1418,42 @@
                 }
             }
 
+             //Asyncronous function for getting the user informationg
+             async function getUserInfoFetch(){
+                try {
+                    // Grab the employee ID from the browser's cookies
+                    const employeeId = document.cookie
+                        .split('; ')
+                        .find(row => row.startsWith('employeeID='))
+                        .split('=')[1];
+
+                    // console.log(employeeId)
+
+                    // Sending the ID in the headers and grabbing the response
+                    const response = await fetch("/employee/getUserInformation", {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Include the employeeID cookie in the request headers
+                            'Cookie': `employeeID=${employeeId}`
+                        },
+                        
+                    });
+
+                   
+                    // Parse the response body as JSON
+                    const data = await response.json();
+                    console.log(data)
+                    // // Return the parsed JSON data
+                    return data;
+
+                } catch (error) {
+                    // Log any errors that occur during the execution of the try block
+                    console.error("Error:", error);
+                }
+            }
+
+
             
 
 
@@ -1527,32 +1563,42 @@
 
 
                 //Generate tasks report
-                generatePDF() {
+                async generatePDF() {
+                        console.log("enter generatepdf");
 
-                    let userID = JSON.parse(sessionStorage.getItem('userID'));
-                    let users = JSON.parse(getCookie('users'));
-                    let user = users.filter(user => {
-                        return user.id === userID
-                    })
+                        //Grab the user information from the fetch
+                        // Contains firstname, lastname and email
+                        const userInfo = await getUserInfoFetch()
+                        
+                        let tasks = await fetchData();
+                        let userID = getCookie("employeeID")
+                        // let users = JSON.parse(getCookie('users'));
+                        // let user = users.filter(user => {
+                        //     return user.id === userID
+                        // })
 
-                    let tasks = taskCookie.filter(task => task.task_user === userID);
-                    console.log('tasks', tasks);
-                    const doc = new jsPDF();
-                    doc.setFont('helvetica'); // Set the font (or another font)
-                    doc.setFontSize(12); // Set the font size
-                    doc.text('Task Report', 10, 10);
-                    doc.text(`User: ${user[0].email}`, 10, 20);
+                        // let tasks = taskCookie.filter(task => task.task_user === userID);
+                        // console.log('tasks', tasks);
+                        const doc = new jsPDF();
+                        doc.setFont('helvetica'); // Set the font (or another font)
+                        doc.setFontSize(12); // Set the font size
+                        doc.text('Task Report', 10, 10);
+                        doc.text(`User: ${userInfo.f_name} ${userInfo.l_name}`, 10, 20);
+                        doc.text(`Email: ${userInfo.email}`, 10, 30);
 
-                    // Format and add data to the PDF
-                    let y = 40;
-                    tasks.forEach(task => {
-                        doc.text(`Task Name: ${task.task_name}`, 10, y);
-                        doc.text(`Description: ${task.task_description.replace(/\s+/g, ' ')}`, 10, y + 10);
-                        doc.text(`Due Date: ${task.due_date}`, 10, y + 20);
-                        doc.text(`Status: ${task.task_status}`, 10, y + 30);
-                        doc.text(`Priority: ${task.task_priority}`, 10, y + 40);
-                        y += 60; // Adjust vertical position for the next entry
-                    });
+
+
+
+                        // Format and add data to the PDF
+                        let y = 40;
+                        tasks.forEach(task => {
+                            doc.text(`Task Name: ${task.title}`, 10, y);
+                            doc.text(`Description: ${task.description.replace(/\s+/g, ' ')}`, 10, y + 10);
+                            doc.text(`Due Date: ${task.due_date}`, 10, y + 20);
+                            doc.text(`Status: ${task.status}`, 10, y + 30);
+                            doc.text(`Priority: ${task.priority}`, 10, y + 40);
+                            y += 60; // Adjust vertical position for the next entry
+                        });
 
                     // Save the PDF 
 

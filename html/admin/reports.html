@@ -913,7 +913,8 @@
                     "In Progress": 0,
                     "Completed": 0
                 };
-                
+             
+  
                 // content section
                 Alpine.data('sales', () => ({
                     init() {
@@ -951,179 +952,196 @@
                         });
 
                     },
-                    generatePDF() {  
-                            let allUsers = JSON.parse(getCookie('users'));
-                            let admins = JSON.parse(getCookie("admins"));
-                            let adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                    // generatePDF() {  
+                    //         let allUsers = JSON.parse(getCookie('users'));
+                    //         let admins = JSON.parse(getCookie("admins"));
+                    //         let adminID = JSON.parse(sessionStorage.getItem("adminID"));
 
-                            //get the admin user list
-                            let adminUserList = admins[adminID-1].userlist;
-                            let users = allUsers.filter((user) => adminUserList.includes(user.id));
+                    //         //get the admin user list
+                    //         let adminUserList = admins[adminID-1].userlist;
+                    //         let users = allUsers.filter((user) => adminUserList.includes(user.id));
 
-                            console.log(users);
+                    //         console.log(users);
 
      
-                            //create new pdf document
-                            const doc = new jsPDF();
-                            doc.setFont('helvetica'); // Set the font (or another font)
-                            doc.setFontSize(12); // Set the font size
-                            doc.text('Task Report', 10, 10);
+                    //         //create new pdf document
+                    //         const doc = new jsPDF();
+                    //         doc.setFont('helvetica'); // Set the font (or another font)
+                    //         doc.setFontSize(12); // Set the font size
+                    //         doc.text('Task Report', 10, 10);
 
-                            //loop through every user in the admin user list
-                            let y = 10;
-                            let pageHeight= doc.internal.pageSize.height;
-                            users.forEach(user => {
-                                //console.log("user: ", user);
-                                //get the user's tasks
-                                 let userTasks = tasks.filter(task => task.task_user === user.id);
-                                 console.log('userTasks', userTasks);
+                    //         //loop through every user in the admin user list
+                    //         let y = 10;
+                    //         let pageHeight= doc.internal.pageSize.height;
+                    //         users.forEach(user => {
+                    //             //console.log("user: ", user);
+                    //             //get the user's tasks
+                    //              let userTasks = tasks.filter(task => task.task_user === user.id);
+                    //              console.log('userTasks', userTasks);
 
-                                 doc.text(`User: ${user.email}`, 10, y + 20);
-                                 // Format and add data to the PDF
+                    //              doc.text(`User: ${user.email}`, 10, y + 20);
+                    //              // Format and add data to the PDF
                                  
-                                 userTasks.forEach(task => {
-                                    if (y + 80 >= pageHeight)
-                                    {
-                                      doc.addPage();
-                                      y = 20; // Restart height position
-                                    }
-                                     doc.text(`Task Name: ${task.task_name}`, 20, y + 30);
-                                     doc.text(`Description: ${task.task_description.replace(/\s+/g, ' ')}`, 20, y + 40);
-                                     doc.text(`Due Date: ${task.due_date}`, 20, y + 50);
-                                     doc.text(`Status: ${task.task_status}`, 20, y + 60);
-                                     doc.text(`Priority: ${task.task_priority}`, 20, y + 70);
-                                     y += 60; // Adjust vertical position for the next entry
-                                 });
+                    //              userTasks.forEach(task => {
+                    //                 if (y + 80 >= pageHeight)
+                    //                 {
+                    //                   doc.addPage();
+                    //                   y = 20; // Restart height position
+                    //                 }
+                    //                  doc.text(`Task Name: ${task.task_name}`, 20, y + 30);
+                    //                  doc.text(`Description: ${task.task_description.replace(/\s+/g, ' ')}`, 20, y + 40);
+                    //                  doc.text(`Due Date: ${task.due_date}`, 20, y + 50);
+                    //                  doc.text(`Status: ${task.task_status}`, 20, y + 60);
+                    //                  doc.text(`Priority: ${task.task_priority}`, 20, y + 70);
+                    //                  y += 60; // Adjust vertical position for the next entry
+                    //              });
                                 
-                                 y += 20;
-                            })
-                            doc.save('task-report.pdf');
-                        },
+                    //              y += 20;
+                    //         })
+                    //         doc.save('task-report.pdf');
+                    //     },
 
                     
                     // sales by category
-                    get salesByCategoryOptions() {
-                        let allUsers = JSON.parse(getCookie('users'));
-                        let admins = JSON.parse(getCookie("admins"));
-                        let adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                    // get salesByCategoryOptions() {
+                    //     let allUsers = JSON.parse(getCookie('users'));
+                    //     let admins = JSON.parse(getCookie("admins"));
+                    //     let adminID = JSON.parse(sessionStorage.getItem("adminID"));
 
-                        //get the admin user list
-                        let adminUserList = admins[adminID-1].userlist;
-                        let users = allUsers.filter(user => adminUserList.includes(user.id));
+                    //     //get the admin user list
+                    //     let adminUserList = admins[adminID-1].userlist;
+                    //     let users = allUsers.filter(user => adminUserList.includes(user.id));
 
 
-                        users.forEach(user => {
-                            let userTasks = tasks.filter(task => task.task_user === user.id)
-                            userTasks.forEach(task => {
-                                const category = task.task_status;
-                                if (categoryCount[category]) {
-                                    categoryCount[category]++;
-                                } else {
-                                    categoryCount[category] = 1;
-                                }
-                            });
-                        })
+                    //     users.forEach(user => {
+                    //         let userTasks = tasks.filter(task => task.task_user === user.id)
+                    //         userTasks.forEach(task => {
+                    //             const category = task.task_status;
+                    //             if (categoryCount[category]) {
+                    //                 categoryCount[category]++;
+                    //             } else {
+                    //                 categoryCount[category] = 1;
+                    //             }
+                    //         });
+                    //     })
 
-                        for(cat in categoryCount){
-                            if (cat === "undefined" || cat === "null"){
-                                cat = 0;
-                            }
-                            console.log("category count: ", cat);
-                        }
-                        return {
-                            series: [categoryCount["Pending"], categoryCount["In Progress"], categoryCount["Completed"]],
-                            chart: {
-                                type: 'donut',
-                                height: 460,
-                                fontFamily: 'Nunito, sans-serif',
-                            },
-                            dataLabels: {
-                                enabled: false,
-                            },
-                            stroke: {
-                                show: true,
-                                width: 25,
-                                colors: isDark ? '#0e1726' : '#fff',
-                            },
-                            colors: isDark ? ['#5c1ac3', '#e2a03f', '#e7515a', '#e2a03f'] : ['#e2a03f', '#5c1ac3', '#e7515a'],
-                            legend: {
-                                position: 'bottom',
-                                horizontalAlign: 'center',
-                                fontSize: '14px',
-                                markers: {
-                                    width: 10,
-                                    height: 10,
-                                    offsetX: -2,
-                                },
-                                height: 50,
-                                offsetY: 20,
-                            },
-                            plotOptions: {
-                                pie: {
-                                    donut: {
-                                        size: '65%',
-                                        background: 'transparent',
-                                        labels: {
-                                            show: true,
-                                            name: {
-                                                show: true,
-                                                fontSize: '29px',
-                                                offsetY: -10,
-                                            },
-                                            value: {
-                                                show: true,
-                                                fontSize: '26px',
-                                                color: isDark ? '#bfc9d4' : undefined,
-                                                offsetY: 16,
-                                                formatter: (val) => {
-                                                    return val;
-                                                },
-                                            },
-                                            total: {
-                                                show: true,
-                                                label: 'Total',
-                                                color: '#888ea8',
-                                                fontSize: '29px',
-                                                formatter: (w) => {
-                                                    return w.globals.seriesTotals.reduce(function (a, b) {
-                                                        return a + b;
-                                                    }, 0);
-                                                },
-                                            },
-                                        },
-                                    },
-                                },
-                            },
-                            //
-                            labels: ['Pending', 'In Progress', 'Completed'],
-                            states: {
-                                hover: {
-                                    filter: {
-                                        type: 'none',
-                                        value: 0.15,
-                                    },
-                                },
-                                active: {
-                                    filter: {
-                                        type: 'none',
-                                        value: 0.15,
-                                    },
-                                },
-                            },
-                        };
-                    },
+                    //     for(cat in categoryCount){
+                    //         if (cat === "undefined" || cat === "null"){
+                    //             cat = 0;
+                    //         }
+                    //         console.log("category count: ", cat);
+                    //     }
+                    //     return {
+                    //         series: [categoryCount["Pending"], categoryCount["In Progress"], categoryCount["Completed"]],
+                    //         chart: {
+                    //             type: 'donut',
+                    //             height: 460,
+                    //             fontFamily: 'Nunito, sans-serif',
+                    //         },
+                    //         dataLabels: {
+                    //             enabled: false,
+                    //         },
+                    //         stroke: {
+                    //             show: true,
+                    //             width: 25,
+                    //             colors: isDark ? '#0e1726' : '#fff',
+                    //         },
+                    //         colors: isDark ? ['#5c1ac3', '#e2a03f', '#e7515a', '#e2a03f'] : ['#e2a03f', '#5c1ac3', '#e7515a'],
+                    //         legend: {
+                    //             position: 'bottom',
+                    //             horizontalAlign: 'center',
+                    //             fontSize: '14px',
+                    //             markers: {
+                    //                 width: 10,
+                    //                 height: 10,
+                    //                 offsetX: -2,
+                    //             },
+                    //             height: 50,
+                    //             offsetY: 20,
+                    //         },
+                    //         plotOptions: {
+                    //             pie: {
+                    //                 donut: {
+                    //                     size: '65%',
+                    //                     background: 'transparent',
+                    //                     labels: {
+                    //                         show: true,
+                    //                         name: {
+                    //                             show: true,
+                    //                             fontSize: '29px',
+                    //                             offsetY: -10,
+                    //                         },
+                    //                         value: {
+                    //                             show: true,
+                    //                             fontSize: '26px',
+                    //                             color: isDark ? '#bfc9d4' : undefined,
+                    //                             offsetY: 16,
+                    //                             formatter: (val) => {
+                    //                                 return val;
+                    //                             },
+                    //                         },
+                    //                         total: {
+                    //                             show: true,
+                    //                             label: 'Total',
+                    //                             color: '#888ea8',
+                    //                             fontSize: '29px',
+                    //                             formatter: (w) => {
+                    //                                 return w.globals.seriesTotals.reduce(function (a, b) {
+                    //                                     return a + b;
+                    //                                 }, 0);
+                    //                             },
+                    //                         },
+                    //                     },
+                    //                 },
+                    //             },
+                    //         },
+                    //         //
+                    //         labels: ['Pending', 'In Progress', 'Completed'],
+                    //         states: {
+                    //             hover: {
+                    //                 filter: {
+                    //                     type: 'none',
+                    //                     value: 0.15,
+                    //                 },
+                    //             },
+                    //             active: {
+                    //                 filter: {
+                    //                     type: 'none',
+                    //                     value: 0.15,
+                    //                 },
+                    //             },
+                    //         },
+                    //     };
+                    // },
 
                     
                 }));
             });
+            async function fetchTeam(adminID) {
+                try {
+                  const response = await fetch(`/admin/getTeam/${adminID}`); 
+                  if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
+                  }
+                  let data = await response.json();
+                  await console.log("team: ", data);
+                  return data[0];
+                } catch (error) {
+                  console.error('Error fetching data:', error);
+                  throw error;
+                }
+             }  
 
-            $("document").ready(() => {
+            $("document").ready(async() => {
         const queryParams = new URLSearchParams(window.location.search);
 
-        // Get the value of 'paramName'
-        const paramName = 'id';
-        const user_id = queryParams.get(paramName);
-        sessionStorage.setItem("uid",JSON.stringify(user_id));
+
+        var admin = getCookie("admin");
+        console.log("admin id: ", admin);
+        
+
+        let team = await fetchTeam(admin);
+        await console.log("team: ", team); 
 
     });
 

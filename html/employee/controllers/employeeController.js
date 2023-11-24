@@ -88,6 +88,10 @@ user.post('/login', async function(req, res) {
       console.log("DB connect login");
 
       const employee = await usersCollection.findOne({ email });
+      if (!employee) {
+        res.status(404).json({ error: 'Employee not found' });
+        return;
+      }
    
 
       // Extracting the employeeID 
@@ -184,12 +188,70 @@ user.get('/getEmployeeTasks', async (req, res) => {
       // console.log(employeeId)
 
       const employee = await employeeCollection.findOne({ "_id": employeeId });
+      if (!employee) {
+        res.status(404).json({ error: 'Employee not found' });
+        return;
+      }
 
       // Retrieve detailed task information for each task ID
       const taskIds = employee.tasks.map(taskId => new ObjectId(taskId));
       const employeeTasks = await taskCollection.find({ "_id": { $in: taskIds } }).toArray();
 
       res.json(employeeTasks);
+  } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+  } finally {
+      await client.close();
+  }
+});
+
+user.get('/getUserInformation', async (req, res) => {
+ 
+  
+  const client = new MongoClient('mongodb://0.0.0.0:27017');
+  
+
+  try {
+
+    // Grab the cookies sent in the response header from the index/fetch
+      const cookies = req.headers.cookie.split(';').map(cookie => cookie.trim());
+      const employeeIdCookie = cookies.find(cookie => cookie.startsWith('employeeID='));
+      
+      //If cookie dont exist
+      if (!employeeIdCookie) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+      }
+
+      // Spliting the id from "employeeID="
+      const employeeID = employeeIdCookie.split('=')[1];
+    
+      await client.connect();
+
+      const database = client.db('task_management');
+      const employeeCollection = database.collection('employees');
+
+
+      // Convert the employeeID into an object ID so the database can use it
+      // const employeeId = new ObjectId("655a5b8c70fc2aea0f9a523a");
+      const employeeId = new ObjectId(employeeID);
+      // console.log(employeeId)
+
+      const employee = await employeeCollection.findOne({ "_id": employeeId });
+      if (!employee) {
+        res.status(404).json({ error: 'Employee not found' });
+        return;
+      }
+
+      // Extracting the firstname, lastname and email from the extracted employee
+      const {f_name, l_name, email} = employee
+      
+
+    // Return the information in the response
+      res.json({ f_name, l_name, email });
+    
+  
   } catch (error) {
       console.error("Error:", error);
       res.status(500).json({ error: "Internal Server Error" });

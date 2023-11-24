@@ -899,6 +899,40 @@
                         console.error("Error:", error);
                     }
                 }
+            
+                async function getUserInfoFetch(){
+                try {
+                    // Grab the employee ID from the browser's cookies
+                    const employeeId = document.cookie
+                        .split('; ')
+                        .find(row => row.startsWith('employeeID='))
+                        .split('=')[1];
+
+                    // console.log(employeeId)
+
+                    // Sending the ID in the headers and grabbing the response
+                    const response = await fetch("/employee/getUserInformation", {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Include the employeeID cookie in the request headers
+                            'Cookie': `employeeID=${employeeId}`
+                        },
+                        
+                    });
+
+                   
+                    // Parse the response body as JSON
+                    const data = await response.json();
+                    console.log(data)
+                    // // Return the parsed JSON data
+                    return data;
+
+                } catch (error) {
+                    // Log any errors that occur during the execution of the try block
+                    console.error("Error:", error);
+                }
+            }
 
                 // Grab user cookies
                 let employeeID = JSON.parse(getCookie('employeeeID'));
@@ -908,8 +942,6 @@
                     "Completed": 0
                 };
 
-             
-                 
 
                 for(cat in categoryCount){
                     console.log("cat");
@@ -982,6 +1014,11 @@
                     },
                     async generatePDF() {
                         console.log("enter generatepdf");
+
+                        //Grab the user information from the fetch
+                        // Contains firstname, lastname and email
+                        const userInfo = await getUserInfoFetch()
+                        
                         let tasks = await fetchData();
                         let userID = getCookie("employeeID")
                         // let users = JSON.parse(getCookie('users'));
@@ -995,7 +1032,8 @@
                         doc.setFont('helvetica'); // Set the font (or another font)
                         doc.setFontSize(12); // Set the font size
                         doc.text('Task Report', 10, 10);
-                        // doc.text(`User: ${user[0].email}`, 10, 20);
+                        doc.text(`User: ${userInfo.f_name} ${userInfo.l_name}`, 10, 20);
+                        doc.text(`Email: ${userInfo.email}`, 10, 30);
 
 
 
@@ -1012,7 +1050,7 @@
                         });
 
                         // Save the PDF 
-                        doc.save('task-report.pdf');
+                        doc.save(`task-report.pdf`);
                         },
 
                     // Diagram maker

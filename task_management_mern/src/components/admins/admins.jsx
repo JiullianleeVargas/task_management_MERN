@@ -1,22 +1,33 @@
 import React, { useState, useEffect } from 'react';
+import axios from "axios";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
-import { AdminService } from '../../service/AdminService';
 
 const Admins = () => {
-
+    const baseUrl = 'http://localhost:3500/admin/';
     const [admins, setAdmins] = useState([]);
 
     useEffect(() => {
-        AdminService.getAdminsMini().then((data) => setAdmins(data));
+        // AdminService.getAllAdmins().then((data) => {
+        //     console.log('data from axios', data);
+        //     setAdmins(data)
+        // });
+        axios.get(baseUrl + '/getAdmins')
+            .then(response => {
+                console.log(response.data.admins);
+                setAdmins(response.data.admins)
+            });
     }, []);
 
     const emailBodyTemplate = (admin) => {
-        return <img src={`/images/favicon.png`} alt={admin.image}
-            style={{ width: 24, height: 24 }}
-            className="w-6rem shadow-2 border-round" />;
+        return <div>
+            <img src={`/images/favicon.png`} alt={admin.image}
+                style={{ width: 24, height: 24 }}
+                className="w-6rem shadow-2 border-round" />
+            <label>{admin.email}</label>
+        </div>;
     };
 
     const statusBodyTemplate = (admin) => {
@@ -25,10 +36,10 @@ const Admins = () => {
 
     const getSeverity = (admin) => {
         switch (admin.status) {
-            case 'Inactive':
+            case 'inactive':
                 return 'warning';
 
-            case 'Active':
+            case 'active':
                 return 'success';
 
             default:

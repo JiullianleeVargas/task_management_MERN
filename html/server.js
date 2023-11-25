@@ -5,6 +5,7 @@
 const express = require("express");
 const bodyParser = require('body-parser');
 const app = express();
+const cors = require('cors')
 const path = require('path'); 
 const adminController = require("./admin/controllers/adminController");
 
@@ -13,6 +14,7 @@ const adminController = require("./admin/controllers/adminController");
 const employeeController = require("./employee/controllers/employeeController");
 
 //Connect app to admin controller
+app.use(cors());
 app.use(express.json());
 app.use("/admin", adminController);
 app.use(express.static(path.join(__dirname, 'admin')));
@@ -37,7 +39,7 @@ app.get('/employee/', (req, res) => {
 
 
 //Port that app is listening to 
-app.listen(3000, () => {
+app.listen(3500, () => {
   console.log("Project is running!");
 })
 

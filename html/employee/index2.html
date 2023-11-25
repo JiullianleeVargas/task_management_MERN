@@ -1009,7 +1009,8 @@
                                                                                     </svg>
 
                                                                                     <span
-                                                                                        x-text="task.status === 'Pending' ? 'Not Pending' : 'Pending'"></span>
+                                                                                        x-text="task.status === 'Pending' ? 'Not Pending' : 'Pending'"
+                                                                                        ></span>
                                                                                 </a>
                                                                             </li>
                                                                             <li>
@@ -1378,6 +1379,39 @@
                 }
             }
 
+            // Function to get the team Tasks for the emmployee
+            async function fetchDataTeam() {
+                try {
+
+                    // Grabing the ID cookie from browser
+                    const employeeId = document.cookie          
+                        .split('; ')
+                        .find(row => row.startsWith('employeeID='))
+                        .split('=')[1];
+                    
+                    console.log(employeeId)
+
+                    // Sending the cookie in the header for the teq in /getEmployeeTasks
+                    const response = await fetch("/employee/getTeamTasks",
+                     {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Include the cookie in the headers
+                            'Cookie': `employeeID=${employeeId}`
+                          
+                        },
+                    });
+
+                    console.log("inside the fetch in the index", response);
+                    const data = await response.json();
+                    return data;
+
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            }
+
 
             //Asyncronous function for updating the status 
             async function setStatusFetch(taskID, newStatus) {
@@ -1453,7 +1487,7 @@
                 }
             }
 
-
+          
             
 
 
@@ -1494,10 +1528,19 @@
                 async init(){
                     // this.searchTasks();
                     // this.initEditor();
-                    console.log("inside the init")
-                    let task = await fetchData();
-                    console.log(task)
+               
 
+                    // Getting personal tasks
+                    let employeeTasks= await fetchData();
+                    console.log(employeeTasks)
+
+                    
+                    // Getting the team tasks
+                    const teamTasks = await fetchDataTeam();
+                    console.log("Team", teamTasks)
+
+                    //Joining the arrays
+                    const task = employeeTasks.concat(teamTasks)
                     //Add to task array from task cookie
                     for (var i = 0; i < task.length; i++) {
                         this.addTask(task[i]['_id'], task[i]['title'], task[i]['due_date'],

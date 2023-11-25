@@ -125,36 +125,6 @@ user.post('/login', async function(req, res) {
 
 })
 
-
-// user.get('/getEmployeeTasks', async (req, res) => {
-//   const client = new MongoClient('mongodb://0.0.0.0:27017');
-
-//     //Connect to DB named 'task_management' and collection named 'employees'
-//     await client.connect();
-//     const database = client.db('task_management');
-//     const employeeCollection = database.collection('employees');
-//     const taskCollection = database.collection('tasks');
-//     console.log("DB connect");
-   
-//     // Grab the specific employee who is logged in to boot up their tasks
-//     const employeeId = new ObjectId("655a5b8c70fc2aea0f9a523a")
-//     const employee = await employeeCollection.findOne({"_id": employeeId});
-//     // console.log("employee:" , employee)
-//     const employeeTasks = employee.tasks
-
-
-//     // const tasks =  await cursor.toArray()
-//     // console.log(employeeTasks)
-//     res.json(employeeTasks);
-//     // await cursor.forEach(admin => {
-//     //   console.log(admin.email);
-//     //   console.log(admin.password);
-//     //   console.log(admin.adminID);
-//     //   // ... and so on
-//     // });
-
-// })
-
 user.get('/getEmployeeTasks', async (req, res) => {
  
   
@@ -198,6 +168,68 @@ user.get('/getEmployeeTasks', async (req, res) => {
       const employeeTasks = await taskCollection.find({ "_id": { $in: taskIds } }).toArray();
 
       res.json(employeeTasks);
+  } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+  } finally {
+      await client.close();
+  }
+});
+
+// Controller/route to fetch tasks from a team of which the employee belongs to
+user.get('/getTeamTasks', async (req, res) => {
+ 
+  
+  const client = new MongoClient('mongodb://0.0.0.0:27017');
+  
+
+  try {
+
+    // Grab the cookies sent in the response header from the index/fetch
+      const cookies = req.headers.cookie.split(';').map(cookie => cookie.trim());
+      const employeeIdCookie = cookies.find(cookie => cookie.startsWith('employeeID='));
+      
+      //If cookie dont exist
+      if (!employeeIdCookie) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+      }
+
+      // Spliting the id from "employeeID="
+      const employeeID = employeeIdCookie.split('=')[1];
+    
+      await client.connect();
+
+      const database = client.db('task_management');
+      const employeeCollection = database.collection('employees');
+      const taskCollection = database.collection('tasks');
+      const teamCollection = database.collection('teams');
+
+      // Convert the employeeID into an object ID so the database can use it
+      // const employeeId = new ObjectId("655a5b8c70fc2aea0f9a523a");
+      const employeeId = new ObjectId(employeeID);
+      // console.log(employeeId)
+
+      const employee = await employeeCollection.findOne({ "_id": employeeId });
+      if (!employee) {
+        res.status(404).json({ error: 'Employee not found' });
+        return;
+      }
+
+      // Queries the team collection and searches the employees array for that specific emplooyee and turns it into array.
+      const teamWithEmployee = await teamCollection.find({employees: employee._id}).toArray()
+      // Stores the task ID's and uses flat map cause teams have arrays of tasks, and it grabs the entire arrays of tasks
+      // Since we dont want the arrays of arrays, we flaten it
+      const taskIDs = teamWithEmployee.flatMap(doc => doc.tasks)
+      
+      //Then we use that array to get the tasks from the task collection
+      const teamEmployeeTasks = await taskCollection.find({ "_id": { $in: taskIDs } }).toArray();
+
+      //Return the employees team tasks
+      res.json(teamEmployeeTasks);
+
+
+      
   } catch (error) {
       console.error("Error:", error);
       res.status(500).json({ error: "Internal Server Error" });

@@ -8,6 +8,7 @@ import { StyleClass } from 'primereact/styleclass';
 import { Badge } from 'primereact/badge';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
+import { Outlet, Link } from "react-router-dom";
 
 
 
@@ -18,43 +19,7 @@ function Sidebar_() {
     const btnRef4 = useRef(null);
     const btnRef5 = useRef(null);
 
-    const menuItem = [
-        {
-            path: "/",
-            label: "Admins",
-            icon: <svg
-                className="shrink-0 group-hover:!text-primary"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <circle opacity="0.5" cx="15" cy="6" r="3" fill="currentColor" />
-                <ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3" fill="currentColor" />
-                <circle cx="9.00098" cy="6" r="4" fill="currentColor" />
-                <ellipse cx="9.00098" cy="17.001" rx="7" ry="4" fill="currentColor" />
-            </svg>
-        },
-        {
-            path: "/reports",
-            label: "Reports",
-            icon: <svg
-                class="shrink-0 group-hover:!text-primary"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-            >
-                <circle opacity="0.5" cx="15" cy="6" r="3" fill="currentColor" />
-                <ellipse opacity="0.5" cx="16" cy="17" rx="5" ry="3" fill="currentColor" />
-                <circle cx="9.00098" cy="6" r="4" fill="currentColor" />
-                <ellipse cx="9.00098" cy="17.001" rx="7" ry="4" fill="currentColor" />
-            </svg>
-        }
-    ]
-    //const [visible, setVisible] = useState(true);
+
     return (
         <div className="min-h-screen flex relative lg:static surface-ground">
             <div id="app-sidebar-1" className="bg-bluegray-800 h-screen hidden lg:block flex-shrink-0 absolute lg:static left-0 top-0 z-1 select-none" style={{ width: '280px' }}>
@@ -67,38 +32,46 @@ function Sidebar_() {
                     <div className="overflow-y-auto mt-3">
                         <ul className="list-none p-3 m-0">
                             <li>
-                                <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-900 border-round text-bluegray-100 hover:text-bluegray-50
+                                <Link to="/tasks" style={{ textDecoration: 'none' }}>
+                                    <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-900 border-round text-bluegray-100 hover:text-bluegray-50
                     transition-duration-150 transition-colors w-full">
-                                    <i className="pi pi-bookmark mr-2"></i>
-                                    <span className="font-medium">Task</span>
-                                    <Ripple />
-                                </a>
+                                        <i className="pi pi-bookmark mr-2"></i>
+                                        <span className="font-medium">Task</span>
+                                        <Ripple />
+                                    </a>
+                                </Link>
                             </li>
                             <li>
-                                <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-900 border-round text-bluegray-100 hover:text-bluegray-50
+                                <Link to="/reports" style={{ textDecoration: 'none' }}>
+                                    <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-900 border-round text-bluegray-100 hover:text-bluegray-50
                     transition-duration-150 transition-colors w-full">
-                                    <i className="pi pi-chart-line mr-2"></i>
-                                    <span className="font-medium">Reports</span>
-                                    <Ripple />
-                                </a>
-                            </li>
-
-                            <li>
-                                <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-900 border-round text-bluegray-100 hover:text-bluegray-50
-                    transition-duration-150 transition-colors w-full">
-                                    <i className="pi pi-users mr-2"></i>
-                                    <span className="font-medium">Employees</span>
-                                    <Ripple />
-                                </a>
+                                        <i className="pi pi-chart-line mr-2"></i>
+                                        <span className="font-medium">Reports</span>
+                                        <Ripple />
+                                    </a>
+                                </Link>
                             </li>
 
                             <li>
-                                <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-900 border-round text-bluegray-100 hover:text-bluegray-50
+                                <Link to="/employees" style={{ textDecoration: 'none' }}>
+                                    <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-900 border-round text-bluegray-100 hover:text-bluegray-50
                     transition-duration-150 transition-colors w-full">
-                                    <i className="pi pi-users mr-2"></i>
-                                    <span className="font-medium">Admins</span>
-                                    <Ripple />
-                                </a>
+                                        <i className="pi pi-users mr-2"></i>
+                                        <span className="font-medium">Employees</span>
+                                        <Ripple />
+                                    </a>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/admins" style={{ textDecoration: 'none' }}>
+                                    <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-900 border-round text-bluegray-100 hover:text-bluegray-50
+                    transition-duration-150 transition-colors w-full">
+                                        <i className="pi pi-users mr-2"></i>
+                                        <span className="font-medium">Admins</span>
+                                        <Ripple />
+                                    </a>
+                                </Link>
                             </li>
 
 
@@ -231,7 +204,7 @@ function Sidebar_() {
 
                 <div className="p-5 flex flex-column flex-auto">
                     <div className="border-2 border-dashed surface-border border-round surface-section flex-auto">
-                        Prueba de contenido
+                        <Outlet />
                     </div>
                 </div>
 

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
 
 const Admins = () => {
@@ -23,10 +22,9 @@ const Admins = () => {
 
     const emailBodyTemplate = (admin) => {
         return <div>
-            <img src={`/images/favicon.png`} alt={admin.image}
-                style={{ width: 24, height: 24 }}
-                className="w-6rem shadow-2 border-round" />
-            <label>{admin.email}</label>
+            <img src={`/images/avatar.png`} alt={admin.image}
+                style={{ width: "24px", height: "24px" }} />
+            <label style={{ marginLeft: "10px" }}>{admin.email}</label>
         </div>;
     };
 
@@ -52,8 +50,8 @@ const Admins = () => {
             <span className="text-xl text-900 font-bold">Administrators</span>
         </div>
     );
-    const footer = `In total there are ${Admins ? Admins.length : 0} Administrators.`;
-
+    const footer = `In total there are ${admins ? admins.length : 0} Administrators.`;
+    console.log("admin length: ", admins);
     return (
         <div className="card">
             <DataTable value={admins} header={header} footer={footer}

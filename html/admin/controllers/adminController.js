@@ -92,29 +92,12 @@ user.post('/login', async function(req, res) {
           if(result)
           {
             console.log("Succesful log in!");
-            //classes.setCookie("admin", admin._id);
-            //console.log(admin._id.toString());
-            //res.cookie("admin", admin._id.toString(), { path: '/' });
-            //res.json({ redirect: '/admin/new-route', cookie: admin._id.toString()});
-            res.cookie('admin', admin._id.toString(), { path: '/' }).json({ redirect: '/admin/new-route' });
+            res.cookie('admin', admin._id.toString()).json({ auth : true });
           }
       }
-
-      // let admins = data.admins;
-      // let adminExists = Object.values(admins).some(admin => admin.email === email && admin.password === password);
-
-      // if (adminExists) {
-      //   console.log("Succesful log in!");
-      //     console.log('building path');
-
-      //     // Set the content type explicitly to text/html
-      //     console.log('heading to html');
-      //     res.json({ redirect: '/admin/new-route' });
-      //     console.log('after html');
-
-      // } 
       else {
         console.log("Username or password is incorrect");
+        res.json({ auth : false })
       }
 
     }

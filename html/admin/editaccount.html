@@ -268,14 +268,14 @@
                                             <path d="M12 6V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                                         </svg>
                                         <!--Notification alert probing icon-->
-                                        <!-- <template x-if="messages.length">
+                                        <template x-if="messages.length">
                                             <span class="absolute top-0 flex h-3 w-3 ltr:right-0 rtl:left-0">
                                                 <span
                                                     class="absolute -top-[3px] inline-flex h-full w-full animate-ping rounded-full bg-success/50 opacity-75 ltr:-left-[3px] rtl:-right-[3px]"
                                                 ></span>
                                                 <span class="relative inline-flex h-[6px] w-[6px] rounded-full bg-success"></span>
                                             </span> 
-                                        </template> -->
+                                        </template>
                                     </a>
                                     <ul
                                         x-cloak
@@ -287,12 +287,12 @@
                                         <li>
                                             <div class="flex items-center justify-between px-4 py-2 font-semibold hover:!bg-transparent">
                                                 <h4 class="text-lg">Notifications</h4>
-                                                <!-- <template x-if="messages.length">
+                                                <template x-if="messages.length">
                                                     <span class="badge bg-primary/80" x-text="messages.length + ''"></span>
-                                                </template> -->
+                                                </template>
                                             </div>
                                         </li>
-                                        <!-- <template x-for="notification in messages">
+                                        <template x-for="notification in messages">
                                             <li class="dark:text-white-light/90">
                                                 <div class="group flex items-center px-4 py-2" @click.self="toggle">
                                                    
@@ -304,7 +304,7 @@
                                                         <button
                                                             type="button"
                                                             class="text-neutral-300 opacity-0 hover:text-danger group-hover:opacity-100 ltr:ml-auto rtl:mr-auto"
-                                                            @click="removeMessage(notification.id)"
+                                                            @click="removeMessage(notification)"
                                                         >
                                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                 <circle opacity="0.5" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
@@ -319,8 +319,8 @@
                                                     </div>
                                                 </div>
                                             </li>
-                                        </template> -->
-                                        <!-- <template x-if="!messages.length">
+                                        </template>
+                                        <template x-if="!messages.length">
                                             <li>
                                                 <div class="!grid min-h-[200px] place-content-center text-lg hover:!bg-transparent">
                                                     <div class="mx-auto mb-4 rounded-full text-primary ring-4 ring-primary/30">
@@ -343,7 +343,7 @@
                                                     No data available.
                                                 </div>
                                             </li>
-                                        </template> -->
+                                        </template>
                                     </ul>
                                 </div>
                                 
@@ -367,7 +367,7 @@
                                         class="top-11 w-[230px] !py-0 font-semibold text-dark ltr:right-0 rtl:left-0 dark:text-white-dark dark:text-white-light/90"
                                     >
                                         <li class="border-t border-white-light dark:border-white-light/10">
-                                            <a href="login.html" class="!py-3 text-danger" @click="toggle">
+                                            <a href="/admin/" class="!py-3 text-danger" @click="toggle">
                                                 <svg
                                                     class="h-4.5 w-4.5 rotate-90 ltr:mr-2 rtl:ml-2"
                                                     width="18"
@@ -489,13 +489,13 @@
                                         </div>
                                     </template>
                                     <template x-if="tab === 'preferences'">
-                                        <div x-data="todolist">
+                                        <div x-data="todolist" >
                                             <div class="relative flex h-full gap-5 sm:h-[calc(100vh_-_150px)]">
                                                 <div
                                                     class="panel absolute z-10 hidden h-full w-[240px] max-w-full flex-none space-y-4 p-4 ltr:rounded-r-none rtl:rounded-l-none xl:relative xl:block xl:h-auto ltr:xl:rounded-r-md rtl:xl:rounded-l-md"
-                                                    :class="{'!block':isShowTaskMenu}"
+                                                    :class="{'!block':isShowTaskMenu}" 
                                                 >
-                                                    <div class="flex h-full flex-col pb-16">
+                                                    <div class="flex h-full flex-col pb-16 ">
                                                         <div class="pb-5">
                                                             <div class="flex items-center text-center">
                                                                 <div class="shrink-0">
@@ -521,7 +521,7 @@
                                                         </div>
                                                         <div class="mb-5 h-px w-full border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div>
                                                         <div class="perfect-scrollbar relative -mr-3.5 h-full grow pr-3.5">
-                                                            <div class="space-y-1">
+                                                            <div class="space-y-1" x-overflow-auto>
                                                                 <button
                                                                     type="button"
                                                                     class="flex h-10 w-full items-center justify-between rounded-md p-2 font-medium hover:bg-white-dark/10 hover:text-primary dark:hover:bg-[#181F32] dark:hover:text-primary"
@@ -752,6 +752,19 @@
                                                                     </svg>
                                                                     <div class="ltr:ml-3 rtl:mr-3">High</div>
                                                                 </button>
+
+                                                                <div class="h-px w-full border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div>
+                                                                <div class="px-1 py-3 text-white-dark">Tags</div>
+                                                                    <!-- Iterate through distinct non-empty tags and create buttons -->
+                                                                    <template x-for="tag in uniqueTags" :key="tag">
+                                                                        <button
+                                                                            type="button"
+                                                                            class="btn btn-outline-secondary"
+                                                                            @click="searchTasksByTag(tag)"
+                                                                        >
+                                                                        <span x-text="tag"></span>
+                                                                        </button>
+                                                                    </template>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1150,11 +1163,13 @@
                                                                     <div class="mb-5 flex justify-between gap-4">
                                                                         <div class="flex-1">
                                                                             <label for="tag1">Tag 1</label>
-                                                                            <input id="tag1" type="text" placeholder="" class="form-input" x-model="params.tag1" />
+                                                                            <input id="tag1" type="text" placeholder="" class="form-input" x-model="params.tag1" 
+                                                                            x-bind:readonly="params.tag1 === 'team'"/>
                                                                         </div>
                                                                         <div class="flex-1">
                                                                             <label for="tag 2">Tag 2</label>
-                                                                            <input id="tag2" type="text" placeholder="" class="form-input" x-model="params.tag2" />
+                                                                            <input id="tag2" type="text" placeholder="" class="form-input" x-model="params.tag2" 
+                                                                            x-bind:readonly="params.tag2 === 'team'"/>
                                                                         </div>
                                                                     </div>
                                                                     <div class="mb-5">
@@ -1216,8 +1231,13 @@
                                                             </button>
                                                             <div
                                                                 class="flex flex-wrap items-center gap-2 bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]"
-                                                            >
+                                                                >
                                                                 <div x-text="selectedTask.title"></div>
+                                                            </div>
+                                                            <div
+                                                                class="flex flex-wrap items-center gap-2 bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]"
+                                                            >
+                                                            Priority: 
                                                                 <div
                                                                     x-show="selectedTask.priority"
                                                                     x-text="selectedTask.priority"
@@ -1228,14 +1248,46 @@
                                                                 'badge-outline-danger ': selectedTask.priority === 'high',
                                                             }"
                                                                 ></div>
-                    
+                                                            </div>
+                                                            <div
+                                                                class="flex flex-wrap items-center gap-2 bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]"
+                                                            >
+                                                            Status: 
+                                                                <div
+                                                                    x-show="selectedTask.status"
+                                                                    x-text="selectedTask.status"
+                                                                    class="badge rounded-3xl capitalize badge-outline-primary"
+                                                                ></div>
+                                                            </div>
+                                                            <div
+                                                                class="flex flex-wrap items-center gap-2 bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]"
+                                                            >
+                                                                Tags: 
+                                                                <div
+                                                                x-show="selectedTask.tag1"
+                                                                x-text="selectedTask.tag1"
+                                                                class="badge rounded-3xl capitalize badge-outline-success"
+                                                            ></div>
+                                                            <div
+                                                            x-show="selectedTask.tag2"
+                                                            x-text="selectedTask.tag2"
+                                                            class="badge rounded-3xl capitalize badge-outline-success"
+                                                        ></div>
                                                                 
+                                                            </div>
+                                                            <div
+                                                                class="flex flex-wrap items-center gap-2 bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]"
+                                                            >
+                                                                Due Date: 
+                                                                <div x-text="selectedTask.date"></div>
                                                             </div>
                                                             <div class="p-5">
                                                                 <div class="prose text-base" x-html="selectedTask.description"></div>
-
+                                                                <br>
+                                                                File: 
                                                                 <button @click="openFile(selectedTask.file)" x-html="selectedTask.file"
-                                                                class="badge rounded-3xl capitalize badge-outline-primary"></button>
+                                                                class="badge rounded-3xl capitalize badge-outline-primary"
+                                                                xx-if="selectedTask.file.trim() !== ''"></button>
                     
                                                                 <div class="mt-8 flex items-center justify-end">
                                                                     <button type="button" class="btn btn-outline-danger" @click="viewTaskModal = false">Close</button>
@@ -1402,7 +1454,9 @@
                         throw new Error(`HTTP Updating Employee error! Status: ${response.status}`);
                     }
 
-                   window.alert("User updated successfully!");
+                   //window.alert("User updated successfully!");
+
+                   showMessage("User updated successfully!");
 
                     //const data = await response.json();
                     //console.log(data);
@@ -1415,9 +1469,26 @@
                 }
         }
 
+        function showMessage(msg = '', type = 'success') {
+                        const toast = window.Swal.mixin({
+                            toast: true,
+                            position: 'top',
+                            showConfirmButton: false,
+                            timer: 3000,
+                        });
+                        toast.fire({
+                            icon: type,
+                            title: msg,
+                            padding: '10px 20px',
+                        });
+                    }
+        
         async function updateTask(task){
             try {
                     console.log('update task entered');
+
+                    const adminID = getCookie('adminID');
+                    const userID = getCookie('userID');
                
                     //const userID = getCookie("userID");
                     const response = await fetch("/adminTasks/updateTask", {
@@ -1426,7 +1497,9 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            task
+                            task,
+                            adminID,
+                            userID,
                         }),
                     });
 
@@ -1434,10 +1507,34 @@
                         throw new Error(`HTTP Updating Task error! Status: ${response.status}`);
                     }
 
-                   window.alert("Task updated successfully!");
+                    showMessage("Task updated successfully!");
+
 
                 } catch (error) {
                     console.error('Error updating task details:', error);
+                }
+        }
+
+        async function setTaskPriority(dbid, priority)
+        {
+            try {
+               
+                    const response = await fetch("/adminTasks/setTaskPriority", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            dbid, priority,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP Updating Priority error! Status: ${response.status}`);
+                    }
+
+                } catch (error) {
+                    console.error('Error updating task priority:', error);
                 }
         }
 
@@ -1462,14 +1559,15 @@
                         throw new Error(`HTTP Creating Task error! Status: ${response.status}`);
                     }
 
-                   window.alert("Task created successfully!");
-
                 } catch (error) {
                     console.error('Error creating task:', error);
                 }
         }
 
         async function saveFile(file){
+            console.log("file: ", file);
+            if(file)
+            {
             try {
                
                     //const userID = getCookie("userID");
@@ -1485,11 +1583,11 @@
                         throw new Error(`HTTP File upload Status: ${response.status}`);
                     }
 
-                   window.alert("File uploaded successfully!");
 
                 } catch (error) {
                     console.error('Error uploading file:', error);
                 }
+            }
         }
 
         $("document").ready( async () => {
@@ -1557,6 +1655,58 @@
                     },
                 }));
 
+                async function getMessages(adminID)
+                    {
+                        console.log("Fetch data");
+                        try {
+                            const response = await fetch("/admin/getMessages", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    adminID: adminID
+                                }),
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+
+                            const data = await response.json();
+                            console.log(data);
+
+                            // Update the component data with employee data
+                            return data.messages;
+
+                        } catch (error) {
+                            console.error('Error fetching admin notifications:', error);
+                        }
+                    }
+
+                    async function deleteMessage(adminID, message){
+                        try {
+                            const response = await fetch("/admin/deleteMessage", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    adminID: adminID,
+                                    messageID: message.id - 1,
+                                }),
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+
+                        } catch (error) {
+                            console.error('Error deleting message:', error);
+                        }
+                    }
+
+
                 // header section
                 Alpine.data('header', () => ({
                     init() {
@@ -1575,72 +1725,50 @@
                             }
                         }
 
-                        //this.addMessages();
+                        this.addMessages();
                     },
 
-                    // messages: [
-                    // ],
+                    messages: [
+                    ],
 
-                    // addMessages() {
-                    //     var admins = JSON.parse(getCookie("admins"));
-                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                    async addMessages() {
+                        var adminID = getCookie("adminID");
+
+                        notifs = await getMessages(adminID);
                         
-                    //     list = admins[adminID-1]['notifications'];
 
-                    //     for(var i = 0; i < list.length; i++)
-                    //     {
-                    //         let maxUserId = this.messages.length
-                    //                 ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
-                    //                 : 0;
+                        for(var i = 0; i < notifs.length; i++)
+                        {
+                            let maxMessageId = this.messages.length
+                                    ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
+                                    : 0;
 
-                    //         let message = {
-                    //             id: maxUserId + 1,
-                    //             message: list[i],
-                    //         }
+                            let notif = {
+                                id: maxMessageId + 1,
+                                message: notifs[i]
+                            }
 
-                    //         this.messages.unshift(message);
-                    //     }
+                            this.messages.unshift(notif);
+                        }
+
                             
-                    // },
+                    },
 
-                    // removeMessage(value) {
-                    //     this.messages = this.messages.filter((d) => d.id !== value);
-                    //     var admins = JSON.parse(getCookie("admins"));
+                    async removeMessage(message) {
+                        var adminID = getCookie("adminID");
 
-                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
-                    //     list = admins[adminID-1]['notifications'];
+                        await deleteMessage(adminID, message);
 
-                    //     for(var i = 0; i < list.length; i++)
-                    //     {
-                    //         if(i == value-1)
-                    //             list = list.splice(i, i);
-                    //     }
-
-                    //     admins[adminID-1]['notifications'] = list;
-                    //     setCookie("admins", admins);
+                        const alpineInstance = this;
+                            
+                        const messageIndex = alpineInstance.messages.findIndex(t => t.id === message.id);
+                        if (messageIndex !== -1) {
+                            alpineInstance.messages.splice(messageIndex, 1);
+                        }
 
 
-
-                    // },
+                    },
                 }));
-
-                //Get tasks and userID from query parameter
-                // var cookie = getCookie("tasks");
-                // tasks = JSON.parse(cookie);
-                // const queryParams = new URLSearchParams(window.location.search);
-                // const paramName = 'id';
-                // const user_id = queryParams.get(paramName);
-                // console.log(tasks)
-                // console.log(user_id)
-
-                // var tasks = tasks.filter(function(task) {
-                //     return task.task_user === parseInt(user_id);
-                // });
-
-                // console.log(tasks)
-
-                
-
 
                 //todolist
                 Alpine.data('todolist', () => ({
@@ -1669,6 +1797,7 @@
                         endIndex: 0,
                     },
                     quillEditor: null,
+                    uniqueTags: [],
 
                     async init() {
                         this.searchTasks();
@@ -1681,6 +1810,8 @@
                             this.addTask(count, task['title'], task['start_date'], task['due_date'],
                                 task['description'], task['priority'], task['status'], task['tags'], task['file'], task['_id']);
                         });
+
+                        this.extractUniqueTags();
                     },
                     initEditor() {
                         this.quillEditor = new Quill(this.$refs.editor, {
@@ -1691,6 +1822,16 @@
                             },
                         });
                     },
+                     // Method to extract unique non-empty tags from tasks
+                        extractUniqueTags() {
+                            const allTags = this.allTasks.flatMap(task => [task.tag1, task.tag2]);
+                            console.log("All Tags: ", allTags);
+
+                            // Remove any undefined or null values from the array
+                            this.uniqueTags = [...new Set(allTags.filter(tag => tag !== undefined && tag !== null && tag !== ""))];
+
+                            console.log("Unique Tags: ", this.uniqueTags);
+                        },
                     searchTasks(isResetPage = true) {
                         //Filter through tasks in display
                         if (isResetPage) {
@@ -1707,6 +1848,12 @@
                             res = res.filter((d) => d.priority === this.selectedTab);
                         }
                         this.filteredTasks = res.filter((d) => d.title?.toLowerCase().includes(this.searchTask));
+                        this.getPager();
+                    },
+                    searchTasksByTag(tag) {
+                        this.filteredTasks = this.allTasks.filter(
+                            (task) => task.tag1 === tag || task.tag2 === tag
+                        );
                         this.getPager();
                     },
                     getPager() {
@@ -1727,51 +1874,33 @@
                         });
                     },
 
-                    setPriority(task, name) {
+                    async setPriority(task, name) {
+                        dbid = task.dbid;
+                        priority = name;
+
+                        await setTaskPriority(dbid, priority);
+
+                        const alpineInstance = this;
+                            
+
+                        // Use this.$set to update the allTasks array
+                        const taskIndex = alpineInstance.allTasks.findIndex(t => t.dbid === task.dbid);
+                        task.priority = name;
+                        if (taskIndex !== -1) {
+                            alpineInstance.allTasks.splice(taskIndex, 1, task);
+                        }
                         //Change the priority of a task and notify user
-                        let item = this.filteredTasks.find((d) => d.id === task.id);
                         
-                        item.priority = name;
-                        console.log("priority task", name)
-                        
-
-                        tasks[task.id-1]['task_priority'] = name;
-                        cookieTasks = JSON.parse(getCookie("tasks"));
-                        
-                        cookieTasks.forEach(function(cookieTask) {
-                                if (cookieTask.taskID == item.id && cookieTask.task_user == user_id) {
-                                    cookieTask.task_priority = name;
-                                }
-                        });
-
-                        setCookie("tasks", cookieTasks);
-                        let user = users.find(user => user.id == this.user_id);
-                            if(users[this.user_id-1])
-                            {
-                                notif = `The task titled "${tasks[task.id-1]['task_name']}" has been changed of priority.`;
-                                users[this.user_id-1]['notifications'].push(notif);
-                                setCookie("users", users);
-                            }
+                        // let user = users.find(user => user.id == this.user_id);
+                        //     if(users[this.user_id-1])
+                        //     {
+                        //         notif = `The task titled "${tasks[task.id-1]['task_name']}" has been changed of priority.`;
+                        //         users[this.user_id-1]['notifications'].push(notif);
+                        //         setCookie("users", users);
+                        //     }
                        
                         this.searchTasks(false);
-                    },
-
-                    setstatus(task, name) {
-                        //Change the status of a task and notify user
-                        let item = this.filteredTasks.find((d) => d.id === task.id);
-                        item.status = name;
-                        
-                        let user = users.find(user => user.id == this.user_id);
-                            if(users[this.user_id-1])
-                            {
-                                notif = `The task titled "${tasks[task.id-1]['task_name']}" has been changed of status.`;
-                                users[this.user_id-1]['notifications'].push(notif);
-                                setCookie("users", users);
-                            }
-                        this.allTasks = [...this.allTasks];
-                        Alpine.store('todolist').$data = Alpine.store('todolist').$data;
-                        this.searchTasks(false);
-
+                        this.showMessage('Task Priority changed!');
                     },
 
                     tabChanged(type) {
@@ -1906,11 +2035,20 @@
                             status = this.params.statusT;
                             console.log("status being edited: ", status);
                             priority = this.params.priority;
-                            tag1 = this.params.tag1;
-                            tag2 = this.params.tag2;
+                            if(this.params.tag1)
+                                tag1 = this.params.tag1;
+                            else
+                                tag1 = "";
+                            if(this.params.tag2)
+                                tag2 = this.params.tag2;
+                            else
+                                tag2 = "";
                             start_date = this.params.dateS;
                             due_date = this.params.date;
-                            file_name = this.params.file;
+                            if(this.params.file)
+                                file_name = this.params.file;
+                            else    
+                                file_name = "";
                             db_id = this.params.dbid;
 
                             let task = {
@@ -2017,9 +2155,11 @@
 
                             this.allTasks = [...this.allTasks];
                             await this.searchTasks();
+
+                            this.showMessage('Task has been added successfully!');
                         }
 
-                        this.showMessage('Task has been saved successfully.');
+                        
                         this.addTaskModal = false;
                     },
 

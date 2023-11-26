@@ -106,7 +106,7 @@ user.post('/login', async function(req, res) {
           if(result)
           {
             console.log("Succesful log in!");
-            res.json({ redirect: '/admin/new-route', cookie: admin._id.toString()});
+            res.json({ redirect: '/admin/employees', cookie: admin._id.toString()});
           }
       }
 
@@ -293,6 +293,69 @@ user.post('/getEmployeeDetails', async (req, res) => {
       await client.close();
   }
 });
+
+user.post('/getMessages', async (req, res) => {
+
+  adminID = req.body.adminID;
+  adminID = new ObjectId(adminID);
+  console.log("UID: ", adminID);
+  const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+  try {
+      //conncet to db
+      await client.connect();
+      const database = client.db('task_management');
+      const adminCollection = database.collection('admins');
+
+      //get admins
+      const admin = await adminCollection.findOne({ _id: adminID });
+      console.log('user found');
+      console.log(admin);
+
+      res.json({ messages: admin.notifications });
+  } catch (error) {
+      console.error('Error retrieving admin:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  } finally {
+      await client.close();
+  }
+});
+
+user.post('/deleteMessage', async (req, res) => {
+
+  adminID = req.body.adminID;
+  adminID = new ObjectId(adminID);
+  messageID = req.body.messageID;
+  console.log("Message ID: ", messageID);
+  const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+  try {
+      //connect to db
+      await client.connect();
+      const database = client.db('task_management');
+      const adminCollection = database.collection('admins');
+
+
+      //Unset the notification
+      const { modifiedCount } = await adminCollection.updateOne(
+        { "_id": adminID },
+        { $unset: { [`notifications.${messageID}`]: 1 } }
+     );
+     //Remove that null field from notifications array
+     await adminCollection.updateOne(
+      { "_id": adminID },
+      { $pull: { "notifications": null } }
+    );
+     res.status(200).json({ message: 'Notification deleted successfully' });
+
+  } catch (error) {
+      console.error('Error retrieving admin:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  } finally {
+      await client.close();
+  }
+});
+
 
 user.post('/createAdmin', async function(req, res) {
 

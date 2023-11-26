@@ -264,14 +264,14 @@
                                             <path d="M12 6V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                                         </svg>
                                         <!--Notification alert probing icon-->
-                                        <!-- <template x-if="messages.length">
+                                        <template x-if="messages.length">
                                             <span class="absolute top-0 flex h-3 w-3 ltr:right-0 rtl:left-0">
                                                 <span
                                                     class="absolute -top-[3px] inline-flex h-full w-full animate-ping rounded-full bg-success/50 opacity-75 ltr:-left-[3px] rtl:-right-[3px]"
                                                 ></span>
                                                 <span class="relative inline-flex h-[6px] w-[6px] rounded-full bg-success"></span>
                                             </span> 
-                                        </template> -->
+                                        </template>
                                     </a>
                                     <!--Notifications-->
                                     <ul
@@ -284,12 +284,12 @@
                                         <li>
                                             <div class="flex items-center justify-between px-4 py-2 font-semibold hover:!bg-transparent">
                                                 <h4 class="text-lg">Notifications</h4>
-                                                <!-- <template x-if="messages.length">
+                                                <template x-if="messages.length">
                                                     <span class="badge bg-primary/80" x-text="messages.length + ''"></span>
-                                                </template> -->
+                                                </template>
                                             </div>
                                         </li>
-                                        <!-- <template x-for="notification in messages">
+                                        <template x-for="notification in messages">
                                             <li class="dark:text-white-light/90">
                                                 <div class="group flex items-center px-4 py-2" @click.self="toggle">
                                                    
@@ -301,7 +301,7 @@
                                                         <button
                                                             type="button"
                                                             class="text-neutral-300 opacity-0 hover:text-danger group-hover:opacity-100 ltr:ml-auto rtl:mr-auto"
-                                                            @click="removeMessage(notification.id)"
+                                                            @click="removeMessage(notification)"
                                                         >
                                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                 <circle opacity="0.5" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" />
@@ -316,8 +316,8 @@
                                                     </div>
                                                 </div>
                                             </li>
-                                        </template> -->
-                                        <!-- <template x-if="!messages.length">
+                                        </template>
+                                        <template x-if="!messages.length">
                                             <li>
                                                 <div class="!grid min-h-[200px] place-content-center text-lg hover:!bg-transparent">
                                                     <div class="mx-auto mb-4 rounded-full text-primary ring-4 ring-primary/30">
@@ -340,7 +340,7 @@
                                                     No data available.
                                                 </div>
                                             </li>
-                                        </template> -->
+                                        </template>
                                     </ul>
                                 </div>
                                 
@@ -731,6 +731,57 @@
                     },
                 }));
 
+                async function getMessages(adminID)
+                    {
+                        console.log("Fetch data");
+                        try {
+                            const response = await fetch("/admin/getMessages", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    adminID: adminID
+                                }),
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+
+                            const data = await response.json();
+                            console.log(data);
+
+                            // Update the component data with employee data
+                            return data.messages;
+
+                        } catch (error) {
+                            console.error('Error fetching admin notifications:', error);
+                        }
+                    }
+
+                    async function deleteMessage(adminID, message){
+                        try {
+                            const response = await fetch("/admin/deleteMessage", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    adminID: adminID,
+                                    messageID: message.id - 1,
+                                }),
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+
+                        } catch (error) {
+                            console.error('Error deleting message:', error);
+                        }
+                    }
+
                 // header section
                 Alpine.data('header', () => ({
                     init() {
@@ -749,53 +800,52 @@
                             }
                         }
 
-                        //this.addMessages();
+                        this.addMessages();
                     },
 
                     //Notifications array
-                    // messages: [
-                    // ],
+                    messages: [
+                    ],
 
-                    //Add notifications to array from cookie
-                    //  addMessages() {
-                    //     var admins = JSON.parse(getCookie("admins"));
-                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                    //Add notifications to array from 
+                     async addMessages() {
+                        var adminID = getCookie("adminID");
+
+                        notifs = await getMessages(adminID);
                         
-                    //     list = admins[adminID-1]['notifications'];
 
-                    //     for(var i = 0; i < list.length; i++)
-                    //     {
-                    //         let maxUserId = this.messages.length
-                    //                 ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
-                    //                 : 0;
+                        for(var i = 0; i < notifs.length; i++)
+                        {
+                            let maxMessageId = this.messages.length
+                                    ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
+                                    : 0;
 
-                    //         let message = {
-                    //             id: maxUserId + 1,
-                    //             message: list[i],
-                    //         }
+                            let notif = {
+                                id: maxMessageId + 1,
+                                message: notifs[i]
+                            }
 
-                    //         this.messages.unshift(message);
-                    //     }
+                            this.messages.unshift(notif);
+                        }
+
                             
-                    // },
+                    },
 
                     //Remove a notification
-                    // removeMessage(value) {
-                    //     this.messages = this.messages.filter((d) => d.id !== value);
-                    //     var admins = JSON.parse(getCookie("admins"));
+                    async removeMessage(message) {
+                        var adminID = getCookie("adminID");
 
-                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
-                    //     list = admins[adminID-1]['notifications'];
+                        await deleteMessage(adminID, message);
 
-                    //     for(var i = 0; i < list.length; i++)
-                    //     {
-                    //         if(i == value-1)
-                    //             list = list.splice(i, i);
-                    //     }
-                    //     admins[adminID-1]['notifications'] = list;
-                    //     setCookie("admins", admins);
+                        const alpineInstance = this;
+                            
+                        const messageIndex = alpineInstance.messages.findIndex(t => t.id === message.id);
+                        if (messageIndex !== -1) {
+                            alpineInstance.messages.splice(messageIndex, 1);
+                        }
 
-                    // },
+
+                    },
                 }));
             });
 
@@ -1114,8 +1164,17 @@
                         // }
 
                         await setUserStatus(contact.DBUserID, nombre);
+                        const alpineInstance = this;
+                            
 
-                        this.contactList = [...this.contactList];
+                        // Use this.$set to update the allTasks array
+                        const userIndex = alpineInstance.contactList.findIndex(t => t.id === contact.id);
+                        contact.status = nombre;
+                        if (userIndex !== -1) {
+                            alpineInstance.contactList.splice(userIndex, 1, contact);
+                        }
+
+                        //this.contactList = [...this.contactList];
                         this.searchContacts(false);
                         
                         //location.reload()

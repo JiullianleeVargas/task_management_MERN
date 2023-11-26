@@ -78,6 +78,7 @@ user.post('/getEmployeeTasks', async (req, res) => {
     let priority = req.body.task.priority;
     let status = req.body.task.statusT;
     let file = req.body.task.file;
+    let tags = req.body.task.tags;
     let start_date = req.body.task.start_date;
     let due_date = req.body.task.due_date;
 
@@ -90,21 +91,9 @@ user.post('/getEmployeeTasks', async (req, res) => {
  
            // Access the 'task_management' database and 'employees' collection
            const database = client.db('task_management');
-           const usersCollection = database.collection('tasks');
-   
-          //  const employee_db = await usersCollection.findOne({ email: employee.email });
+           const taskCollection = database.collection('tasks');
   
-          //  if (!employee_db) {
-          //   // If the employee is not found, handle the error appropriately
-          //   res.status(404).json({ error: 'Employee not found' });
-          //   return;
-          // }
-  
-          // const eid = employee_db._id;
-  
-          //const cursor = await teamCollection.find({ admin: adminID }).toArray();
-  
-          await usersCollection.updateOne(
+          await taskCollection.updateOne(
             { _id: id },
             {$set:{
               title: title,
@@ -112,14 +101,77 @@ user.post('/getEmployeeTasks', async (req, res) => {
               priority: priority,
               status: status,
               file: file,
+              tags: tags,
               start_date: start_date,
               due_date: due_date
             }}
         );
 
+        //If tags contains "team"
+        if (Array.isArray(tags) && tags.includes("team")) {
+                adminID = req.body.adminID;
+                adminID = new ObjectId(adminID);
+                let userID = req.body.userID;
+                userID = new ObjectId(userID);
+
+                const usersCollection = database.collection('employees');
+                const teamCollection = database.collection('teams');
+
+                //Check that task isn't already in team
+                const task = await teamCollection.findOne({ tasks: id })
+                if(!task)
+                {
+                    //Take task from employee and add to team.
+                    
+                    const result = await usersCollection.updateOne({_id: userID},{$pull:{ tasks: id }});
+                    await teamCollection.updateOne({admin: adminID},{$push:{ tasks: id }});
+                }
+
+                
+        }
+        else
+            console.log("NOT ENTERED THERE");
    
            // Respond with a success message or other appropriate response
            res.status(200).json({ message: 'Task successfully'});
+       } catch (error) {
+           console.error('Error updating task:', error);
+   
+           // Respond with an error message or handle the error appropriately
+           res.status(500).json({ error: 'Internal Server Error' });
+       } finally {
+           // Close the MongoDB connection
+           await client.close();
+       }
+   
+  })
+
+  user.post("/setTaskPriority", async (req, res) => {
+
+    //console.log("updateEmployeeDetails entered");
+    let id = req.body.dbid;
+    id = new ObjectId(id);
+    let priority = req.body.priority;
+
+      
+       // Connect to the MongoDB server
+       const client = new MongoClient('mongodb://0.0.0.0:27017');
+  
+       try {
+           await client.connect();
+ 
+           // Access the 'task_management' database and 'employees' collection
+           const database = client.db('task_management');
+           const taskCollection = database.collection('tasks');
+  
+          await taskCollection.updateOne(
+            { _id: id },
+            {$set:{
+              priority: priority,
+            }}
+        );
+        
+           res.status(200).json({ message: 'Task priority successfully updated'});
        } catch (error) {
            console.error('Error updating task:', error);
    

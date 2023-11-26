@@ -33,7 +33,7 @@ function adminLogin(evt) {
 function logout(evt) {
     evt.preventDefault();
     sessionStorage.clear();
-    window.location.href = "login.html";
+    window.location.href = "/admin/";
 
 };
 

@@ -3,16 +3,14 @@ import axios from "axios";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
+import { Button } from 'primereact/button';
+
 
 const Admins = () => {
     const baseUrl = 'http://localhost:3500/admin/';
     const [admins, setAdmins] = useState([]);
 
     useEffect(() => {
-        // AdminService.getAllAdmins().then((data) => {
-        //     console.log('data from axios', data);
-        //     setAdmins(data)
-        // });
         axios.get(baseUrl + '/getAdmins')
             .then(response => {
                 console.log(response.data.admins);
@@ -48,6 +46,9 @@ const Admins = () => {
     const header = (
         <div className="flex flex-wrap align-items-center justify-content-between gap-2">
             <span className="text-xl text-900 font-bold">Administrators</span>
+            <Button severity="info">
+                <i className='pi pi-plus'></i>&nbsp; Create Admin Account
+            </Button>
         </div>
     );
     const footer = `In total there are ${admins ? admins.length : 0} Administrators.`;

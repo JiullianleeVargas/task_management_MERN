@@ -25,10 +25,11 @@ const Login = (props) => {
                 email: email,
                 password: password,
             }),
+            credentials: 'include',
         }).then(response => response.json())
             .then(value => {
                 if (value.auth === true) {
-                    window.location.href = "/sidebar/tasks";
+                    window.location.href = "/main/tasks";
                 } else if (value.auth === false) {
                     window.location.href = "login";
                 }

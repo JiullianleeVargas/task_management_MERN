@@ -9,12 +9,14 @@ const cors = require('cors')
 const path = require('path'); 
 const adminController = require("./admin/controllers/adminController");
 
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+
 
 // Importing the employee controller 
 const employeeController = require("./employee/controllers/employeeController");
 
 //Connect app to admin controller
-app.use(cors());
+//app.use(cors());
 app.use(express.json());
 app.use("/admin", adminController);
 app.use(express.static(path.join(__dirname, 'admin')));

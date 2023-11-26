@@ -18,7 +18,7 @@ function App({ Component, pageProps }) {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Login />}/>
-              <Route path="/sidebar" element={<Sidebar_ />}>
+              <Route path="/main" element={<Sidebar_ />}>
                 <Route index element={<Tasks />} />
                 <Route path="admins" element={<Admins />} />
                 <Route path="employees" element={<Employees />} />

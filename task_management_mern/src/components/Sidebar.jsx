@@ -1,14 +1,16 @@
 
-import React, { useState, useRef } from 'react';
-//import { Sidebar } from 'primereact/sidebar';
-//import { Button } from 'primereact/button';
-//import { Menu } from 'primereact/menu';
+import React, { useState, useRef, useEffect } from 'react';
+import axios from "axios";
+import Cookies from 'js-cookie';
+import { useCookies } from 'react-cookie';
 import { Ripple } from 'primereact/ripple';
 import { StyleClass } from 'primereact/styleclass';
 import { Badge } from 'primereact/badge';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Outlet, Link } from "react-router-dom";
+import { Menu } from 'primereact/menu';
+
 
 
 
@@ -20,12 +22,45 @@ function Sidebar_() {
     const btnRef5 = useRef(null);
 
 
+    const baseUrl = 'http://localhost:3500/admin/';
+
+    const [admin, setAdmin] = useState([]);
+    const adminID = Cookies.get('admin');
+    console.log("adminId: ", adminID);
+
+    const [, , removeAllCookies] = useCookies();
+
+    useEffect(() => {
+        if (adminID) {
+            const fetchData = () => {
+                axios.get(baseUrl + `/getAdmin/${adminID}`)
+                    .then(async (res) => {
+                        await console.log(res.data)
+                        await setAdmin(res.data[0])
+
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
+            }
+            fetchData();
+        }
+        console.log("admin: ", admin.email);
+    }, [adminID]);
+
+    const menuRight = useRef(null);
+    const toast = useRef(null);
+    const handleLogout = () => {
+        removeAllCookies();
+        window.location.href = "/";
+    }
+
     return (
         <div className="min-h-screen flex relative lg:static surface-ground">
             <div id="app-sidebar-1" className="surface-section h-screen hidden lg:block flex-shrink-0 absolute lg:static left-0 top-0 z-1 select-none" style={{ width: '280px' }}>
                 <div className="flex flex-column h-full">
                     <div className="flex align-items-center px-5 surface-section  flex-shrink-0" style={{ height: '60px' }}>
-                        <img src="./images/favicon.png" alt="hyper-300" height={30} />
+                        <img src="../images/favicon.png" alt="hyper-300" height={30} />
                         <span style={{ fontSize: '20px' }} className="align-middle text-2xl font-semibold ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light lg:inline">TechSpire</span>
                     </div>
 
@@ -33,7 +68,7 @@ function Sidebar_() {
                     <div className="overflow-y-auto mt-3">
                         <ul className="list-none p-3 m-0">
                             <li>
-                                <Link to="/tasks" style={{ textDecoration: 'none' }}>
+                                <Link to="/main/tasks" style={{ textDecoration: 'none' }}>
                                     <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-200 text-bluegray-800 hover:text-bluegray-50
                     transition-duration-150 transition-colors w-full">
                                         <i className="pi pi-bookmark mr-2"></i>
@@ -43,7 +78,7 @@ function Sidebar_() {
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/reports" style={{ textDecoration: 'none' }}>
+                                <Link to="/main/reports" style={{ textDecoration: 'none' }}>
                                     <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-200 text-bluegray-800 hover:text-bluegray-50
                     transition-duration-150 transition-colors w-full">
                                         <i className="pi pi-chart-line mr-2"></i>
@@ -54,7 +89,7 @@ function Sidebar_() {
                             </li>
 
                             <li>
-                                <Link to="/employees" style={{ textDecoration: 'none' }}>
+                                <Link to="/main/employees" style={{ textDecoration: 'none' }}>
                                     <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-200 text-bluegray-800 hover:text-bluegray-50
                     transition-duration-150 transition-colors w-full">
                                         <i className="pi pi-users mr-2"></i>
@@ -65,7 +100,7 @@ function Sidebar_() {
                             </li>
 
                             <li>
-                                <Link to="/admins" style={{ textDecoration: 'none' }}>
+                                <Link to="/main/admins" style={{ textDecoration: 'none' }}>
                                     <a className="p-ripple flex align-items-center cursor-pointer p-3 hover:bg-bluegray-200 text-bluegray-800 hover:text-bluegray-50
                     transition-duration-150 transition-colors w-full">
                                         <i className="pi pi-users mr-2"></i>
@@ -135,8 +170,8 @@ function Sidebar_() {
                         <StyleClass nodeRef={btnRef3} selector="@prev" enterClassName="hidden" enterActiveClassName="fadein" leaveToClassName="hidden" leaveActiveClassName="fadeout">
                             <a ref={btnRef3} className="p-ripple my-3 px-3 py-2 flex align-items-center hover:bg-bluegray-200 border-round cursor-pointer text-bluegray-800 hover:text-bluegray-50
             transition-duration-150 transition-colors w-full">
-                                <img src="./images/avatar.png" className="mr-2" style={{ width: '28px', height: '28px' }} alt="avatar-f-1" />
-                                <span className="font-medium">Amy Elsner</span>
+                                <img src="../images/avatar.png" className="mr-2" style={{ width: '28px', height: '28px' }} alt="avatar-f-1" />
+                                <span className="font-small">{admin.email}</span>
                                 <i className="pi pi-chevron-up ml-auto"></i>
                                 <Ripple />
                             </a>
@@ -191,11 +226,12 @@ function Sidebar_() {
                         <li className="border-top-1 surface-border lg:border-top-none">
                             <a className="p-ripple flex p-3 lg:px-3 lg:py-2 align-items-center hover:surface-100 font-medium border-round cursor-pointer
                 transition-duration-150 transition-colors w-full">
-                                <img src="./images/avatar.png" className="mr-3 lg:mr-0" style={{ width: '32px', height: '32px' }} alt="avatar-f-1" />
-                                <div className="block lg:hidden">
-                                    <div className="text-900 font-medium">Josephine Lillard</div>
-                                    <span className="text-600 font-medium text-sm">Marketing Specialist</span>
-                                </div>
+                                <Menu popup ref={menuRight} id="popup_menu_right" popupAlignment="right">
+                                    <Button label="Logout" icon="pi pi-power-off" onClick={handleLogout} />
+                                </Menu>
+                                <Button className="bg-white border-white" onClick={(event) => menuRight.current.toggle(event)} aria-controls="popup_menu_right" >
+                                    <img src="../images/avatar.png" className="mr-3 lg:mr-0" style={{ width: '32px', height: '32px' }} alt="avatar-f-1" />
+                                </Button>
                                 <Ripple />
                             </a>
                         </li>
@@ -203,7 +239,7 @@ function Sidebar_() {
                 </div>
 
                 <div className="p-5 flex flex-column flex-auto">
-                    <div className="border-2 border-dashed surface-border border-round surface-section flex-auto">
+                    <div className=" surface-border border-round surface-section flex-auto">
                         <Outlet />
                     </div>
                 </div>

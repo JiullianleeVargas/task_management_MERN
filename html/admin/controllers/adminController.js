@@ -9,6 +9,8 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10; // Number of salt rounds for bcrypt hashing
 module.exports = user;
 const classes = require('../assets/js/classes');
+const cookieParser = require('cookie-parser');
+
 
 function writeTo(file, data) {
   fs.writeFile(file, JSON.stringify(data), "utf8", (err) => {
@@ -37,6 +39,7 @@ async function comparePassword(plaintextPassword, hash) {
 
 
 user.use(express.json());
+user.use(cookieParser());
 
 user.get('/new-route', (req, res) => {
   //console.log('entered new route');
@@ -91,8 +94,9 @@ user.post('/login', async function(req, res) {
           let result = comparePassword(String(password), String(admin['password']));
           if(result)
           {
-            console.log("Succesful log in!");
-            res.cookie('admin', admin._id.toString()).json({ auth : true });
+            console.log("Succesful log in! ", admin._id.toString());
+            res.cookie('admin', admin._id.toString(), { httpOnly: false, sameSite: 'None' }).json({ auth : true });
+            //res.json({ auth : true, cookie: admin._id.toString()});
           }
       }
       else {
@@ -125,41 +129,6 @@ user.get('/getAdmins', async (req, res) => {
       await client.close();
   }
 });
-
-
-// user.post("/getEmployees", async (req, res) => {
-
-//       console.log("getEmployees entered");
-//       adminID = req.body.adminID;
-//       adminID = new ObjectId(adminID);
-//       console.log(adminID);
-
-//       const client = new MongoClient('mongodb://0.0.0.0:27017');
-
-//       await client.connect();
-//       const database = client.db('task_management');
-//       const usersCollection = database.collection('team');
-//       console.log("DB connect");
-
-//       // Alternatively, if using a cursor
-//       const cursor = await usersCollection.find({ admin: adminID }).toArray();
-//       const employeeIDs = cursor.map(doc => doc.employees);
-//       const employeesArray = [];
-
-//       for (const employeeId of employeeIDs[0]) {
-//         //const employeeObjectId = new ObjectId(employeeId);
-//         const employeeCollection = database.collection('employee');
-//         const employee = await employeeCollection.findOne({ _id: employeeId });
-  
-//         // Add the employee details to the array
-//         employeesArray.push(employee);
-//       }
-
-//       //console.log(employeesArray);
-
-//       res.json({employees: employeesArray});
-
-// })
 
 user.post('/register', (req, res) => {
   try {

@@ -9,16 +9,16 @@
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-        <link rel="stylesheet" type="text/css" media="screen" href="assets/css/perfect-scrollbar.min.css" />
-        <link rel="stylesheet" type="text/css" media="screen" href="assets/css/style.css" />
-        <link defer rel="stylesheet" type="text/css" media="screen" href="assets/css/animate.css" />
+        <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/perfect-scrollbar.min.css" />
+        <link rel="stylesheet" type="text/css" media="screen" href="/assets/css/style.css" />
+        <link defer rel="stylesheet" type="text/css" media="screen" href="/assets/css/animate.css" />
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script defer src="assets/js/classes.js"></script>
-        <script defer src="assets/js/test.js"></script>
-        <script src="assets/js/perfect-scrollbar.min.js"></script>
-        <script defer src="assets/js/popper.min.js"></script>
-        <script defer src="assets/js/tippy-bundle.umd.min.js"></script>
-        <script defer src="assets/js/sweetalert.min.js"></script>
+        <script defer src="/assets/js/classes.js"></script>
+        <script defer src="/assets/js/test.js"></script>
+        <script src="/assets/js/perfect-scrollbar.min.js"></script>
+        <script defer src="/assets/js/popper.min.js"></script>
+        <script defer src="/assets/js/tippy-bundle.umd.min.js"></script>
+        <script defer src="/assets/js/sweetalert.min.js"></script>
     </head>
 
     <body
@@ -268,14 +268,14 @@
                                             <path d="M12 6V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                                         </svg>
                                         <!--Notification alert probing icon-->
-                                        <template x-if="messages.length">
+                                        <!-- <template x-if="messages.length">
                                             <span class="absolute top-0 flex h-3 w-3 ltr:right-0 rtl:left-0">
                                                 <span
                                                     class="absolute -top-[3px] inline-flex h-full w-full animate-ping rounded-full bg-success/50 opacity-75 ltr:-left-[3px] rtl:-right-[3px]"
                                                 ></span>
                                                 <span class="relative inline-flex h-[6px] w-[6px] rounded-full bg-success"></span>
-                                            </span> <!---->
-                                        </template>
+                                            </span> 
+                                        </template> -->
                                     </a>
                                     <ul
                                         x-cloak
@@ -287,12 +287,12 @@
                                         <li>
                                             <div class="flex items-center justify-between px-4 py-2 font-semibold hover:!bg-transparent">
                                                 <h4 class="text-lg">Notifications</h4>
-                                                <template x-if="messages.length">
+                                                <!-- <template x-if="messages.length">
                                                     <span class="badge bg-primary/80" x-text="messages.length + ''"></span>
-                                                </template>
+                                                </template> -->
                                             </div>
                                         </li>
-                                        <template x-for="notification in messages">
+                                        <!-- <template x-for="notification in messages">
                                             <li class="dark:text-white-light/90">
                                                 <div class="group flex items-center px-4 py-2" @click.self="toggle">
                                                    
@@ -319,8 +319,8 @@
                                                     </div>
                                                 </div>
                                             </li>
-                                        </template>
-                                        <template x-if="!messages.length">
+                                        </template> -->
+                                        <!-- <template x-if="!messages.length">
                                             <li>
                                                 <div class="!grid min-h-[200px] place-content-center text-lg hover:!bg-transparent">
                                                     <div class="mx-auto mb-4 rounded-full text-primary ring-4 ring-primary/30">
@@ -343,7 +343,7 @@
                                                     No data available.
                                                 </div>
                                             </li>
-                                        </template>
+                                        </template> -->
                                     </ul>
                                 </div>
                                 
@@ -466,6 +466,14 @@
                                                             <input id="password" type="password" placeholder="" class="form-input" />
                                                         </div>
                                                         <div>
+                                                            <label for="f_name">First Name</label>
+                                                            <input id="f_name" type="text" placeholder="" class="form-input" />
+                                                        </div>
+                                                        <div>
+                                                            <label for="l_name">Last Name</label>
+                                                            <input id="l_name" type="text" placeholder="" class="form-input" />
+                                                        </div>
+                                                        <div>
                                                             <label for="status">Status</label>
                                                             <select id="status" class="form-select text-white-dark">
                                                                 <!-- <option>All Countries</option>
@@ -473,7 +481,7 @@
                                                             </select>
                                                         </div>
                                                         <div class="mt-3 sm:col-span-2">
-                                                            <button id='savebtn' type="button" class="btn btn-primary">Save</button>
+                                                            <button id='savebtn' type="button" class="btn btn-primary" onclick="saveEmployeeDetails()">Save</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1108,15 +1116,23 @@
                                                                     <div class="mb-5">
                                                                         <label for="title">Title</label>
                                                                         <input id="title" required type="text" placeholder="Enter Task Title" class="form-input" x-model="params.title" />
-                                                                    </div>
-                                                                    <div class="mb-5">
-                                                                        <label for="duedate">Due Date</label>
-                                                                        <input id="duedate" required class="form-date" type="date" x-model="params.date">
+                                                                        <input id="dbid" type="hidden" x-model="params.dbid">
                                                                     </div>
                                                                     <div class="mb-5 flex justify-between gap-4">
                                                                         <div class="flex-1">
-                                                                            <label for="status">Status</label>
-                                                                            <select id="status" class="form-select" x-model="params.status">
+                                                                            <label for="startdate">Start Date</label>
+                                                                            <input id="startdate" required class="form-date" type="date" x-model="params.dateS">
+                                                                         </div>
+                                                                         <div class="flex-1">
+                                                                            <label for="duedate">Due Date</label>
+                                                                            <input id="duedate" required class="form-date" type="date" x-model="params.date">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="mb-5 flex justify-between gap-4">
+                                                                        <div class="flex-1">
+
+                                                                            <label for="statusT">Status</label>
+                                                                            <select id="statusT" class="form-select" x-model="params.statusT">
                                                                                 <option value="Pending">Pending</option>
                                                                                 <option value="In Progress">In Progress</option>
                                                                                 <option value="Completed">Completed</option>
@@ -1131,9 +1147,31 @@
                                                                             </select>
                                                                         </div>
                                                                     </div>
+                                                                    <div class="mb-5 flex justify-between gap-4">
+                                                                        <div class="flex-1">
+                                                                            <label for="tag1">Tag 1</label>
+                                                                            <input id="tag1" type="text" placeholder="" class="form-input" x-model="params.tag1" />
+                                                                        </div>
+                                                                        <div class="flex-1">
+                                                                            <label for="tag 2">Tag 2</label>
+                                                                            <input id="tag2" type="text" placeholder="" class="form-input" x-model="params.tag2" />
+                                                                        </div>
+                                                                    </div>
                                                                     <div class="mb-5">
                                                                         <label>Description</label>
                                                                         <div x-ref="editor"></div>
+                                                                    </div>
+                                                                    <div class="mb-5 flex justify-between gap-4">
+                                                                        <div class="flex-1">
+                                                                            <!-- File name only-->
+                                                                            <label for="fileDisplay">File name</label>
+                                                                            <input type="text" id="fileDisplay" x-model="params.file" readonly>
+                                                                        </div>
+                                                                        <div class="flex-1">
+                                                                            <!-- Separate file input for selecting a file -->
+                                                                            <label for="file">Choose file to upload</label>
+                                                                            <input type="file" ref="fileInput" id="fileInput" name='file' @change="updateFile">
+                                                                        </div>
                                                                     </div>
                                                                     <div class="mt-8 flex items-center justify-end ltr:text-right rtl:text-left">
                                                                         <button type="button" class="btn btn-outline-danger" @click="addTaskModal = false">Cancel</button>
@@ -1195,6 +1233,9 @@
                                                             </div>
                                                             <div class="p-5">
                                                                 <div class="prose text-base" x-html="selectedTask.description"></div>
+
+                                                                <button @click="openFile(selectedTask.file)" x-html="selectedTask.file"
+                                                                class="badge rounded-3xl capitalize badge-outline-primary"></button>
                     
                                                                 <div class="mt-8 flex items-center justify-end">
                                                                     <button type="button" class="btn btn-outline-danger" @click="viewTaskModal = false">Close</button>
@@ -1222,22 +1263,249 @@
             </div>
         </div>
 
-        <script src="assets/js/alpine-collaspe.min.js"></script>
-        <script src="assets/js/alpine-persist.min.js"></script>
-        <script defer src="assets/js/alpine-ui.min.js"></script>
-        <script defer src="assets/js/alpine-focus.min.js"></script>
-        <script defer src="assets/js/alpine.min.js"></script>
-        <script src="assets/js/custom.js"></script>
-        <script src="assets/js/quill.js"></script>
+        <script src="/assets/js/alpine-collaspe.min.js"></script>
+        <script src="/assets/js/alpine-persist.min.js"></script>
+        <script defer src="/assets/js/alpine-ui.min.js"></script>
+        <script defer src="/assets/js/alpine-focus.min.js"></script>
+        <script defer src="/assets/js/alpine.min.js"></script>
+        <script src="/assets/js/custom.js"></script>
+        <script src="/assets/js/quill.js"></script>
 
         <script>
+
+        async function openFile(file)
+        {
+
+            const fileUrl = `/adminTasks/getFile?file=${file}`;
+
+            // Open a new tab/window with the file
+            window.open(fileUrl, '_blank');
+        }
+
+        async function loadInfo() {
+            //Load user info onto HTML
+
+            console.log("entered load info");
+            var uid = getCookie("userID");
+            console.log("uid: ", uid);
+
+            fetch("/admin/getEmployeeDetails", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id: uid,
+                }),
+                })
+                .then((response) => {
+                return response.json();
+                })
+                .then((data) => {
+                    console.log('data found');
+                    console.log(data);
+                // Handle the response from the server
+                if (data.user) {
+                // Redirect to the specified URL
+                    var user = data.user;
+                    $("#email").val(user.email);
+                    $("#uid").val(user._id);
+                    $("#password").val(user.password);
+                    $("#f_name").val(user.f_name);
+                    $("#l_name").val(user.l_name);
+                    let status = user.status;
+                    let html = "";
+
+                    if (status === 'active') {
+                        html += "<option value='active' selected='selected'>Active</option>" +
+                            "<option value='inactive'>Inactive</option>";
+                    } else if (status === 'inactive') {
+                        html += "<option value='active'>Active</option>" +
+                            "<option value ='inactive' selected='selected'>Inactive</option>";
+                    }
+
+                    $("#status").html(html);
+
+                    console.log('loaded info');
+                   
+                }
+                else{
+                    // Display the response in a window.alert
+                    window.alert(data.error);
+                }
+                })
+                .catch((error) => {
+                console.error("Error:", error);
+                });
+
+            
+        }
+
+        async function fetchTasks() {
+                console.log("Fetching tasks");
+                try {
+                    const userID = getCookie("userID");
+                    const response = await fetch("/adminTasks/getEmployeeTasks", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            id: userID
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP Fetching Tasks error! Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log(data);
+
+                    // Update the component data with employee data
+                    return data.tasks;
+
+                } catch (error) {
+                    console.error('Error fetching tasks data:', error);
+                }
+            }
+
+        async function saveEmployeeDetails(){
+            console.log("Entered saveEmployeeDetails");
+                try {
+                    console.log('Save button clicked!');
+                    var id = document.getElementById('uid').value;
+                    var email = document.getElementById('email').value;
+                    var password = document.getElementById('password').value;
+                    var f_name = document.getElementById('f_name').value;
+                    var l_name = document.getElementById('l_name').value;
+                    var status = document.getElementById('status').value;
+                    console.log("Email Of Employee to edit: ", email);
+               
+                    const userID = getCookie("userID");
+                    const response = await fetch("/admin/updateEmployeeDetails", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                            email: email,
+                            password: password,
+                            f_name: f_name,
+                            l_name: l_name,
+                            status: status
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP Updating Employee error! Status: ${response.status}`);
+                    }
+
+                   window.alert("User updated successfully!");
+
+                    //const data = await response.json();
+                    //console.log(data);
+
+                    // Update the component data with employee data
+                    //return data.tasks;
+
+                } catch (error) {
+                    console.error('Error updating employee details:', error);
+                }
+        }
+
+        async function updateTask(task){
+            try {
+                    console.log('update task entered');
+               
+                    //const userID = getCookie("userID");
+                    const response = await fetch("/adminTasks/updateTask", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            task
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP Updating Task error! Status: ${response.status}`);
+                    }
+
+                   window.alert("Task updated successfully!");
+
+                } catch (error) {
+                    console.error('Error updating task details:', error);
+                }
+        }
+
+        async function createTask(task){
+            try {
+                    console.log('create task entered');
+               
+                    //const userID = getCookie("userID");
+                    userID = getCookie("userID");
+                    const response = await fetch("/adminTasks/createTask", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            task,
+                            userID
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP Creating Task error! Status: ${response.status}`);
+                    }
+
+                   window.alert("Task created successfully!");
+
+                } catch (error) {
+                    console.error('Error creating task:', error);
+                }
+        }
+
+        async function saveFile(file){
+            try {
+               
+                    //const userID = getCookie("userID");
+                    const formData = new FormData();
+                    formData.append('file', file); // 'file' should match the name attribute of your file input
+                    await new Promise(resolve => setTimeout(resolve, 0));
+
+                    const response = await fetch("/upload", {
+                        method: 'POST',
+                        body: formData,
+                    });
+                    if (!response.ok) {
+                        throw new Error(`HTTP File upload Status: ${response.status}`);
+                    }
+
+                   window.alert("File uploaded successfully!");
+
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                }
+        }
+
+        $("document").ready( async () => {
+                console.log("entered document ready");
+
+            await loadInfo();
+            });
+
+
             const defaultParams = {
                 id: null,
                 title: '',
                 description: '',
                 descriptionText: '',
                 path: '',
-                status: '',
+                statusT: '',
                 priority: '',
             };
             document.addEventListener('alpine:init', () => {
@@ -1307,69 +1575,71 @@
                             }
                         }
 
-                        this.addMessages();
+                        //this.addMessages();
                     },
 
-                    messages: [
-                    ],
+                    // messages: [
+                    // ],
 
-                    addMessages() {
-                        var admins = JSON.parse(getCookie("admins"));
-                        var adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                    // addMessages() {
+                    //     var admins = JSON.parse(getCookie("admins"));
+                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
                         
-                        list = admins[adminID-1]['notifications'];
+                    //     list = admins[adminID-1]['notifications'];
 
-                        for(var i = 0; i < list.length; i++)
-                        {
-                            let maxUserId = this.messages.length
-                                    ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
-                                    : 0;
+                    //     for(var i = 0; i < list.length; i++)
+                    //     {
+                    //         let maxUserId = this.messages.length
+                    //                 ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
+                    //                 : 0;
 
-                            let message = {
-                                id: maxUserId + 1,
-                                message: list[i],
-                            }
+                    //         let message = {
+                    //             id: maxUserId + 1,
+                    //             message: list[i],
+                    //         }
 
-                            this.messages.unshift(message);
-                        }
+                    //         this.messages.unshift(message);
+                    //     }
                             
-                    },
+                    // },
 
-                    removeMessage(value) {
-                        this.messages = this.messages.filter((d) => d.id !== value);
-                        var admins = JSON.parse(getCookie("admins"));
+                    // removeMessage(value) {
+                    //     this.messages = this.messages.filter((d) => d.id !== value);
+                    //     var admins = JSON.parse(getCookie("admins"));
 
-                        var adminID = JSON.parse(sessionStorage.getItem("adminID"));
-                        list = admins[adminID-1]['notifications'];
+                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                    //     list = admins[adminID-1]['notifications'];
 
-                        for(var i = 0; i < list.length; i++)
-                        {
-                            if(i == value-1)
-                                list = list.splice(i, i);
-                        }
+                    //     for(var i = 0; i < list.length; i++)
+                    //     {
+                    //         if(i == value-1)
+                    //             list = list.splice(i, i);
+                    //     }
 
-                        admins[adminID-1]['notifications'] = list;
-                        setCookie("admins", admins);
+                    //     admins[adminID-1]['notifications'] = list;
+                    //     setCookie("admins", admins);
 
 
 
-                    },
+                    // },
                 }));
 
                 //Get tasks and userID from query parameter
-                var cookie = getCookie("tasks");
-                tasks = JSON.parse(cookie);
-                const queryParams = new URLSearchParams(window.location.search);
-                const paramName = 'id';
-                const user_id = queryParams.get(paramName);
-                console.log(tasks)
-                console.log(user_id)
+                // var cookie = getCookie("tasks");
+                // tasks = JSON.parse(cookie);
+                // const queryParams = new URLSearchParams(window.location.search);
+                // const paramName = 'id';
+                // const user_id = queryParams.get(paramName);
+                // console.log(tasks)
+                // console.log(user_id)
 
-                var tasks = tasks.filter(function(task) {
-                    return task.task_user === parseInt(user_id);
-                });
+                // var tasks = tasks.filter(function(task) {
+                //     return task.task_user === parseInt(user_id);
+                // });
 
-                console.log(tasks)
+                // console.log(tasks)
+
+                
 
 
                 //todolist
@@ -1400,20 +1670,17 @@
                     },
                     quillEditor: null,
 
-                    init() {
+                    async init() {
                         this.searchTasks();
                         this.initEditor();
-                        this.user_id = user_id;
 
-                        //Add the employee's tasks to the tasks array
-                        for(var i = 0; i < tasks.length; i++){
-                            if(tasks[i]['task_user'] == this.user_id)
-                            {
-                                this.addTask(tasks[i]['taskID'], tasks[i]['task_name'], tasks[i]['due_date'],
-                                tasks[i]['task_description'], tasks[i]['task_priority'], tasks[i]['task_status'],
-                                tasks[i]['task_user']);
-                            }
-                        }
+                        let count = 0;
+                        let tasks = await fetchTasks();
+                        tasks.forEach(task => {
+                            count++;
+                            this.addTask(count, task['title'], task['start_date'], task['due_date'],
+                                task['description'], task['priority'], task['status'], task['tags'], task['file'], task['_id']);
+                        });
                     },
                     initEditor() {
                         this.quillEditor = new Quill(this.$refs.editor, {
@@ -1502,6 +1769,7 @@
                                 setCookie("users", users);
                             }
                         this.allTasks = [...this.allTasks];
+                        Alpine.store('todolist').$data = Alpine.store('todolist').$data;
                         this.searchTasks(false);
 
                     },
@@ -1532,6 +1800,7 @@
                     },
 
                     filteredCount(type){
+                        console.log(type);
                         return this.allTasks && this.allTasks.filter((d) => d.status === type).length
                     },
 
@@ -1550,8 +1819,9 @@
                             this.params = JSON.parse(JSON.stringify(task));
                             console.log(this.params)
                             this.quillEditor.root.innerHTML = this.params.description;
-                            this.params.status = task.status; 
+                            this.params.statusT = task.status; 
                             this.params.priority = task.priority;
+                            this.params.file = task.file;
                             console.log("task.status ->",task.status)
                             console.log("task.priority ->",task.priority)
                         }
@@ -1559,6 +1829,11 @@
 
 
                         this.addTaskModal = true;
+                    },
+
+                    updateFile(event) {
+                        this.params.file = event.target.files[0]?.name || null;
+                        this.allTasks = [...this.allTasks];
                     },
 
                     deleteTask(task, type) {
@@ -1587,22 +1862,29 @@
                         this.searchTasks(false);
                     },
 
-                    addTask(id, name, date, desc, priority, status, userID) {
-                        //Add task from cookie to array
+                    addTask(id, name, dateS, date, desc, priority, status, tags, file, taskDBID) {
+                        
                         let maxid = 0;
                         if (this.allTasks.length > 0) 
                             maxid = this.allTasks.reduce((max, obj) => (obj.id > max ? obj.id : max), this.allTasks[0].id);
                         if (isNaN(maxid) || maxid === undefined) 
                             maxid = 0;
 
+                        console.log("tag1->",tags[0]);
+
                         let task = {
                             id: maxid + 1,
                             title: name,
                             description: desc,
                             descriptionText: desc,
+                            dateS: dateS,
                             date: date,
                             priority: priority,
                             status: status,
+                            tag1: tags[0],
+                            tag2: tags[1],
+                            file: file, 
+                            dbid: taskDBID
                         };
 
                         console.log("task " + task);
@@ -1612,106 +1894,129 @@
                         this.searchTasks();
                     },
 
-                    saveTask() {
+                    async saveTask() {
                         if (!this.params.title) {
                             this.showMessage('Title is required.', 'error');
                             return false;
                         }
 
                         if (this.params.id) {
-                            //update task
-                            this.pagedTasks = this.pagedTasks.map((d) => {
-                                console.log("ENTERED UPDATE?")
-                                if (d.id === this.params.id) {
-                                    //Receive parameters
-                                    d = this.params;
-                                    d.description = this.quillEditor.root.innerHTML;
-                                    d.descriptionText = this.quillEditor.getText();
+                            title = this.params.title;
+                            description = this.params.descriptionText;
+                            status = this.params.statusT;
+                            console.log("status being edited: ", status);
+                            priority = this.params.priority;
+                            tag1 = this.params.tag1;
+                            tag2 = this.params.tag2;
+                            start_date = this.params.dateS;
+                            due_date = this.params.date;
+                            file_name = this.params.file;
+                            db_id = this.params.dbid;
 
-                                    tasks[d.id-1]['task_name'] = this.params.title;
-                                    tasks[d.id-1]['task_description'] = d.descriptionText;
-                                    tasks[d.id-1]['task_status'] = this.params.status;
-                                    tasks[d.id-1]['task_priority'] = this.params.priority;
-                                    tasks[d.id-1]['due_date'] = this.params.date;
-                                    console.log(d.id);
+                            let task = {
+                                title: title,
+                                description: description,
+                                statusT: status,
+                                priority: priority,
+                                tags: [tag1, tag2],
+                                start_date: start_date,
+                                due_date: due_date,
+                                file: file_name,
+                                dbid: db_id
+                            }
+                            const fileInput = this.$el.querySelector('#fileInput'); // Adjust the selector based on your HTML structure
 
-                                    //Add to tasks array
-                                    this.allTasks[d.id]['status'] = this.params.status;
-                                    this.allTasks = [...this.allTasks];
+                            if (fileInput) {
+                                const file = fileInput.files[0];
+                                await saveFile(file);
+                            }
+                            else
+                                console.log("file input not found");
+                            
+                            
+                            await updateTask(task);
 
-                                    cookieTasks = JSON.parse(getCookie("tasks"));
-                                    console.log(cookieTasks);
+                            const alpineInstance = this;
+                            
 
-                                    id = d.id;
+                            // Use this.$set to update the allTasks array
+                            const taskIndex = alpineInstance.allTasks.findIndex(t => t.dbid === task.dbid);
+                            console.log("taskIndex: ", taskIndex);
+                            let task2 = {
+                            id: taskIndex,
+                            title: title,
+                            description: description,
+                            descriptionText: description,
+                            dateS: start_date,
+                            date: due_date,
+                            priority: priority,
+                            status: status,
+                            tag1: tag1,
+                            tag2: tag2,
+                            file: file_name, 
+                            dbid: db_id
+                            };
+                            console.log("task2: ", task2);
+                            if (taskIndex !== -1) {
+                                alpineInstance.allTasks.splice(taskIndex, 1, task2);
+                            }
 
-                                    //Add to tasks cookie
-                                    cookieTasks.forEach(function(cookieTask) {
-                                            // Check if taskID and task_user match
-                                            console.log(id + " " + user_id);
-                                            if (cookieTask.taskID == id && cookieTask.task_user == user_id) {
-                                                console.log(cookieTask);
-                                                cookieTask.task_name = tasks[id-1]['task_name'];
-                                                cookieTask.task_description = tasks[id-1]['task_description'];
-                                                cookieTask.task_status = tasks[id-1]['task_status'];
-                                                cookieTask.task_priority = tasks[id-1]['task_priority'];
-                                                cookieTask.due_date = tasks[id-1]['due_date'];
-                                                console.log('cookietask: ' + cookieTask);
-                                            }
-                                    });
-                                    console.log(cookieTasks);
-                                    setCookie("tasks", cookieTasks);
+                            console.log("all tasks: ", alpineInstance.allTasks);
+                            //const taskIndex = this.allTasks.findIndex(t => t.dbid === task.dbid);
+                            
+                            // if (taskIndex !== -1) {
+                            //     // Ensure that the task object contains all necessary properties
+                            //     this.$set(this.allTasks, taskIndex, task2);
+                            // }
+                            
 
-                                    //Notify user
-                                    if(users[this.user_id-1])
-                                    {
-                                        notif = `The task titled "${tasks[d.id-1]['task_name']}" has been updated`;
-                                        users[this.user_id-1]['notifications'].push(notif);
-                                        setCookie("users", users);
-                                    }
-                                    }
-                                return d;
-                            });
+                            //this.allTasks = [...this.allTasks];
+                            await this.searchTasks();
                         } else {
 
                             //Add new task
-                            let task = this.params;
-                            let maxid = 0;
-                            if (this.allTasks.length > 0) 
-                                maxid = this.allTasks.reduce((max, obj) => (obj.id > max ? obj.id : max), this.allTasks[0].id);
-                            if (isNaN(maxid) || maxid === undefined) 
-                            maxid = 0;
-                            task.id = maxid + 1;
-                            task.description = this.quillEditor.root.innerHTML;
-                            task.descriptionText = this.quillEditor.getText();
+                            title = this.params.title;
+                            description = this.params.descriptionText;
+                            if(this.params.statusT)
+                                statusT = this.params.statusT;
+                            else
+                                statusT = "Pending";
+                            if(this.params.priority)
+                                priority = this.params.priority;
+                            else
+                                priority = "low";
+                            console.log("Priority that is being added: ", priority);
+                            if(this.params.tag1)
+                                tag1 = this.params.tag1;
+                            else    
+                                tag1 = "";
+                            if(this.params.tag2)
+                                tag2 = this.params.tag2;
+                            else
+                                tag2 = "";
+                            start_date = this.params.dateS;
+                            due_date = this.params.date;
+                            file_name = this.params.file;
+                            db_id = this.params.dbid;
 
-                            if(!task.status)
-                                task.status = 'Pending';
-                            if(!task.priority)
-                                task.priority = 'low';
-
-                            console.log(task);
-                            this.addTask(task.id, task.title, task.date, task.descriptionText, task.priority, task.status, this.user_id);
-
-                            //Add new task to cookie tasks
-                            cookieTasks = getCookie("tasks");
-                            cookieTasks = JSON.parse(cookieTasks);
-
-                            newTask = {"taskID": task.id, "task_user": parseInt(this.user_id), "task_name": task.title,
-                                        "task_description": task.descriptionText, "due_date": task.date,
-                                        "task_status": task.status, "task_priority": task.priority};
-                            cookieTasks.push(newTask);
-                            setCookie("tasks", cookieTasks);
-
-                            console.log(this.allTasks);
-                            let user = users.find(user => user.id == this.user_id);
-                            //Notify user
-                            if(users[this.user_id-1])
-                            {
-                                notif = `The task titled "${cookieTasks[task.id-1]['task_name']}" has been added`;
-                                users[this.user_id-1]['notifications'].push(notif);
-                                setCookie("users", users);
+                            let task = {
+                                title: title,
+                                description: description,
+                                statusT: statusT,
+                                priority: priority,
+                                tag1: tag1,
+                                tag2: tag2,
+                                start_date: start_date,
+                                due_date: due_date,
+                                file: file_name,
+                                dbid: db_id
                             }
-                            this.searchTasks();
+                            console.log("try create task");
+                            await createTask(task);
+                            console.log('after create task');
+
+                            this.allTasks = [...this.allTasks];
+                            await this.searchTasks();
                         }
 
                         this.showMessage('Task has been saved successfully.');
@@ -1734,39 +2039,7 @@
                 }));
             });
 
-            $("document").ready(() => {
-            const queryParams = new URLSearchParams(window.location.search);
-
-            const paramName = 'id';
-            const user_id = queryParams.get(paramName);
-            sessionStorage.setItem("uid",JSON.stringify(user_id));
-
-            loadInfo();
-        });
-
-        const loadInfo = () => {
-            //Load user info onto HTML
-            const id = JSON.parse(sessionStorage.getItem("uid"));
-
-            var cookie = getCookie("users");
-            users = JSON.parse(cookie);
-
-            $("#email").val(users[id-1]['email']);
-            $("#uid").val(id);
-            $("#password").val(users[id-1]['password']);
-            let status = users[id-1]['status'];
-            let html = "";
-
-            if (status === 'active') {
-                html += "<option selected='selected'>Active</option>" +
-                    "<option>Inactive</option>";
-            } else if (status === 'inactive') {
-                html += "<option>Active</option>" +
-                    "<option selected='selected'>Inactive</option>";
-            }
-
-            $("#status").html(html);
-        }
+            
         
         </script>
     </body>

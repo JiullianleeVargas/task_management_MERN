@@ -133,6 +133,7 @@ user.get('/getEmployeeTasks', async (req, res) => {
 
   try {
 
+    //employeeTasks = [];
     // Grab the cookies sent in the response header from the index/fetch
       const cookies = req.headers.cookie.split(';').map(cookie => cookie.trim());
       const employeeIdCookie = cookies.find(cookie => cookie.startsWith('employeeID='));
@@ -151,6 +152,7 @@ user.get('/getEmployeeTasks', async (req, res) => {
       const database = client.db('task_management');
       const employeeCollection = database.collection('employees');
       const taskCollection = database.collection('tasks');
+      const teamCollection = database.collection('teams');
 
       // Convert the employeeID into an object ID so the database can use it
       // const employeeId = new ObjectId("655a5b8c70fc2aea0f9a523a");
@@ -163,9 +165,16 @@ user.get('/getEmployeeTasks', async (req, res) => {
         return;
       }
 
+      const team = await teamCollection.findOne({ "employees": employeeId });
+
       // Retrieve detailed task information for each task ID
       const taskIds = employee.tasks.map(taskId => new ObjectId(taskId));
+      //const taskIds2 = team.tasks.map(taskId => new ObjectId(taskId));
       const employeeTasks = await taskCollection.find({ "_id": { $in: taskIds } }).toArray();
+      //const teamTasks = await teamCollection.find({ "_id": { $in: taskIds2 } }).toArray();
+
+      // employeeTasks.push(individualTasks);
+      // employeeTasks.push(teamTasks);
 
       res.json(employeeTasks);
   } catch (error) {

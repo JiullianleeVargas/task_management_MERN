@@ -24,10 +24,19 @@ function readFrom(file) {
   }
 }
 
-// function setCookie(name, value) {
-//   value = JSON.stringify(value);
-//     document.cookie = name + '=' + value + ';path=/';
-// }
+async function hashPassword(password) {
+  try {
+      // Generate a salt
+      const salt = await bcrypt.genSalt(saltRounds);
+
+      // Hash the password with the generated salt
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      return hashedPassword;
+  } catch (error) {
+      throw error;
+  }
+}
 
 // compare password
 async function comparePassword(plaintextPassword, hash) {
@@ -54,12 +63,17 @@ user.get('/tasks', (req, res) => {
   res.type('html').sendFile(path.join(__dirname, '..', 'tasks.html'));
 })
 
-user.get('/accounts', (req, res) => {
+user.get('/employees', (req, res) => {
   res.type('html').sendFile(path.join(__dirname, '..', 'accounts.html'));
 })
 
 user.get('/reports', (req, res) => {
   res.type('html').sendFile(path.join(__dirname, '..', 'reports.html'));
+})
+
+user.get('/getEmployee', (req, res) => {
+  console.log('getEmployee');
+  res.type('html').sendFile(path.join(__dirname, '..', 'editaccount.html'));
 })
 
 user.post('/login', async function(req, res) {
@@ -92,27 +106,10 @@ user.post('/login', async function(req, res) {
           if(result)
           {
             console.log("Succesful log in!");
-            //classes.setCookie("admin", admin._id);
-            //console.log(admin._id.toString());
-            //res.cookie("admin", admin._id.toString(), { path: '/' });
-            //res.json({ redirect: '/admin/new-route', cookie: admin._id.toString()});
-            res.cookie('admin', admin._id.toString(), { path: '/' }).json({ redirect: '/admin/new-route' });
+            res.json({ redirect: '/admin/new-route', cookie: admin._id.toString()});
           }
       }
 
-      // let admins = data.admins;
-      // let adminExists = Object.values(admins).some(admin => admin.email === email && admin.password === password);
-
-      // if (adminExists) {
-      //   console.log("Succesful log in!");
-      //     console.log('building path');
-
-      //     // Set the content type explicitly to text/html
-      //     console.log('heading to html');
-      //     res.json({ redirect: '/admin/new-route' });
-      //     console.log('after html');
-
-      // } 
       else {
         console.log("Username or password is incorrect");
       }
@@ -142,92 +139,6 @@ user.get('/getAdmins', async (req, res) => {
       await client.close();
   }
 });
-
-
-// user.post("/getEmployees", async (req, res) => {
-
-//       console.log("getEmployees entered");
-//       adminID = req.body.adminID;
-//       adminID = new ObjectId(adminID);
-//       console.log(adminID);
-
-//       const client = new MongoClient('mongodb://0.0.0.0:27017');
-
-//       await client.connect();
-//       const database = client.db('task_management');
-//       const usersCollection = database.collection('team');
-//       console.log("DB connect");
-
-//       // Alternatively, if using a cursor
-//       const cursor = await usersCollection.find({ admin: adminID }).toArray();
-//       const employeeIDs = cursor.map(doc => doc.employees);
-//       const employeesArray = [];
-
-//       for (const employeeId of employeeIDs[0]) {
-//         //const employeeObjectId = new ObjectId(employeeId);
-//         const employeeCollection = database.collection('employee');
-//         const employee = await employeeCollection.findOne({ _id: employeeId });
-  
-//         // Add the employee details to the array
-//         employeesArray.push(employee);
-//       }
-
-//       //console.log(employeesArray);
-
-//       res.json({employees: employeesArray});
-
-// })
-
-user.post('/register', (req, res) => {
-  try {
-
-    let email = req.body.email;
-    let password = req.body.password;
-
-
-
-    email = email.trim();
-    password = password.trim();
-
-    if (email != "" && password != "") {
-      const data = readFrom("data.json");
-      const admins = data.admins;
-      let adminExists = false;
-      //let lastIndex = 0;
-
-      for (let index in admins) {
-        if (admins[index].email == email) {
-          res.send("Username exists");
-          userExists = true;
-        }
-
-        lastIndex = parseInt(index);
-      }
-
-      if (!userExists) {
-        let user = {
-          username: username,
-          password: password
-        };
-
-        data.users[`${lastIndex + 1}`] = user;
-
-        writeTo("data.json", data);
-
-        res.send({
-          message: "Successfull",
-          user: user
-        });
-      }
-    } else {
-      res.send('The username and password can`t be empty');
-    }
-  }
-  catch (error) {
-    res.status(400).send('Invalid JSON data');
-  }
-
-})
 
 user.post('/createAdmin', async function(req, res) {
 
@@ -292,12 +203,9 @@ user.get('/getAdmin/:id', async (req, res) => {
       //console.log('DB connected');
 
       //get admins
-      //const admins = await usersCollection.find({}).toArray();
       const admin = await usersCollection.find({_id: new ObjectId(id)}).toArray();
-      //console.log("admin getAdmin:", admin);
       res.json(admin);
   } catch (error) {
-      //console.error('Error retrieving admins:', error);
       res.status(500).json({ error: 'Internal Server Error' });
   } finally {
       await client.close();
@@ -323,10 +231,8 @@ user.post('/updateAdmin', async function(req, res) {
       console.log("DB connect");
       const admin = await usersCollection.find({_id: new ObjectId(id)}).toArray();
       console.log("admin db:", admin);
-      //res.json({admin});
       if(!admin)
       {
-        //console.log("not admin");
         return res.status(404).json({ error: 'User not found' });
       }
       else {
@@ -355,6 +261,291 @@ user.post('/updateAdmin', async function(req, res) {
     console.log('Connection closed');
   }
 })
+
+user.post('/getEmployeePage', (req, res) => {
+  console.log('/getEmployeePage');
+  res.json({ redirect: '/admin/getEmployee'});
+})
+
+user.post('/getEmployeeDetails', async (req, res) => {
+
+  uid = req.body.id;
+  uid = new ObjectId(uid);
+  console.log("UID: ", uid);
+  const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+  try {
+      //conncet to db
+      await client.connect();
+      const database = client.db('task_management');
+      const usersCollection = database.collection('employees');
+
+      //get admins
+      const user = await usersCollection.findOne({ _id: uid });
+      console.log('user found');
+      console.log(user);
+
+      res.json({ user: user });
+  } catch (error) {
+      console.error('Error retrieving user:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  } finally {
+      await client.close();
+  }
+});
+
+user.post('/createAdmin', async function(req, res) {
+
+  let email = req.body.email;
+  let password = req.body.password;
+  email = email.trim();
+  password = password.trim();
+
+  if (!email || !password) {
+      console.log("No email or password provided");
+      res.status(400).json({ error: "Both email and password are required." });
+  } else {
+    const client = new MongoClient('mongodb://0.0.0.0:27017');
+    try{
+
+        await client.connect();
+        const database = client.db('task_management');
+        const usersCollection = database.collection('admins');
+        console.log("DB connect");
+
+        const employee = await usersCollection.findOne({ email });
+
+        if(!employee)
+        {
+          console.log('no existe el email.');
+          const adminToInsert = { "email": email, "password": password, "status":"active"};
+          console.log('data: ', adminToInsert);
+          // Insert the data into the collection
+          const result = await usersCollection.insertOne(adminToInsert);
+          console.log(`Inserted ${result.insertedCount} document(s)`);
+        }
+        else {
+          console.log("Email already exists");
+        }
+    } finally {
+      // Close the MongoDB connection
+      await client.close();
+      console.log('Connection closed');
+    }
+
+  }
+
+})
+
+
+user.post("/getEmployees", async (req, res) => {
+
+      console.log("getEmployees entered");
+      adminID = req.body.adminID;
+      adminID = new ObjectId(adminID);
+      console.log(adminID);
+
+      const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+      await client.connect();
+      const database = client.db('task_management');
+      const usersCollection = database.collection('teams');
+      console.log("DB connect");
+
+      // Alternatively, if using a cursor
+      const cursor = await usersCollection.find({ admin: adminID }).toArray();
+      const employeeIDs = cursor.map(doc => doc.employees);
+      const employeesArray = [];
+
+      for (const employeeId of employeeIDs[0]) {
+        //const employeeObjectId = new ObjectId(employeeId);
+        const employeeCollection = database.collection('employees');
+        const employee = await employeeCollection.findOne({ _id: employeeId });
+  
+        // Add the employee details to the array
+        employeesArray.push(employee);
+      }
+
+      //console.log(employeesArray);
+
+      res.json({employees: employeesArray});
+
+})
+
+user.post("/updateEmployeeDetails", async (req, res) => {
+
+  console.log("updateEmployeeDetails entered");
+  let id = req.body.id;
+  id = new ObjectId(id);
+  const email = req.body.email;
+  const password = hashPassword(req.body.password);
+  const f_name = req.body.f_name;
+  const l_name = req.body.l_name;
+  const status = req.body.status;
+    
+     // Connect to the MongoDB server
+     const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+     try {
+         await client.connect();
+
+         const employee = {
+          email: email,
+          password: password,
+          f_name: f_name,
+          l_name: l_name,
+          status: status,
+        };
+ 
+         // Access the 'task_management' database and 'employees' collection
+         const database = client.db('task_management');
+         const usersCollection = database.collection('employees');
+ 
+        //  const employee_db = await usersCollection.findOne({ email: employee.email });
+
+        //  if (!employee_db) {
+        //   // If the employee is not found, handle the error appropriately
+        //   res.status(404).json({ error: 'Employee not found' });
+        //   return;
+        // }
+
+        // const eid = employee_db._id;
+
+        //const cursor = await teamCollection.find({ admin: adminID }).toArray();
+
+        await usersCollection.updateOne(
+          { _id: id },
+          {$set:{
+            email: email,
+            password: password,
+            f_name: f_name,
+            l_name: l_name,
+            status: status,
+          }}
+      );
+
+
+ 
+         // Respond with a success message or other appropriate response
+         res.status(200).json({ message: 'Employee updated successfully'});
+     } catch (error) {
+         console.error('Error inserting employee:', error);
+ 
+         // Respond with an error message or handle the error appropriately
+         res.status(500).json({ error: 'Internal Server Error' });
+     } finally {
+         // Close the MongoDB connection
+         await client.close();
+     }
+ 
+})
+
+user.post("/createEmployee", async (req, res) => {
+
+  console.log("getEmployees entered");
+  const email = req.body.email;
+  const password = hashPassword(req.body.password);
+  const f_name = req.body.f_name;
+  const l_name = req.body.l_name;
+  const status = req.body.status;
+    
+     // Connect to the MongoDB server
+     const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+     try {
+         await client.connect();
+
+         const employee = {
+          email: email,
+          password: password,
+          f_name: f_name,
+          l_name: l_name,
+          status: status,
+        };
+ 
+         // Access the 'task_management' database and 'employees' collection
+         const database = client.db('task_management');
+         const usersCollection = database.collection('employees');
+         const teamCollection = database.collection('teams');
+ 
+         // Insert the employee object into the collection
+         const result = await usersCollection.insertOne(employee);
+ 
+         const employee_db = await usersCollection.findOne({ email: employee.email });
+
+        const eid = employee_db._id;
+
+        //const cursor = await teamCollection.find({ admin: adminID }).toArray();
+
+        const result2 = await teamCollection.updateOne(
+          { admin: adminID },
+          {
+              $push: {
+                  employees: eid,
+              },
+          }
+      );
+
+
+ 
+         // Respond with a success message or other appropriate response
+         res.status(200).json({ message: 'Employee inserted successfully', id: eid });
+     } catch (error) {
+         console.error('Error inserting employee:', error);
+ 
+         // Respond with an error message or handle the error appropriately
+         res.status(500).json({ error: 'Internal Server Error' });
+     } finally {
+         // Close the MongoDB connection
+         await client.close();
+     }
+ 
+})
+
+user.post("/setStatus", async (req, res) => {
+
+  console.log("/setStatus entered");
+  const userID = new ObjectId(req.body.userID);
+  console.log(userID);
+  const status = req.body.status;
+  console.log(status);
+    
+     // Connect to the MongoDB server
+     const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+     try {
+         await client.connect();
+ 
+         // Access the 'task_management' database and 'employees' collection
+         const database = client.db('task_management');
+         const usersCollection = database.collection('employees');
+
+         await usersCollection.updateOne(
+          { _id: userID },
+          {$set:
+            {
+              status: status
+            }
+         }
+        );
+
+        const employee_db = await usersCollection.findOne({ _id: userID });
+        console.log(employee_db.status);
+ 
+         // Respond with a success message or other appropriate response
+         res.status(200).json({ message: 'Employee updated successfully'});
+     } catch (error) {
+         console.error('Error inserting employee:', error);
+ 
+         // Respond with an error message or handle the error appropriately
+         res.status(500).json({ error: 'Internal Server Error' });
+     } finally {
+         // Close the MongoDB connection
+         await client.close();
+     }
+ 
+})
+
 
 
 user.get('/getTeam/:id', async (req, res) => {

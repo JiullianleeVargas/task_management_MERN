@@ -22,7 +22,7 @@
     </head>
 
     <body
-        x-data="main"
+        x-data="main()"
         class="relative overflow-x-hidden font-nunito text-sm font-normal antialiased"
         :class="[ $store.app.sidebar ? 'toggle-sidebar' : '', $store.app.theme === 'dark' || $store.app.isDarkMode ?  'dark' : '', $store.app.menu, $store.app.layout,$store.app.rtlClass]"
     >
@@ -46,7 +46,7 @@
         </div>
 
         <!-- scroll to top button -->
-        <div class="fixed bottom-6 z-50 ltr:right-6 rtl:left-6" x-data="scrollToTop">
+        <div class="fixed bottom-6 z-50 ltr:right-6 rtl:left-6" x-data="scrollToTop()">
             <template x-if="showTopButton">
                 <button
                     type="button"
@@ -74,7 +74,7 @@
             <!-- start sidebar section -->
             <div :class="{'dark text-white-dark' : $store.app.semidark}">
                 <nav
-                    x-data="sidebar"
+                    x-data="sidebar()"
                     class="sidebar fixed top-0 bottom-0 z-50 h-full min-h-screen w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] transition-all duration-300"
                 >
                     <div class="h-full bg-white dark:bg-[#0e1726]">
@@ -109,7 +109,7 @@
                         <li class="nav-item">
                             <ul>
                                 <li class="nav-item">
-                                    <a href="tasks" class="group">
+                                    <a href="tasks.html" class="group">
                                         <div class="flex items-center">
                                             <svg
                                                 class="shrink-0 group-hover:!text-primary"
@@ -136,7 +136,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="accounts" class="active group">
+                                    <a href="accounts.html" class="active group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -156,7 +156,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="admins" class="group">
+                                    <a href="admins.html" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -176,7 +176,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="reports" class="group">
+                                    <a href="reports.html" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -236,14 +236,14 @@
                                 </ul>
                             </div>
                             <div
-                                x-data="header"
+                                x-data="header()"
                                 class="flex items-center space-x-1.5 ltr:ml-auto rtl:mr-auto rtl:space-x-reverse dark:text-[#d0d2d6] sm:flex-1 ltr:sm:ml-0 sm:rtl:mr-0 lg:space-x-2"
                             >
                                 <div class="sm:ltr:mr-auto sm:rtl:ml-auto" x-data="{ search: false }" @click.outside="search = false">
                                 </div>
                                 
 
-                                <div class="dropdown" x-data="dropdown" @click.outside="open = false">
+                                <div class="dropdown" x-data="dropdown()" @click.outside="open = false">
                                     <a
                                         href="javascript:;"
                                         class="relative block rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary dark:bg-dark/40 dark:hover:bg-dark/60"
@@ -264,14 +264,14 @@
                                             <path d="M12 6V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                                         </svg>
                                         <!--Notification alert probing icon-->
-                                        <template x-if="messages.length">
+                                        <!-- <template x-if="messages.length">
                                             <span class="absolute top-0 flex h-3 w-3 ltr:right-0 rtl:left-0">
                                                 <span
                                                     class="absolute -top-[3px] inline-flex h-full w-full animate-ping rounded-full bg-success/50 opacity-75 ltr:-left-[3px] rtl:-right-[3px]"
                                                 ></span>
                                                 <span class="relative inline-flex h-[6px] w-[6px] rounded-full bg-success"></span>
-                                            </span> <!---->
-                                        </template>
+                                            </span> 
+                                        </template> -->
                                     </a>
                                     <!--Notifications-->
                                     <ul
@@ -284,12 +284,12 @@
                                         <li>
                                             <div class="flex items-center justify-between px-4 py-2 font-semibold hover:!bg-transparent">
                                                 <h4 class="text-lg">Notifications</h4>
-                                                <template x-if="messages.length">
+                                                <!-- <template x-if="messages.length">
                                                     <span class="badge bg-primary/80" x-text="messages.length + ''"></span>
-                                                </template>
+                                                </template> -->
                                             </div>
                                         </li>
-                                        <template x-for="notification in messages">
+                                        <!-- <template x-for="notification in messages">
                                             <li class="dark:text-white-light/90">
                                                 <div class="group flex items-center px-4 py-2" @click.self="toggle">
                                                    
@@ -316,8 +316,8 @@
                                                     </div>
                                                 </div>
                                             </li>
-                                        </template>
-                                        <template x-if="!messages.length">
+                                        </template> -->
+                                        <!-- <template x-if="!messages.length">
                                             <li>
                                                 <div class="!grid min-h-[200px] place-content-center text-lg hover:!bg-transparent">
                                                     <div class="mx-auto mb-4 rounded-full text-primary ring-4 ring-primary/30">
@@ -340,11 +340,11 @@
                                                     No data available.
                                                 </div>
                                             </li>
-                                        </template>
+                                        </template> -->
                                     </ul>
                                 </div>
                                 
-                                <div class="dropdown flex-shrink-0" x-data="dropdown" @click.outside="open = false">
+                                <div class="dropdown flex-shrink-0" x-data="dropdown()" @click.outside="open = false">
                                     <a href="javascript:;"
                                     class="block rounded-full bg-white-light/40 p-2 hover:bg-white-light/90 hover:text-primary dark:bg-dark/40 dark:hover:bg-dark/60"
                                     @click="toggle()">
@@ -481,7 +481,27 @@
                                                             />
                                                         </div>
                                                         <div class="mb-5">
-                                                            <label for="password">password</label>
+                                                            <label for="f_name">First Name</label>
+                                                            <input
+                                                                id="f_name"
+                                                                type="text"
+                                                                placeholder="Yeyo"
+                                                                class="form-input"
+                                                                x-model="params.f_name"
+                                                            />
+                                                        </div>
+                                                        <div class="mb-5">
+                                                            <label for="l_name">Last Name</label>
+                                                            <input
+                                                                id="l_name"
+                                                                type="text"
+                                                                placeholder="Soto"
+                                                                class="form-input"
+                                                                x-model="params.l_name"
+                                                            />
+                                                        </div>
+                                                        <div class="mb-5">
+                                                            <label for="password">Password</label>
                                                             <input
                                                                 id="password"
                                                                 type="password"
@@ -577,14 +597,14 @@
                                                                 ></ellipse>
                                                             </svg>
                                                         </div>
-                                                        <div class='email_tab' x-on:click="editAccount(contact.cookieUserID)" x-text="contact.email"></div>
+                                                        <div class='email_tab' x-on:click="editAccount(contact.DBUserID)" x-text="contact.email"></div>
                                                     </div>
                                                 </td>
                                                 
                                                 <td class="w-1">
                                                     <div class="flex items-center space-x-2 ltr:justify-end rtl:justify-start rtl:space-x-reverse">
                                                         <template x-if="contact.status">
-                                                            <div x-data="dropdown" @click.outside="open = false" class="dropdown">
+                                                            <div x-data="dropdown()" @click.outside="open = false" class="dropdown">
                                                                 <button
                                                                     type="button"
                                                                     class="badge rounded-full capitalize hover:top-0 hover:text-white"
@@ -646,49 +666,27 @@
             </div>
         </div>
 
+        <script defer src="/assets/js/alpine.min.js"></script>
         <script src="/assets/js/alpine-collaspe.min.js"></script>
         <script src="/assets/js/alpine-persist.min.js"></script>
         <script defer src="/assets/js/alpine-ui.min.js"></script>
         <script defer src="/assets/js/alpine-focus.min.js"></script>
-        <script defer src="/assets/js/alpine.min.js"></script>
         <script src="/assets/js/custom.js"></script>
 
         <script>
-            document.addEventListener("DOMContentLoaded", function () {
-            //var adminID = JSON.parse(sessionStorage.getItem("adminID"));
-            console.log("Entered DOM Content Loaded");
-            var answer = checkCookieExists("adminID");
-            if(answer)  
-                console.log("adminID was found");
-            else   
-                console.log("adminID was not found");
-            var adminID = getCookie("adminID");
-            console.log("adminID: ", adminID);
+            $("document").ready(() => {
+                $(".email_tab").mouseover(function() {
+                $(".email_tab").css("cursor", "pointer");
+                });
 
-            fetch("/admin/getEmployees", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    adminID: adminID
-                }),
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                // Handle the response or update the UI
-                console.log(data);
-                let employees = data.employees;
-            })
-            .catch((error) => {
-                console.error("Error:", error);
+                $(".email_tab").mouseout(function() {
+                    $(".email_tab").css("cursor", "default");
+                });
             });
 
-            console.log("EMPLOYEES");
-            console.log(employees);
-        });
-
-            document.addEventListener('alpine:init', () => {
+            
+            document.addEventListener('alpine:init', async () => {
+                console.log("FIRST EVENT");
                 // main section
                 Alpine.data('scrollToTop', () => ({
                     showTopButton: false,
@@ -751,66 +749,58 @@
                             }
                         }
 
-                        this.addMessages();
+                        //this.addMessages();
                     },
 
                     //Notifications array
-                    messages: [
-                    ],
+                    // messages: [
+                    // ],
 
                     //Add notifications to array from cookie
-                    addMessages() {
-                        var admins = JSON.parse(getCookie("admins"));
-                        var adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                    //  addMessages() {
+                    //     var admins = JSON.parse(getCookie("admins"));
+                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
                         
-                        list = admins[adminID-1]['notifications'];
+                    //     list = admins[adminID-1]['notifications'];
 
-                        for(var i = 0; i < list.length; i++)
-                        {
-                            let maxUserId = this.messages.length
-                                    ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
-                                    : 0;
+                    //     for(var i = 0; i < list.length; i++)
+                    //     {
+                    //         let maxUserId = this.messages.length
+                    //                 ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
+                    //                 : 0;
 
-                            let message = {
-                                id: maxUserId + 1,
-                                message: list[i],
-                            }
+                    //         let message = {
+                    //             id: maxUserId + 1,
+                    //             message: list[i],
+                    //         }
 
-                            this.messages.unshift(message);
-                        }
+                    //         this.messages.unshift(message);
+                    //     }
                             
-                    },
+                    // },
 
                     //Remove a notification
-                    removeMessage(value) {
-                        this.messages = this.messages.filter((d) => d.id !== value);
-                        var admins = JSON.parse(getCookie("admins"));
+                    // removeMessage(value) {
+                    //     this.messages = this.messages.filter((d) => d.id !== value);
+                    //     var admins = JSON.parse(getCookie("admins"));
 
-                        var adminID = JSON.parse(sessionStorage.getItem("adminID"));
-                        list = admins[adminID-1]['notifications'];
+                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                    //     list = admins[adminID-1]['notifications'];
 
-                        for(var i = 0; i < list.length; i++)
-                        {
-                            if(i == value-1)
-                                list = list.splice(i, i);
-                        }
-                        admins[adminID-1]['notifications'] = list;
-                        setCookie("admins", admins);
+                    //     for(var i = 0; i < list.length; i++)
+                    //     {
+                    //         if(i == value-1)
+                    //             list = list.splice(i, i);
+                    //     }
+                    //     admins[adminID-1]['notifications'] = list;
+                    //     setCookie("admins", admins);
 
-                    },
+                    // },
                 }));
             });
-        
-        //Redirect to employee account given their ID
-        const editAccount = (id) => {  
-            var uid = id;
-            const newUrl = `editaccount.html?id=${uid}`;
 
-            // Redirect to the new URL
-            window.location.href = newUrl;
-        }
-
-        document.addEventListener("alpine:init", () => {
+        document.addEventListener("alpine:init", async () => {
+            console.log("HEY");
             Alpine.data("collapse", () => ({
                 collapse: false,
 
@@ -826,32 +816,132 @@
                     this.open = !this.open;
                 },
             }));
-
-            // var users = JSON.parse(getCookie("users"));
-            // var admins = JSON.parse(getCookie("admins"));
-            var adminID = JSON.parse(sessionStorage.getCookie("adminID"));
-
-            fetch("/admin/getEmployees", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                // Your data goes here
-                adminID: adminID
-            }),
-            })
-            .then((response) => {
-            return response.json();
-            })
-            .then((data) => {
-
-            })
-            .catch((error) => {
-            console.error("Error:", error);
-            });
             
-            
+            async function fetchData() {
+                console.log("Fetch data");
+                try {
+                    const adminID = getCookie("adminID");
+                    const response = await fetch("/admin/getEmployees", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            adminID: adminID
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log(data);
+
+                    // Update the component data with employee data
+                    return data.employees;
+
+                } catch (error) {
+                    console.error('Error fetching employee data:', error);
+                }
+            }
+
+            async function insertEmployee(user) {
+                console.log("Inserting employee");
+                try {
+                    const adminID = getCookie("adminID");
+                    const response = await fetch("/admin/createEmployee", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            email: user.email,
+                            f_name: user.f_name,
+                            l_name: user.l_name,
+                            password: user.password,
+                            status: user.status
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log(data);
+
+                    // Update the component data with employee data
+                    return data.id;
+
+                } catch (error) {
+                    console.error('Error fetching employee data:', error);
+                }
+            }
+
+            async function setUserStatus(userID, status) {
+                console.log("Updating employee status");
+                try {
+                    const response = await fetch("/admin/setStatus", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            userID: userID,
+                            status: status
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log(data);
+
+                    // Update the component data with employee data
+                    return
+
+                } catch (error) {
+                    console.error('Error updating employee data:', error);
+                }
+            }
+
+            async function editUserAccount(id) {  
+                var uid = id;
+                document.cookie = `userID=${uid}; path=/`;
+                // Send the data to the server using Fetch API
+                fetch("/admin/getEmployeePage", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id: uid,
+                }),
+                })
+                .then((response) => {
+                return response.json();
+                })
+                .then((data) => {
+                    console.log('data hey');
+                // Handle the response from the server
+                if (data.redirect) {
+                // Redirect to the specified URL
+                    console.log("data redirect");
+                    window.location.href = data.redirect;
+                }
+                else{
+                    // Display the response in a window.alert
+                    window.alert(data.error || "Welcome!");
+                }
+                })
+                .catch((error) => {
+                console.error("Error:", error);
+                });
+            }
+
             Alpine.data('contacts', () => ({
                     defaultParams: {
                         id: null,
@@ -877,19 +967,25 @@
                         
                     ],
 
-                    init() {
+                    async init() {
+                        console.log("init");
+
+                        
+
                         this.searchContacts();
-                        list = admins[adminID-1]['userlist'];
-                        console.log(list);
-                        length = list.length;
-                        for(var i = 0; i < length; i++)
-                        {
-                            id = list[i];
-                            console.log(users[id-1]['email']);
-                            this.addUser(id, users[id-1]['email'], users[id-1]['password'], users[id-1]['status'], users[id-1]['id']);
-                        }
+                        let count = 0;
+                        let employees = await fetchData();
+                        employees.forEach(employee => {
+                            count++;
+                            // Assuming addUser takes parameters (id, email, password, status, userId)
+                            this.addUser(count, employee['email'], employee['password'], employee['status'], employee['_id']);
+                        });
+
+                        console.log(this.contactList);
 
                     },
+
+                    
 
                     searchContacts() {
                         this.filterdContactsList = this.contactList.filter((d) => d.email.toLowerCase().includes(this.searchUser.toLowerCase()));
@@ -913,22 +1009,23 @@
                                 id: maxUserId + 1,
                                 path: 'profile-35.png',
                                 email: themail,
-                                password: password,
+                                password: pass,
                                 status: thestatus,
-                                cookieUserID: userid,
+                                DBUserID: userid,
                             };
+                            //this.contactList.unshift(user);
                             this.contactList.splice(0, 0, user);
                             this.searchContacts();
                             
                     },
 
-                    saveUser() {
+                    async saveUser() {
                         if (!this.params.email) {
-                            this.showMessage('Email is required.', 'error');
+                            //this.showMessage('Email is required.', 'error');
                             return true;
                         }
                         if (!this.params.password) {
-                            this.showMessage('Password is required.', 'error');
+                            //this.showMessage('Password is required.', 'error');
                             return true;
                         }
 
@@ -937,6 +1034,7 @@
                             let user = this.contactList.find((d) => d.id === this.params.id);
                             user.email = this.params.email;
                             user.password = this.params.password;
+                            user.
                             user.status = 'active';
                         } else {
                             //add user
@@ -944,73 +1042,90 @@
                                 ? this.contactList.reduce((max, character) => (character.id > max ? character.id : max), this.contactList[0].id)
                                 : 0;
 
-                            const user1 = new EMPLOYEE(users.length + 1, this.params.email, this.params.password);
-                            console.log("user 1: ", user1);
-                            users.push(user1);
+                            // const user1 = new EMPLOYEE(users.length + 1, this.params.email, this.params.password);
+                            // console.log("user 1: ", user1);
+                            // users.push(user1);
 
                             let user = {
                                 id: maxUserId + 1,
                                 path: 'profile-35.png',
                                 email: this.params.email,
                                 password: this.params.password,
+                                f_name: this.params.f_name,
+                                l_name: this.params.l_name,
                                 status: 'active',
                             };
+                            // this.contactList.splice(0, 0, user);
+                            // this.searchContacts();
+
+                            // setCookie("users", users);
+
+                            // admin = admins.find(admin => admin.id == adminID);
+                            // if(admin)
+                            // {
+                            //     console.log("Aqui: ", admin);
+                            //     admins[adminID-1].userlist.push(user1.id);
+                            //     setCookie("admins", admins);
+                            // }
+                            
+                            const dbuserid = await insertEmployee(user);
+                            user.DBUserID = dbuserid;
                             this.contactList.splice(0, 0, user);
-                            this.searchContacts();
-
-                            setCookie("users", users);
-
-                            admin = admins.find(admin => admin.id == adminID);
-                            if(admin)
-                            {
-                                console.log("Aqui: ", admin);
-                                admins[adminID-1].userlist.push(user1.id);
-                                setCookie("admins", admins);
-                            }
     
                         }
 
-                        this.showMessage('User has been saved successfully.');
+                        //this.showMessage('User has been saved successfully.');
+                        this.searchContacts();
                         this.addContactModal = false;
                     },
 
                     deleteUser(user) {
                         this.contactList = this.contactList.filter((d) => d.id != user.id);
                         this.searchContacts();
-                        this.showMessage('User has been deleted successfully.');
+                        //this.showMessage('User has been deleted successfully.');
                     },
 
-                    showMessage(msg = '', type = 'success') {
-                        const toast = window.Swal.mixin({
-                            toast: true,
-                            position: 'top',
-                            showConfirmButton: false,
-                            timer: 3000,
-                        });
-                        toast.fire({
-                            icon: type,
-                            title: msg,
-                            padding: '10px 20px',
-                        });
-                    },
+                    // showMessage(msg = '', type = 'success') {
+                    //     const toast = window.Swal.mixin({
+                    //         toast: true,
+                    //         position: 'top',
+                    //         showConfirmButton: false,
+                    //         timer: 3000,
+                    //     });
+                    //     toast.fire({
+                    //         icon: type,
+                    //         title: msg,
+                    //         padding: '10px 20px',
+                    //     });
+                    // },
 
-                    setStatus(contact, nombre) {
-                        let item = this.filterdContactsList.find((d) => {
-                            return d.id === contact.id;
+                    async setStatus(contact, nombre) {
+                        // let item = this.filterdContactsList.find((d) => {
+                        //     return d.id === contact.id;
                             
-                        });
+                        // });
 
-                        if(item)
-                        {
-                            users[contact.id-1]['status'] = nombre;
-                            let usersJSON = JSON.stringify(users);
-                            document.cookie = `users=${usersJSON}; path=/`;
-                            item.status = nombre;
-                        }
+                        // if(item)
+                        // {
+                        //     users[contact.id-1]['status'] = nombre;
+                        //     let usersJSON = JSON.stringify(users);
+                        //     document.cookie = `users=${usersJSON}; path=/`;
+                        //     item.status = nombre;
+                        // }
 
-                        
+                        await setUserStatus(contact.DBUserID, nombre);
+
+                        this.contactList = [...this.contactList];
                         this.searchContacts(false);
+                        
+                        //location.reload()
                     },
+
+                
+                    async editAccount(id)
+                    {
+                        await editUserAccount(id);
+                    }
 
                     
                 }));

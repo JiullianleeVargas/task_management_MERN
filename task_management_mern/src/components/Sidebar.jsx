@@ -62,6 +62,12 @@ function Sidebar_() {
                     <div className="flex align-items-center px-5 surface-section  flex-shrink-0" style={{ height: '60px' }}>
                         <img src="../images/favicon.png" alt="hyper-300" height={30} />
                         <span style={{ fontSize: '20px' }} className="align-middle text-2xl font-semibold ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light lg:inline">TechSpire</span>
+                        <StyleClass nodeRef={btnRef2} selector="#app-sidebar-1" enterClassName="hidden" enterActiveClassName="fadeinleft" leaveToClassName="hidden" leaveActiveClassName="fadeoutleft" hideOnOutsideClick>
+                            <a ref={btnRef2} className="p-ripple cursor-pointer block text-700 pl-3 ml-5">
+                                <i className="pi pi-angle-double-left text-2xl"></i>
+                                <Ripple />
+                            </a>
+                        </StyleClass>
                     </div>
 
 

@@ -4,6 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
+import CreateAdmin from './createAdmin';
 
 
 const Admins = () => {
@@ -46,9 +47,7 @@ const Admins = () => {
     const header = (
         <div className="flex flex-wrap align-items-center justify-content-between gap-2">
             <span className="text-xl text-900 font-bold">Administrators</span>
-            <Button severity="info">
-                <i className='pi pi-plus'></i>&nbsp; Create Admin Account
-            </Button>
+            <CreateAdmin />
         </div>
     );
     const footer = `In total there are ${admins ? admins.length : 0} Administrators.`;

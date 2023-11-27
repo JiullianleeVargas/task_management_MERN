@@ -24,7 +24,7 @@ const Admins = () => {
         return <div>
             <img src={`/images/avatar.png`} alt={admin.image}
                 style={{ width: "24px", height: "24px" }} />
-            <label style={{ marginLeft: "10px" }}><Link to={`/main/editAdmin/${admin._id}`} style={{ textDecoration: 'none' }}>{admin.email}</Link></label>
+            <label style={{ marginLeft: "10px" }}><Link to={`/main/editAdmin/id=${admin._id}`} style={{ textDecoration: 'none' }}>{admin.email}</Link></label>
         </div>;
     };
 

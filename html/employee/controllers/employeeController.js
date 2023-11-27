@@ -43,28 +43,28 @@ user.use(express.json());
 
 
 user.get('/index.html', (req, res) => {
-  console.log("inside the new route function")
+  // console.log("inside the new route function")
   res.type('html').sendFile(path.join(__dirname, '..', 'index2.html'));
-  console.log(__dirname);
+  // console.log(__dirname);
 })
 
 
 user.get('/login.html', (req, res) => {
-  console.log("inside the new route function")
+  // console.log("inside the new route function")
   res.type('html').sendFile(path.join(__dirname, '..', 'login2.html'));
-  console.log(__dirname);
+  // console.log(__dirname);
 })
 
 user.get('/apps-calendar.html', (req, res) => {
-  console.log("inside the new route function")
+  // console.log("inside the new route function")
   res.type('html').sendFile(path.join(__dirname, '..', 'apps-calendar.html'));
-  console.log(__dirname);
+  // console.log(__dirname);
 })
 
 user.get('/reports.html', (req, res) => {
-  console.log("inside the new route function")
+  // console.log("inside the new route function")
   res.type('html').sendFile(path.join(__dirname, '..', 'reports.html'));
-  console.log(__dirname);
+  // console.log(__dirname);
 })
 
 user.post('/login', async function(req, res) {
@@ -75,7 +75,7 @@ user.post('/login', async function(req, res) {
     password = password.trim();
 
     if (!email || !password) {
-        console.log("No email or password provided");
+        // console.log("No email or password provided");
         res.status(400).json({ error: "Both email and password are required." });
     } else {
       const client = new MongoClient('mongodb://0.0.0.0:27017');
@@ -119,6 +119,7 @@ user.post('/login', async function(req, res) {
 
       else {
         console.log("Username or password is incorrect");
+        res.status(404).json({ error: 'Username and password incorrect' });
       }
 
     }
@@ -127,7 +128,7 @@ user.post('/login', async function(req, res) {
 
 user.get('/getEmployeeTasks', async (req, res) => {
  
-  
+  console.log("Entered getEmployeeTasks controller")
   const client = new MongoClient('mongodb://0.0.0.0:27017');
   
 
@@ -146,7 +147,7 @@ user.get('/getEmployeeTasks', async (req, res) => {
 
       // Spliting the id from "employeeID="
       const employeeID = employeeIdCookie.split('=')[1];
-    
+      console.log("EmployeeID: ", employeeID);
       await client.connect();
 
       const database = client.db('task_management');
@@ -165,7 +166,7 @@ user.get('/getEmployeeTasks', async (req, res) => {
         return;
       }
 
-      const team = await teamCollection.findOne({ "employees": employeeId });
+      // const team = await teamCollection.findOne({ "employees": employeeId });
 
       // Retrieve detailed task information for each task ID
       const taskIds = employee.tasks.map(taskId => new ObjectId(taskId));
@@ -173,6 +174,7 @@ user.get('/getEmployeeTasks', async (req, res) => {
       const employeeTasks = await taskCollection.find({ "_id": { $in: taskIds } }).toArray();
       //const teamTasks = await teamCollection.find({ "_id": { $in: taskIds2 } }).toArray();
 
+      console.log(employeeTasks)
       // employeeTasks.push(individualTasks);
       // employeeTasks.push(teamTasks);
 
@@ -188,7 +190,7 @@ user.get('/getEmployeeTasks', async (req, res) => {
 // Controller/route to fetch tasks from a team of which the employee belongs to
 user.get('/getTeamTasks', async (req, res) => {
  
-  
+  console.log("Entered getTeamTasks")
   const client = new MongoClient('mongodb://0.0.0.0:27017');
   
 
@@ -236,6 +238,7 @@ user.get('/getTeamTasks', async (req, res) => {
 
       //Return the employees team tasks
       res.json(teamEmployeeTasks);
+      console.log("Team Tasks: ", teamEmployeeTasks)
 
 
       
@@ -249,7 +252,7 @@ user.get('/getTeamTasks', async (req, res) => {
 
 user.get('/getUserInformation', async (req, res) => {
  
-  
+  console.log("Entered the getUserInformation")
   const client = new MongoClient('mongodb://0.0.0.0:27017');
   
 
@@ -291,7 +294,9 @@ user.get('/getUserInformation', async (req, res) => {
 
     // Return the information in the response
       res.json({ f_name, l_name, email });
-    
+      console.log("Employees first name: ", f_name)
+      console.log("Employees last name: ", l_name)
+      console.log("Employees email:  ", email)
   
   } catch (error) {
       console.error("Error:", error);
@@ -305,6 +310,8 @@ user.get('/getUserInformation', async (req, res) => {
 // Controller that changes the status in the database
 // Recieves in the req the userID, taskID and newStatus
 user.post('/setStatus', async (req, res) => {
+
+  console.log("Entered setStatus")
   const client = new MongoClient('mongodb://0.0.0.0:27017');
 
   try {
@@ -315,6 +322,9 @@ user.post('/setStatus', async (req, res) => {
     // Extracting the taskID of the task to change and the new status
     const taskID = req.body.taskID;
     const newStatus = req.body.newStatus;
+
+    console.log("TaskID: ", taskID)
+    console.log("newStatus: ", newStatus)
 
     if (!employeeIdCookie) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -349,6 +359,8 @@ user.post('/setStatus', async (req, res) => {
     // Retrieve updated task information if needed
     const updatedTaskIds = employee.tasks.map(taskId => new ObjectId(taskId));
     const updatedEmployeeTasks = await taskCollection.find({ "_id": { $in: updatedTaskIds } }).toArray();
+    
+    console.log("Updated Employee Tasks: ", updatedEmployeeTasks)
 
     res.json(updatedEmployeeTasks);
   } catch (error) {

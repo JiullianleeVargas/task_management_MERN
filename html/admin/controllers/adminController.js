@@ -40,6 +40,14 @@ async function comparePassword(plaintextPassword, hash) {
 
 user.use(express.json());
 user.use(cookieParser());
+user.use((req, res, next) => {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // Continue to the next middleware or route
+  next();
+});
 
 user.get('/new-route', (req, res) => {
   //console.log('entered new route');
@@ -69,6 +77,7 @@ user.post('/login', async function(req, res) {
 
     let email = req.body.email;
     let password = req.body.password;
+    console.log("email: ". email);
     email = email.trim();
     password = password.trim();
 
@@ -95,8 +104,10 @@ user.post('/login', async function(req, res) {
           if(result)
           {
             console.log("Succesful log in! ", admin._id.toString());
-            res.cookie('admin', admin._id.toString(), { httpOnly: false, sameSite: 'None' }).json({ auth : true });
+            //res.cookie('admin', admin._id.toString(), { httpOnly: false, sameSite: 'None' }).json({ auth : true });
             //res.json({ auth : true, cookie: admin._id.toString()});
+            res.json({ auth : true, admin: admin._id.toString() });
+
           }
       }
       else {

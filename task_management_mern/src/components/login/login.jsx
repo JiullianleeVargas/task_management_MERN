@@ -12,28 +12,86 @@ const Login = (props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault(); // Prevent form submission
 
+        //         const res = await axios.post(baseUrl,  
+        //         { withCredentials: true ,
+        //             headers: {
+        //             Accept: "application/json",
+        //             "Content-Type": "application/json",
+        //         },
+        //         body: JSON.stringify({
+        //             email: email,
+        //             password: password,
+        //         })
+        //     }).then(response => response.json())
+        //     .then(value => {
+        //         if (value.auth === true) {
+        //             window.location.href = "/main/tasks";
+        //         } else if (value.auth === false) {
+        //             window.location.href = "login";
+        //         }
+        //     })
+        // };
+
+        // fetch(baseUrl, {
+        //     method: "POST",
+        //     headers: {
+        //         Accept: "application/json",
+        //         "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({
+        //         email: email,
+        //         password: password,
+        //     }),
+        //     credentials: 'include',
+        // }).then(response => response.json())
+        //     .then(value => {
+        //         if (value.auth === true) {
+        //             window.location.href = "/main/tasks";
+        //         } else if (value.auth === false) {
+        //             window.location.href = "login";
+        //         }
+        //     })
         fetch(baseUrl, {
             method: "POST",
             headers: {
-                Accept: "application/json",
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 email: email,
                 password: password,
             }),
-            credentials: 'include',
-        }).then(response => response.json())
-            .then(value => {
-                if (value.auth === true) {
+        }).then((response) => {
+            // Check for the Set-Cookie header in the response headers
+            const setCookieHeader = response.headers.get('Set-Cookie');
+
+            if (setCookieHeader) {
+                // Access the cookie value or perform any other operations
+                console.log('Set-Cookie:', setCookieHeader);
+            } else
+                console.log('no cookie');
+
+            // Continue processing the response, e.g., by parsing JSON
+            return response.json();
+        })
+            .then((data) => {
+                // Handle the response from the server
+                if (data.auth) {
+                    // Redirect to the specified URL
+                    console.log("data: ", data);
+                    document.cookie = `adminID=${data.admin}; path=/`;
                     window.location.href = "/main/tasks";
-                } else if (value.auth === false) {
-                    window.location.href = "login";
+                }
+                else {
+                    // Display the response in a window.alert
+                    window.alert(data.error || "Welcome!");
                 }
             })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
     };
 
 

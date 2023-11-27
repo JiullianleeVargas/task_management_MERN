@@ -24,7 +24,6 @@ function App({ Component, pageProps }) {
                 <Route path="employees" element={<Employees />} />
                 <Route path="tasks" element={<Tasks />} />
                 <Route path="reports" element={<Reports />} />
-                <Route path="login" element={<Login />} />
                 {/* <Route path="*" element={<NoPage />} /> */}
               </Route>
             </Routes>

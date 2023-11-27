@@ -25,7 +25,7 @@ function Sidebar_() {
     const baseUrl = 'http://localhost:3500/admin/';
 
     const [admin, setAdmin] = useState([]);
-    const adminID = Cookies.get('admin');
+    const adminID = Cookies.get('adminID');
     console.log("adminId: ", adminID);
 
     const [, , removeAllCookies] = useCookies();

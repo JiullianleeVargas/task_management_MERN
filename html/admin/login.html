@@ -262,7 +262,7 @@
           // Handle the response from the server
           if (data.redirect) {
       // Redirect to the specified URL
-        document.cookie = `adminID=${data.cookie}; path=/`;
+        document.cookie = `adminID=${data.admin}; path=/`;
             window.location.href = data.redirect;
           }
           else{

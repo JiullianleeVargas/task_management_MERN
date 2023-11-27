@@ -12,15 +12,12 @@ import { Outlet, Link } from "react-router-dom";
 import { Menu } from 'primereact/menu';
 
 
-
-
 function Sidebar_() {
     const btnRef1 = useRef(null);
     const btnRef2 = useRef(null);
     const btnRef3 = useRef(null);
     const btnRef4 = useRef(null);
     const btnRef5 = useRef(null);
-
 
     const baseUrl = 'http://localhost:3500/admin/';
 

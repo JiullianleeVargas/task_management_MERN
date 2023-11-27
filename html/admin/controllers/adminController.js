@@ -196,6 +196,10 @@ user.post('/createAdmin', async function(req, res) {
 
   let email = req.body.email;
   let password = req.body.password;
+  let fname = req.body.fname;
+  let lname = req.body.lname;
+  fname = fname.trim();
+  lname = lname.trim();
   email = email.trim();
   password = password.trim();
 
@@ -216,14 +220,15 @@ user.post('/createAdmin', async function(req, res) {
         if(!employee)
         {
           console.log('no existe el email.');
-          const adminToInsert = { "email": email, "password": password, "status":"active"};
+          const adminToInsert = { "email": email, "password": password, "status":"active", "l_name": lname, "f_name": fname};
           console.log('data: ', adminToInsert);
           // Insert the data into the collection
           const result = await usersCollection.insertOne(adminToInsert);
           console.log(`Inserted ${result.insertedCount} document(s)`);
+          res.json({isInserted: true});
         }
         else {
-          console.log("Email already exists");
+          res.json({isInserted: false});
         }
     } finally {
       // Close the MongoDB connection

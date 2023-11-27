@@ -5,6 +5,7 @@ import { Column } from 'primereact/column';
 import { Tag } from 'primereact/tag';
 import { Button } from 'primereact/button';
 import CreateAdmin from './createAdmin';
+import { Outlet, Link } from "react-router-dom";
 
 
 const Admins = () => {
@@ -15,7 +16,7 @@ const Admins = () => {
         axios.get(baseUrl + '/getAdmins')
             .then(response => {
                 console.log(response.data.admins);
-                setAdmins(response.data.admins)
+                setAdmins(response.data.admins);
             });
     }, []);
 
@@ -23,7 +24,7 @@ const Admins = () => {
         return <div>
             <img src={`/images/avatar.png`} alt={admin.image}
                 style={{ width: "24px", height: "24px" }} />
-            <label style={{ marginLeft: "10px" }}>{admin.email}</label>
+            <label style={{ marginLeft: "10px" }}><Link to={`/main/editAdmin/${admin._id}`} style={{ textDecoration: 'none' }}>{admin.email}</Link></label>
         </div>;
     };
 
@@ -54,7 +55,11 @@ const Admins = () => {
     console.log("admin length: ", admins);
     return (
         <div className="card">
-            <DataTable value={admins} header={header} footer={footer}
+            <div className="flex flex-wrap align-items-center justify-content-between gap-2 px-3">
+                <span className="text-xl text-900 font-bold">Administrators</span>
+                <CreateAdmin />
+            </div>
+            <DataTable value={admins} footer={footer}
                 stripedRows tableStyle={{ minWidth: '60rem' }} scrollable scrollHeight="390px" >
                 <Column header="Email" body={emailBodyTemplate}></Column>
                 <Column header="Status" body={statusBodyTemplate}></Column>

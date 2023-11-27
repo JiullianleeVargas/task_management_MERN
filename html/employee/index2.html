@@ -1478,7 +1478,7 @@
                     // Parse the response body as JSON
                     const data = await response.json();
                     console.log(data)
-                    // // Return the parsed JSON data
+                    // // Return the parsed JSON dataupd
                     return data;
 
                 } catch (error) {
@@ -1487,6 +1487,7 @@
                 }
             }
 
+            
           
             
 
@@ -1675,6 +1676,30 @@
 
                 filteredCountAll() {
                     return this.allTasks && this.allTasks.filter((d) => d.status != 'trash').length - 1;
+                },
+
+                updateStatus(task, newStatusString) {
+                    // Grabing the taskID
+                    const taskID = task.id
+
+                    // This is to change local and make the alpine rerender
+                    task.status = newStatusString
+                    // Storing the status recieved from the html/alpine
+
+                    const newStatus = newStatusString
+                    // console.log(taskID)
+                    // console.log(newStatus)
+
+
+                    // Calling the fetch/controller to change the data
+                    setStatusFetch(taskID, newStatus)
+                        .then(data => {
+                            // Handle the response data if needed
+                            console.log(data);
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                        });
                 },
 
                 addEditTask(task) {

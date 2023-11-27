@@ -67,6 +67,89 @@ user.post('/getEmployeeTasks', async (req, res) => {
     }
   });
 
+  user.post('/getTeamTasks', async (req, res) => {
+
+    uid = req.body.id;
+    uid = new ObjectId(uid);
+    //console.log("UID: ", uid);
+    const client = new MongoClient('mongodb://0.0.0.0:27017');
+  
+    try {
+        //connect to db
+        const tasksArray = [];
+        
+        await client.connect();
+        const database = client.db('task_management');
+        const usersCollection = database.collection('employees');
+        const taskCollection = database.collection('tasks');
+        const teamCollection = database.collection('teams');
+  
+        // const cursor = await usersCollection.find({ _id: uid }).toArray();
+        // const taskIDs = cursor.map(doc => doc.tasks);
+        
+
+        // for (const taskID of taskIDs[0]) {
+            
+        //     const task = await taskCollection.findOne({ _id: taskID });
+    
+        //     // Add the employee details to the array
+        //     tasksArray.push(task);
+        // }
+
+        
+  
+        const emp = await teamCollection.find({ admin: uid }).toArray();
+        const taskIDs2 = emp.map(doc => doc.tasks);
+        
+
+        for (const taskID of taskIDs2[0]) {
+            const task = await taskCollection.findOne({ _id: taskID });
+    
+            task.user = 'team';
+            // Add the employee details to the array
+            tasksArray.push(task);
+        }
+
+        if (emp.length > 0 && emp[0].employees) {
+            const employeeIDs = emp[0].employees;
+  
+        
+            for (const employeeID of employeeIDs) {
+                const employee = await usersCollection.findOne({ _id: employeeID });
+
+        
+                if (employee && employee.tasks) {
+                    const taskIDs = employee.tasks;
+
+        
+                    for (const taskID of taskIDs) {
+                        const task = await taskCollection.findOne({ _id: taskID });
+
+                        task.user = employee.email;
+
+        
+                        if (task) {
+                            tasksArray.push(task);
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+
+        //console.log(employeesArray);
+
+        res.json({tasks: tasksArray});
+        
+    } catch (error) {
+        console.error('Error retrieving user:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    } finally {
+        await client.close();
+    }
+  });
+
 
   user.post("/updateTask", async (req, res) => {
 
@@ -109,16 +192,21 @@ user.post('/getEmployeeTasks', async (req, res) => {
 
         //If tags contains "team"
         if (Array.isArray(tags) && tags.includes("team")) {
+            console.log("Entered tags if");
                 adminID = req.body.adminID;
                 adminID = new ObjectId(adminID);
-                let userID = req.body.userID;
-                userID = new ObjectId(userID);
 
                 const usersCollection = database.collection('employees');
                 const teamCollection = database.collection('teams');
 
+                //get user for that task
+                const user = await usersCollection.findOne({tasks: id});
+                let userID = user._id;
+                userID = new ObjectId(userID);
+                console.log('User id: ', userID);
+
                 //Check that task isn't already in team
-                const task = await teamCollection.findOne({ tasks: id })
+                const task = await teamCollection.findOne({ tasks: id });
                 if(!task)
                 {
                     //Take task from employee and add to team.

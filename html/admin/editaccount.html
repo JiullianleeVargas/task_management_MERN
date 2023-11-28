@@ -463,7 +463,8 @@
                                                         </div>
                                                         <div>
                                                             <label for="password">Password</label>
-                                                            <input id="password" type="password" placeholder="" class="form-input" />
+                                                            <input id="old_password" type="hidden" placeholder="" class="form-input"/>
+                                                            <input id="password" type="password" placeholder="" class="form-input"/>
                                                         </div>
                                                         <div>
                                                             <label for="f_name">First Name</label>
@@ -1363,6 +1364,7 @@
                     $("#email").val(user.email);
                     $("#uid").val(user._id);
                     $("#password").val(user.password);
+                    $("#old_password").val(user.password);
                     $("#f_name").val(user.f_name);
                     $("#l_name").val(user.l_name);
                     let status = user.status;
@@ -1429,6 +1431,9 @@
                     var id = document.getElementById('uid').value;
                     var email = document.getElementById('email').value;
                     var password = document.getElementById('password').value;
+                    var old_password = document.getElementById('old_password').value;
+                    if(password == old_password)
+                        password = '';
                     var f_name = document.getElementById('f_name').value;
                     var l_name = document.getElementById('l_name').value;
                     var status = document.getElementById('status').value;

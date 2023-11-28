@@ -65,7 +65,7 @@ user.get('/reports', (req, res) => {
 user.post('/login', async function(req, res) {
 
     let email = req.body.email;
-    let password = req.body.password;
+    let password = (String(req.body.password)).trim();
     email = email.trim();
     password = password.trim();
 
@@ -97,7 +97,7 @@ user.post('/login', async function(req, res) {
 
       if(employee)
       {
-          let result = comparePassword(String(password), String(employee['password']));
+          let result = await comparePassword(password, String(employee['password']));
           if(result)
           {
             console.log("Succesful log in!");
@@ -106,10 +106,9 @@ user.post('/login', async function(req, res) {
             
 
             res.json({ redirect: '/employee/tasks'});
-           
-           
-        
           }
+          else
+            res.json({ error: 'Login credentials are incorrect.'});
       }
 
       else {

@@ -10,20 +10,6 @@ const saltRounds = 10; // Number of salt rounds for bcrypt hashing
 module.exports = user;
 const classes = require('../assets/js/classes');
 
-function writeTo(file, data) {
-  fs.writeFile(file, JSON.stringify(data), "utf8", (err) => {
-    throw err;
-  });
-}
-
-function readFrom(file) {
-  if (fs.existsSync(file)) {
-    let data = fs.readFileSync(file, "utf-8");
-    data = JSON.parse(data);
-    return data;
-  }
-}
-
 async function hashPassword(password) {
   try {
       // Generate a salt
@@ -40,17 +26,13 @@ async function hashPassword(password) {
 
 // compare password
 async function comparePassword(plaintextPassword, hash) {
-  const result = await bcrypt.compare(plaintextPassword, hash);
-  return result;
+  return await bcrypt.compare(plaintextPassword, hash);
 }
 
 
 user.use(express.json());
 
 user.get('/new-route', (req, res) => {
-  //console.log('entered new route');
-  //res.type('html').sendFile(path.join(__dirname, '..', 'test.html'));
-  //console.log(path.join(__dirname, '..', 'admins2.html'));
   res.type('html').sendFile(path.join(__dirname, '..', 'accounts.html'));
 })
 
@@ -79,9 +61,9 @@ user.get('/getEmployee', (req, res) => {
 user.post('/login', async function(req, res) {
 
     let email = req.body.email;
-    let password = req.body.password;
+    let password = (String(req.body.password)).trim();
     email = email.trim();
-    password = password.trim();
+    password = password;
 
     if (!email || !password) {
         console.log("No email or password provided");
@@ -102,12 +84,15 @@ user.post('/login', async function(req, res) {
 
       if(admin)
       {
-          let result = await comparePassword(String(password), String(admin['password']));
+          let result = await comparePassword(password, String(admin.password));
+          console.log("Result: ", result);
           if(result)
           {
             console.log("Succesful log in!");
             res.json({ redirect: '/admin/employees', cookie: admin._id.toString()});
           }
+          else
+            res.json({ error: 'Login credentials are incorrect.'});
       }
 
       else {
@@ -122,7 +107,7 @@ user.get('/getAdmins', async (req, res) => {
   const client = new MongoClient('mongodb://0.0.0.0:27017');
 
   try {
-      //conncet to db
+      //connect to db
       await client.connect();
       const database = client.db('task_management');
       const usersCollection = database.collection('admins');
@@ -143,12 +128,11 @@ user.get('/getAdmins', async (req, res) => {
 user.post('/createAdmin', async function(req, res) {
 
   let email = req.body.email;
-  let password = hashPassword(req.body.password.trim());
+  let password = (String(req.body.password)).trim();
+  password = await hashPassword(password);
   let f_name = req.body.f_name;
   let l_name = req.body.l_name;
   email = email.trim();
-  //password = password.trim();
-  password = hashPassword(req.body.password);
   f_name = f_name.trim();
   l_name = l_name.trim();
 
@@ -234,7 +218,12 @@ user.post('/updateAdmin', async function(req, res) {
   let id = req.body.id;
   const adminData = {};
   adminData.email = req.body.email.trim();
-  adminData.password = hashPassword(req.body.password.trim());
+  adminData.password = '';
+  if(req.body.password !== req.body.old_password)
+  {
+    adminData.password = (String(req.body.password)).trim();
+    adminData.password = await hashPassword(adminData.password);
+  }
   adminData.f_name = req.body.f_name.trim();
   adminData.l_name = req.body.l_name.trim();
   adminData.status = req.body.status.trim();
@@ -265,7 +254,15 @@ user.post('/updateAdmin', async function(req, res) {
 
         // Update the user in the database
         const updatedAdmin = await usersCollection.updateOne({_id: new ObjectId(id)}, 
-        { $set: {email: adminData.email, password: adminData.password, status: adminData.status, f_name: adminData.f_name, l_name: adminData.l_name} });
+        { $set: {email: adminData.email, status: adminData.status, f_name: adminData.f_name, l_name: adminData.l_name} });
+
+        // Update the password if it was changed
+        if(adminData.password !== '')
+        {
+          await usersCollection.updateOne({_id: new ObjectId(id)}, 
+          { $set: {password: adminData.password,} });
+  
+        }
 
         if(updatedAdmin.modifiedCount > 0){
           console.log("updatedAdmin: ", adminData);
@@ -416,7 +413,13 @@ user.post("/updateEmployeeDetails", async (req, res) => {
   let id = req.body.id;
   id = new ObjectId(id);
   const email = req.body.email;
-  const password = hashPassword(req.body.password);
+  let password = '';
+  if(req.body.password !== '')
+  {
+    password = (String(req.body.password)).trim();
+    password = await hashPassword(password);
+  }
+  
   const f_name = req.body.f_name;
   const l_name = req.body.l_name;
   const status = req.body.status;
@@ -427,13 +430,7 @@ user.post("/updateEmployeeDetails", async (req, res) => {
      try {
          await client.connect();
 
-         const employee = {
-          email: email,
-          password: password,
-          f_name: f_name,
-          l_name: l_name,
-          status: status,
-        };
+        
  
          // Access the 'task_management' database and 'employees' collection
          const database = client.db('task_management');
@@ -450,17 +447,26 @@ user.post("/updateEmployeeDetails", async (req, res) => {
         // const eid = employee_db._id;
 
         //const cursor = await teamCollection.find({ admin: adminID }).toArray();
-
+        
         await usersCollection.updateOne(
           { _id: id },
           {$set:{
             email: email,
-            password: password,
             f_name: f_name,
             l_name: l_name,
             status: status,
           }}
       );
+
+      if(password !== '')
+      {
+        await usersCollection.updateOne(
+          { _id: id },
+          {$set:{
+            password: password,
+          }}
+      );
+      }
 
 
  
@@ -482,7 +488,8 @@ user.post("/createEmployee", async (req, res) => {
 
   console.log("getEmployees entered");
   const email = req.body.email;
-  const password = hashPassword(req.body.password);
+  let password = (String(req.body.password)).trim();
+  password = await hashPassword(password);
   const f_name = req.body.f_name;
   const l_name = req.body.l_name;
   const status = req.body.status;

@@ -453,6 +453,7 @@
                                                         </div>
                                                         <div>
                                                             <label for="password">Password</label>
+                                                            <input id="old_password" type="hidden" placeholder="" class="form-input" />
                                                             <input id="password" type="password" placeholder="" class="form-input" />
                                                         </div>
                                                         <div>
@@ -744,6 +745,7 @@
             $("#uid").val(id);
             $("#email").val(admin.email);
             $("#password").val(admin.password);
+            $("#old_password").val(admin.password);
             $("#lname").val(admin.l_name);
             $("#fname").val(admin.f_name);
             let status = admin.status;
@@ -774,6 +776,7 @@
                 l_name: $("#lname").val(),
                email: $("#email").val(),
                password: $("#password").val(),
+               old_password:  $("#old_password").val(),
                id: $("#uid").val(),
                status: $("#status").val().toLowerCase()
              }),

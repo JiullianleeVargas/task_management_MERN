@@ -1564,6 +1564,29 @@
                 }
         }
 
+        async function deleteATask(task)
+        {
+            try {
+                    console.log('delete task entered');
+                    const response = await fetch("/adminTasks/deleteTask", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            task,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP Delete Task error! Status: ${response.status}`);
+                    }
+
+                } catch (error) {
+                    console.error('Error deleting task:', error);
+                }
+        }
+
         async function saveFile(file){
             console.log("file: ", file);
             if(file)
@@ -1822,14 +1845,16 @@
                             },
                         });
                     },
-                     // Method to extract unique non-empty tags from tasks
-                        extractUniqueTags() {
-                            const allTags = this.allTasks.flatMap(task => [task.tag1, task.tag2]);
 
-                            // Remove any undefined or null values from the array
-                            this.uniqueTags = [...new Set(allTags.filter(tag => tag !== undefined && tag !== null && tag !== ""))];
+                    //Function to load only tags with proper content
+                    async extractUniqueTags() {
+                        const allTags = this.allTasks.flatMap(task => [task.tag1, task.tag2]);
 
-                        },
+                        // Remove any undefined or null values from the array
+                        this.uniqueTags = [...new Set(allTags.filter(tag => tag !== undefined && tag !== null && tag !== ""))];
+
+                    },
+
                     searchTasks(isResetPage = true) {
                         //Filter through tasks in display
                         if (isResetPage) {
@@ -1963,26 +1988,27 @@
                         this.allTasks = [...this.allTasks];
                     },
 
-                    deleteTask(task, type) {
+                    async deleteTask(task) {
                         reply = window.prompt("Are you sure you want to remove this task from the employee? (Y/N)");
 
                         if(reply == 'Y' || reply == 'y'){
-                            if (type === 'delete') {
-                            task.status = 'trash';
-                            this.allTasks = this.allTasks.filter((d) => d.id != task.id);
-                           
-                            }
 
-                            tasks[task.id-1]['task_user'] = "";
-                            setCookie("tasks", tasks);
-
+                            //Call delete function
+                            await deleteATask(task);
+                            const alpineInstance = this;
                             
-                            if(users[this.user_id-1])
-                            {
-                                notif = `The task titled "${tasks[task.id-1]['task_name']}" has been removed`;
-                                users[this.user_id-1]['notifications'].push(notif);
-                                setCookie("users", users);
+                            //Update the Alpine tasks array
+                            const taskIndex = alpineInstance.allTasks.findIndex(t => t.dbid === task.dbid);
+                            
+                            if (taskIndex !== -1) {
+                                alpineInstance.allTasks.splice(taskIndex, 1);
                             }
+
+                            //update the tags
+                            await this.extractUniqueTags();
+
+                            this.showMessage('Task has been deleted successfully!');
+                            
                         }
 
                         
@@ -2047,6 +2073,13 @@
                             else    
                                 file_name = "";
                             db_id = this.params.dbid;
+                            if(tag1 == "" && tag2 !== "")
+                            {
+                                tag1 = tag2;
+                                tag2 = "";
+                            }
+                            if(tag1 == 'team' && tag2 == 'team')
+                                tag2 = '';
 
                             let task = {
                                 title: title,
@@ -2068,7 +2101,7 @@
                             else
                                 console.log("file input not found");
                             
-                            
+                            await this.extractUniqueTags();
                             await updateTask(task);
 
                             const alpineInstance = this;
@@ -2095,17 +2128,8 @@
                             if (taskIndex !== -1) {
                                 alpineInstance.allTasks.splice(taskIndex, 1, task2);
                             }
-
-                            //console.log("all tasks: ", alpineInstance.allTasks);
-                            //const taskIndex = this.allTasks.findIndex(t => t.dbid === task.dbid);
                             
-                            // if (taskIndex !== -1) {
-                            //     // Ensure that the task object contains all necessary properties
-                            //     this.$set(this.allTasks, taskIndex, task2);
-                            // }
-                            
-
-                            //this.allTasks = [...this.allTasks];
+                            await this.extractUniqueTags();
                             await this.searchTasks();
                         } else {
 
@@ -2132,6 +2156,13 @@
                             due_date = this.params.date;
                             file_name = this.params.file;
                             db_id = this.params.dbid;
+                            if(tag1 == "" && tag2 !== "")
+                            {
+                                tag1 = tag2;
+                                tag2 = "";
+                            }
+                            if(tag1 == 'team' && tag2 == 'team')
+                                tag2 = '';
 
                             let task = {
                                 title: title,

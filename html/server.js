@@ -8,6 +8,7 @@ const app = express();
 const path = require('path'); 
 const adminController = require("./admin/controllers/adminController");
 const adminTasksController = require("./admin/controllers/adminTasksController");
+const employeeController = require("./employee/controllers/employeeController");
 const multer = require('multer');
 
 const storage = multer.diskStorage({
@@ -21,10 +22,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-
-// Importing the employee controller 
-const employeeController = require("./employee/controllers/employeeController");
-
 //Connect app to admin controller
 app.use(express.json());
 app.use("/admin", adminController);
@@ -37,15 +34,12 @@ app.use("/assets", express.static(path.join(__dirname, "admin", "assets")));
 app.use("/employee", employeeController);
 app.use(express.static(path.join(__dirname, 'employee')));
 app.use("/assets", express.static(path.join(__dirname, "employee", "assets")));
-app.use("/employeeTasks", employeeController);
 
 
 app.get('/admin/', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin', 'login.html'));
   });
 
-// Handle a GET request to the '/employee/' route. 
-//When a user accesses this route, send the 'login2.html' file as the response.
 app.get('/employee/', (req, res) => {
     res.sendFile(path.join(__dirname, 'employee', 'login2.html'));
   });

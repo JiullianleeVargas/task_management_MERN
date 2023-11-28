@@ -477,8 +477,7 @@
                                                         <div>
                                                             <label for="status">Status</label>
                                                             <select id="status" class="form-select text-white-dark">
-                                                                <!-- <option>All Countries</option>
-                                                                <option selected="">United States</option> -->
+                                                                <!-- Options are loaded in here with loadInfo() -->
                                                             </select>
                                                         </div>
                                                         <div class="mt-3 sm:col-span-2">
@@ -569,6 +568,7 @@
                                                                     <div
                                                                         class="whitespace-nowrap rounded-md bg-primary-light py-0.5 px-2 font-semibold dark:bg-[#060818]"
                                                                         x-text="filteredCountAll()"
+                                                                        id="alltaskstxt"
                                                                     ></div>
                                                                 </button>
                                                                 <button
@@ -648,6 +648,7 @@
                                                                     <div
                                                                         class="whitespace-nowrap rounded-md bg-primary-light py-0.5 px-2 font-semibold dark:bg-[#060818]"
                                                                         x-text="filteredCount('In Progress')"
+                                                                        id="progresstxt"
                                                                     ></div>
                                                                 </button>
                                                                 <button
@@ -680,6 +681,7 @@
                                                                     <div
                                                                         class="whitespace-nowrap rounded-md bg-primary-light py-0.5 px-2 font-semibold dark:bg-[#060818]"
                                                                         x-text="filteredCount('Completed')"
+                                                                        id="completedtxt"
                                                                 ></div>
                                                                 </button>
                                                                 <div class="h-px w-full border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div>
@@ -1356,10 +1358,7 @@
                 })
                 .then((data) => {
                     console.log('data found');
-                    console.log(data);
-                // Handle the response from the server
                 if (data.user) {
-                // Redirect to the specified URL
                     var user = data.user;
                     $("#email").val(user.email);
                     $("#uid").val(user._id);
@@ -1826,6 +1825,10 @@
                     },
                     quillEditor: null,
                     uniqueTags: [],
+                    pendingCount: 0,
+                    progressCount: 0,
+                    completedCount: 0,
+                    allCount: 0,
 
                     async init() {
                         this.searchTasks();
@@ -1840,6 +1843,24 @@
                         });
 
                         this.extractUniqueTags();
+                        this.$watch('allTasks', () => {
+                            // Recalculate the filtered count
+                            this.pendingCount = this.allTasks.filter(task => task.status === 'Pending').length;
+                            console.log(this.pendingCount);
+                            this.progressCount = this.allTasks.filter(task => task.status === 'In Progress').length;
+                            console.log(this.progressCount);
+                            this.completedCount = this.allTasks.filter(task => task.status === 'Completed').length;
+                            console.log(this.completedCount);
+                            this.allCount = this.allTasks.filter(task => task.status !== 'trash').length;
+                            console.log(this.allCount);
+                            this.$nextTick(() => {
+                                document.getElementById('pendingtxt').textContent = this.pendingCount;
+                                document.getElementById('progresstxt').textContent = this.progressCount;
+                                document.getElementById('completedtxt').textContent = this.completedCount;
+                                document.getElementById('alltaskstxt').textContent = this.allCount;
+                            });
+                            
+                        }, { deep: true });
                     },
                     initEditor() {
                         this.quillEditor = new Quill(this.$refs.editor, {
@@ -2198,7 +2219,7 @@
                             dateS: start_date,
                             date: due_date,
                             priority: priority,
-                            status: status,
+                            status: statusT,
                             tag1: tag1,
                             tag2: tag2,
                             file: file_name, 

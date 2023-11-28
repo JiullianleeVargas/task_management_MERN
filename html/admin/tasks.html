@@ -491,6 +491,7 @@
                                                                     <div
                                                                         class="whitespace-nowrap rounded-md bg-primary-light py-0.5 px-2 font-semibold dark:bg-[#060818]"
                                                                         x-text="filteredCountAll()"
+                                                                        id="alltaskstxt"
                                                                     ></div>
                                                                 </button>
                                                                 <button
@@ -570,6 +571,7 @@
                                                                     <div
                                                                         class="whitespace-nowrap rounded-md bg-primary-light py-0.5 px-2 font-semibold dark:bg-[#060818]"
                                                                         x-text="filteredCount('In Progress')"
+                                                                        id="progresstxt"
                                                                     ></div>
                                                                 </button>
                                                                 <button
@@ -602,6 +604,7 @@
                                                                     <div
                                                                         class="whitespace-nowrap rounded-md bg-primary-light py-0.5 px-2 font-semibold dark:bg-[#060818]"
                                                                         x-text="filteredCount('Completed')"
+                                                                        id="completedtxt"
                                                                 ></div>
                                                                 </button>
                                                                 <div class="h-px w-full border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div>
@@ -1680,6 +1683,10 @@
                     },
                     quillEditor: null,
                     uniqueTags: [],
+                    pendingCount: 0,
+                    progressCount: 0,
+                    completedCount: 0,
+                    allCount: 0,
 
                     async init() {
                         this.searchTasks();
@@ -1694,6 +1701,25 @@
                         });
 
                         await this.extractUniqueTags();
+
+                        this.$watch('allTasks', () => {
+                            // Recalculate the filtered count
+                            this.pendingCount = this.allTasks.filter(task => task.status === 'Pending').length;
+                            console.log(this.pendingCount);
+                            this.progressCount = this.allTasks.filter(task => task.status === 'In Progress').length;
+                            console.log(this.progressCount);
+                            this.completedCount = this.allTasks.filter(task => task.status === 'Completed').length;
+                            console.log(this.completedCount);
+                            this.allCount = this.allTasks.filter(task => task.status !== 'trash').length;
+                            console.log(this.allCount);
+                            this.$nextTick(() => {
+                                document.getElementById('pendingtxt').textContent = this.pendingCount;
+                                document.getElementById('progresstxt').textContent = this.progressCount;
+                                document.getElementById('completedtxt').textContent = this.completedCount;
+                                document.getElementById('alltaskstxt').textContent = this.allCount;
+                            });
+                            
+                        }, { deep: true });
                     },
                     initEditor() {
                         this.quillEditor = new Quill(this.$refs.editor, {
@@ -1763,22 +1789,11 @@
                         const alpineInstance = this;
                             
 
-                        // Use this.$set to update the allTasks array
                         const taskIndex = alpineInstance.allTasks.findIndex(t => t.dbid === task.dbid);
                         task.priority = name;
                         if (taskIndex !== -1) {
                             alpineInstance.allTasks.splice(taskIndex, 1, task);
                         }
-                        //Change the priority of a task and notify user
-                        
-                        // let user = users.find(user => user.id == this.user_id);
-                        //     if(users[this.user_id-1])
-                        //     {
-                        //         notif = `The task titled "${tasks[task.id-1]['task_name']}" has been changed of priority.`;
-                        //         users[this.user_id-1]['notifications'].push(notif);
-                        //         setCookie("users", users);
-                        //     }
-                       
                         this.searchTasks(false);
                         this.showMessage('Task Priority changed!');
                     },
@@ -2002,6 +2017,8 @@
                                 alpineInstance.allTasks.splice(taskIndex, 1, task2);
                             }
 
+                            
+
                             //update the tags
                             await this.extractUniqueTags();
 
@@ -2012,11 +2029,11 @@
                             title = this.params.title;
                             description = this.quillEditor.getText();
                             description = description.replace(/<\/?p>/g, '');
-                            console.log("DESCRIPTION: ", description);
                             if(this.params.statusT)
                                 statusT = this.params.statusT;
                             else
                                 statusT = "Pending";
+                            console.log(statusT);
                             if(this.params.priority)
                                 priority = this.params.priority;
                             else
@@ -2070,11 +2087,9 @@
                                 user: user,
                                 dbid: db_id
                             }
-                            console.log("USER TO RECEIVE TASK: ", user);
                             taskID = await createTask(task);
                             const alpineInstance = this;
 
-                            // Use this.$set to update the allTasks array
                             const taskIndex = alpineInstance.allTasks.findIndex(t => t.dbid === task.dbid);
                             let task2 = {
                             id: taskIndex,
@@ -2084,7 +2099,7 @@
                             dateS: start_date,
                             date: due_date,
                             priority: priority,
-                            status: status,
+                            status: statusT,
                             tag1: tag1,
                             tag2: tag2,
                             file: file_name, 
@@ -2098,6 +2113,8 @@
 
                             await this.extractUniqueTags();
                             await this.searchTasks();
+
+                            console.log(alpineInstance.allTasks);
 
                             this.showMessage('Task has been added successfully!');
                         }

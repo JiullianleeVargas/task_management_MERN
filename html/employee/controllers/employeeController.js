@@ -169,7 +169,7 @@ user.get('/getEmployeeTasks', async (req, res) => {
       const employeeTasks = await taskCollection.find({ "_id": { $in: taskIds } }).toArray();
       //const teamTasks = await teamCollection.find({ "_id": { $in: taskIds2 } }).toArray();
 
-      console.log(employeeTasks)
+      // console.log(employeeTasks)
       // employeeTasks.push(individualTasks);
       // employeeTasks.push(teamTasks);
 
@@ -318,6 +318,7 @@ user.post('/setStatus', async (req, res) => {
 
     // Extracting the taskID of the task to change and the new status
     const taskID = req.body.taskID;
+    const objectTaskID = new ObjectId(taskID)
     const newStatus = req.body.newStatus;
 
     console.log("TaskID: ", taskID)
@@ -329,7 +330,10 @@ user.post('/setStatus', async (req, res) => {
     }
 
     // Here I have the parsed ID
-    const employeeID = employeeIdCookie.split('=')[1];
+    const employeeId= employeeIdCookie.split('=')[1];
+    const employeeID = new ObjectId(employeeId);
+
+    console.log("EmployeeID in setStatus: ", employeeID)
 
     await client.connect();
 
@@ -338,20 +342,37 @@ user.post('/setStatus', async (req, res) => {
 
     //Grabing the collection to search for the user
     const employeeCollection = database.collection('employees');
+    const adminCollection = database.collection('admins');
+    const teamCollection = database.collection('teams');
 
     // Grabing the task collection to search for the users tasks
     const taskCollection = database.collection('tasks');
 
+    const teamWithEmployee = await teamCollection.findOne({employees: employeeID})
+
+    const updatedTask = await taskCollection.findOne({"_id": objectTaskID})
+    const adminID = teamWithEmployee.admin
+    console.log("Admin: ", adminID)
+
     // Converting the userID into an obejctID so I can search in the database
-    const employeeId = new ObjectId(employeeID);
-    const employee = await employeeCollection.findOne({ "_id": employeeId });
+   
+    const employee = await employeeCollection.findOne({ "_id": employeeID });
 
     // Update the status of the specified task
     // Also converting the ID to objectID
     await taskCollection.updateOne(
       { "_id": new ObjectId(taskID) },
       { $set: { "status": newStatus } }
+    )
+
+    const notificationString = `${employee.f_name} has updated "${updatedTask.title}" status to ${newStatus}`
+    await adminCollection.updateOne(
+      { "_id": adminID },
+      { $push: {"notifications":  notificationString} }
     );
+
+
+
 
     // Retrieve updated task information if needed
     const updatedTaskIds = employee.tasks.map(taskId => new ObjectId(taskId));

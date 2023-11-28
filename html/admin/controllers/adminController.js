@@ -143,7 +143,7 @@ user.get('/getAdmins', async (req, res) => {
 user.post('/createAdmin', async function(req, res) {
 
   let email = req.body.email;
-  let password = req.body.password;
+  let password = hashPassword(req.body.password.trim());
   let f_name = req.body.f_name;
   let l_name = req.body.l_name;
   email = email.trim();
@@ -234,7 +234,7 @@ user.post('/updateAdmin', async function(req, res) {
   let id = req.body.id;
   const adminData = {};
   adminData.email = req.body.email.trim();
-  adminData.password = req.body.password.trim();
+  adminData.password = hashPassword(req.body.password.trim());
   adminData.f_name = req.body.f_name.trim();
   adminData.l_name = req.body.l_name.trim();
   adminData.status = req.body.status.trim();

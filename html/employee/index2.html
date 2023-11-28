@@ -1282,6 +1282,16 @@
     <script src="../assets/js/classes.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
     <script>
+
+            async    function openFile(file)
+            {
+
+                const fileUrl = `/employeeTasks/getFile?file=${file}`;
+
+                // Open a new tab/window with the file
+                window.open(fileUrl, '_blank');
+            }
+        
         const defaultParams = {
             id: null,
             title: '',
@@ -1418,7 +1428,8 @@
             }));
 
         
-     
+            
+
             
           // Function tha fetches the data from the database so igt can be used down bellow in the alpine
             async function fetchData() {

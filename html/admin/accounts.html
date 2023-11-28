@@ -109,7 +109,7 @@
                         <li class="nav-item">
                             <ul>
                                 <li class="nav-item">
-                                    <a href="tasks.html" class="group">
+                                    <a href="/admin/tasks/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                                 class="shrink-0 group-hover:!text-primary"
@@ -136,7 +136,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="accounts.html" class="active group">
+                                    <a href="/admin/employees" class="active group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -156,7 +156,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="admins.html" class="group">
+                                    <a href="/admin/admins/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -176,7 +176,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="reports.html" class="group">
+                                    <a href="/admin/reports/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -466,7 +466,7 @@
                                                 </button>
                                                 <h3
                                                     class="bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]"
-                                                    x-text="params.id ? 'Editar estudiante' : 'Create employee'"
+                                                    x-text="params.id ? 'Edit employee' : 'Create employee'"
                                                 ></h3>
                                                 <div class="p-5">
                                                     <form @submit.prevent="saveUser">
@@ -498,6 +498,16 @@
                                                                 placeholder="Soto"
                                                                 class="form-input"
                                                                 x-model="params.l_name"
+                                                            />
+                                                        </div>
+                                                        <div class="mb-5">
+                                                            <label for="position">Position</label>
+                                                            <input
+                                                                id="position"
+                                                                type="text"
+                                                                placeholder="Web Developer"
+                                                                class="form-input"
+                                                                x-model="params.position"
                                                             />
                                                         </div>
                                                         <div class="mb-5">
@@ -910,6 +920,7 @@
                             f_name: user.f_name,
                             l_name: user.l_name,
                             password: user.password,
+                            position: user.position,
                             status: user.status
                         }),
                     });
@@ -1103,20 +1114,9 @@
                                 password: this.params.password,
                                 f_name: this.params.f_name,
                                 l_name: this.params.l_name,
+                                position: this.params.position,
                                 status: 'active',
                             };
-                            // this.contactList.splice(0, 0, user);
-                            // this.searchContacts();
-
-                            // setCookie("users", users);
-
-                            // admin = admins.find(admin => admin.id == adminID);
-                            // if(admin)
-                            // {
-                            //     console.log("Aqui: ", admin);
-                            //     admins[adminID-1].userlist.push(user1.id);
-                            //     setCookie("admins", admins);
-                            // }
                             
                             const dbuserid = await insertEmployee(user);
                             user.DBUserID = dbuserid;
@@ -1124,7 +1124,7 @@
     
                         }
 
-                        //this.showMessage('User has been saved successfully.');
+                        this.showMessage('User has been added successfully!');
                         this.searchContacts();
                         this.addContactModal = false;
                     },
@@ -1135,19 +1135,19 @@
                         //this.showMessage('User has been deleted successfully.');
                     },
 
-                    // showMessage(msg = '', type = 'success') {
-                    //     const toast = window.Swal.mixin({
-                    //         toast: true,
-                    //         position: 'top',
-                    //         showConfirmButton: false,
-                    //         timer: 3000,
-                    //     });
-                    //     toast.fire({
-                    //         icon: type,
-                    //         title: msg,
-                    //         padding: '10px 20px',
-                    //     });
-                    // },
+                    showMessage(msg = '', type = 'success') {
+                        const toast = window.Swal.mixin({
+                            toast: true,
+                            position: 'top',
+                            showConfirmButton: false,
+                            timer: 3000,
+                        });
+                        toast.fire({
+                            icon: type,
+                            title: msg,
+                            padding: '10px 20px',
+                        });
+                    },
 
                     async setStatus(contact, nombre) {
                         // let item = this.filterdContactsList.find((d) => {

@@ -109,7 +109,7 @@
                         <li class="nav-item">
                             <ul>
                                 <li class="nav-item">
-                                    <a href="tasks.html" class="group">
+                                    <a href="/admin/tasks/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                                 class="shrink-0 group-hover:!text-primary"
@@ -136,7 +136,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="accounts.html" class="group">
+                                    <a href="/admin/employees/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -156,7 +156,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="admins.html" class="group">
+                                    <a href="/admin/admins/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -176,7 +176,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="reports.html" class="group">
+                                    <a href="/admin/reports/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -1114,9 +1114,9 @@
                                                                             <input type="file" ref="fileInput" id="fileInput" name='file' @change="updateFile">
                                                                         </div>
                                                                     </div>
-                                                                    <div x-data="{ dropdownOptions: [], selectedEmployee: params.user }" x-init="getDropdownOptions().then(options => dropdownOptions = options)">
+                                                                    <div x-data="{ dropdownOptions: [] }">
                                                                         <label for="employeeDropdown">Select an employee:</label>
-                                                                        <select id="employeeDropdown" x-model="selectedEmployee">
+                                                                        <select id="employeeDropdown" x-model="params.user" x-init="await getDropdownOptions().then(options => dropdownOptions = options)">
                                                                             <template x-for="option in dropdownOptions">
                                                                                 <option :value="option.value" x-text="option.label"></option>
                                                                             </template>
@@ -1315,6 +1315,7 @@
 
                     const adminID = getCookie('adminID');
                     //const userID = getCookie('userID');
+                    const key = task.user;
                
                     //const userID = getCookie("userID");
                     const response = await fetch("/adminTasks/updateTask", {
@@ -1325,6 +1326,7 @@
                         body: JSON.stringify({
                             task,
                             adminID,
+                            key,
                             //userID,
                         }),
                     });
@@ -1367,9 +1369,8 @@
         async function createTask(task){
             try {
                     console.log('create task entered');
-               
-                    //const userID = getCookie("userID");
-                    userID = getCookie("userID");
+                    adminID = getCookie('adminID');
+                    userkey = task.user;
                     const response = await fetch("/adminTasks/createTask", {
                         method: 'POST',
                         headers: {
@@ -1377,7 +1378,8 @@
                         },
                         body: JSON.stringify({
                             task,
-                            userID
+                            userkey,
+                            adminID,
                         }),
                     });
 
@@ -1791,24 +1793,30 @@
                         return this.allTasks && this.allTasks.filter((d) => d.status != 'trash').length-1;
                     },
 
-                    addEditTask(task) {
+                    
+                    async addEditTask(task) {
                         this.isShowTaskMenu = false;
-
                         this.params = JSON.parse(JSON.stringify(defaultParams));
-
                         this.quillEditor.root.innerHTML = '';
 
                         if (task.id) {
                             this.params = JSON.parse(JSON.stringify(task));
-                            //console.log(this.params)
                             this.quillEditor.root.innerHTML = this.params.description;
                             this.params.statusT = task.status; 
                             this.params.priority = task.priority;
                             this.params.file = task.file;
-                            this.params.user = task.user;
+
+                            // Fetch dropdown options and set params.user
+                            const dropdownOptions = await getDropdownOptions();
+                            this.dropdownOptions = dropdownOptions;
+                            this.params.user = task.user; // Set the initial value
+                        } else {
+                            // For new tasks, set the default dropdown options
+                            const dropdownOptions = await getDropdownOptions();
+                            this.dropdownOptions = dropdownOptions;
+                            this.params.user = this.dropdownOptions.length > 0 ? this.dropdownOptions[0].value : '';
+
                         }
-
-
 
                         this.addTaskModal = true;
                     },
@@ -1900,6 +1908,14 @@
                             else    
                                 file_name = "";
                             db_id = this.params.dbid;
+                            user = this.params.user;
+                            if(user != 'team')
+                            {
+                                if(tag1 == 'team')
+                                    tag1 = '';
+                                if(tag2 == 'team')
+                                    tag2 = '';
+                            }
 
                             let task = {
                                 title: title,
@@ -1910,6 +1926,7 @@
                                 start_date: start_date,
                                 due_date: due_date,
                                 file: file_name,
+                                user: user,
                                 dbid: db_id
                             }
                             const fileInput = this.$el.querySelector('#fileInput'); // Adjust the selector based on your HTML structure
@@ -1972,6 +1989,9 @@
                             start_date = this.params.dateS;
                             due_date = this.params.date;
                             file_name = this.params.file;
+                            console.log("PARAMS: ", this.params);
+                            user = this.params.user;
+                            console.log("EMPLOYEE: ", user);
                             db_id = this.params.dbid;
 
                             let task = {
@@ -1984,11 +2004,33 @@
                                 start_date: start_date,
                                 due_date: due_date,
                                 file: file_name,
+                                user: user,
                                 dbid: db_id
                             }
+                            console.log("USER TO RECEIVE TASK: ", user);
                             await createTask(task);
+                            const alpineInstance = this;
 
-                            this.allTasks = [...this.allTasks];
+                            // Use this.$set to update the allTasks array
+                            const taskIndex = alpineInstance.allTasks.findIndex(t => t.dbid === task.dbid);
+                            let task2 = {
+                            id: taskIndex,
+                            title: title,
+                            description: description,
+                            descriptionText: description,
+                            dateS: start_date,
+                            date: due_date,
+                            priority: priority,
+                            status: status,
+                            tag1: tag1,
+                            tag2: tag2,
+                            file: file_name, 
+                            dbid: db_id
+                            };
+                            if (taskIndex !== -1) {
+                                alpineInstance.allTasks.splice(taskIndex, 1, task2);
+                            }
+
                             await this.searchTasks();
 
                             this.showMessage('Task has been added successfully!');

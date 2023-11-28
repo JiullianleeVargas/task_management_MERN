@@ -55,7 +55,6 @@ user.post('/getEmployeeTasks', async (req, res) => {
             tasksArray.push(task);
         }
 
-        //console.log(employeesArray);
 
         res.json({tasks: tasksArray});
         
@@ -71,32 +70,16 @@ user.post('/getEmployeeTasks', async (req, res) => {
 
     uid = req.body.id;
     uid = new ObjectId(uid);
-    //console.log("UID: ", uid);
     const client = new MongoClient('mongodb://0.0.0.0:27017');
   
     try {
-        //connect to db
         const tasksArray = [];
         
         await client.connect();
         const database = client.db('task_management');
         const usersCollection = database.collection('employees');
         const taskCollection = database.collection('tasks');
-        const teamCollection = database.collection('teams');
-  
-        // const cursor = await usersCollection.find({ _id: uid }).toArray();
-        // const taskIDs = cursor.map(doc => doc.tasks);
-        
-
-        // for (const taskID of taskIDs[0]) {
-            
-        //     const task = await taskCollection.findOne({ _id: taskID });
-    
-        //     // Add the employee details to the array
-        //     tasksArray.push(task);
-        // }
-
-        
+        const teamCollection = database.collection('teams');        
   
         const emp = await teamCollection.find({ admin: uid }).toArray();
         const taskIDs2 = emp.map(doc => doc.tasks);
@@ -135,10 +118,6 @@ user.post('/getEmployeeTasks', async (req, res) => {
                 }
             }
         }
-        
-        
-
-        //console.log(employeesArray);
 
         res.json({tasks: tasksArray});
         
@@ -153,9 +132,18 @@ user.post('/getEmployeeTasks', async (req, res) => {
 
   user.post("/updateTask", async (req, res) => {
 
-    //console.log("updateEmployeeDetails entered");
     let id = req.body.task.dbid;
     id = new ObjectId(id);
+    console.log("TASK ID: ", id);
+    let adminID = req.body.adminID;
+    adminID = new ObjectId(adminID);  
+    let key;
+    if(req.body.key)
+        key = req.body.key;
+    let userID;
+    if(req.body.userID);
+        userID = req.body.userID;
+        userID = new ObjectId(userID);
     let title = req.body.task.title;
     let desc = req.body.task.description;
     let priority = req.body.task.priority;
@@ -175,7 +163,16 @@ user.post('/getEmployeeTasks', async (req, res) => {
            // Access the 'task_management' database and 'employees' collection
            const database = client.db('task_management');
            const taskCollection = database.collection('tasks');
-  
+           const usersCollection = database.collection('employees');
+           const teamCollection = database.collection('teams');
+
+           if(!key)
+           {
+                userTemp = await usersCollection.findOne({_id: userID});
+                key = userTemp.email;
+           }
+
+         //Update task for a single employee (no team)
           await taskCollection.updateOne(
             { _id: id },
             {$set:{
@@ -190,35 +187,193 @@ user.post('/getEmployeeTasks', async (req, res) => {
             }}
         );
 
+        //Send notification of task change to single employee
+        // const user = await usersCollection.findOne({tasks: id});
+        // let userID = user._id;
+        // userID = new ObjectId(userID);
+        // var string = `The task "${title}" was updated!`;
+        // await usersCollection.updateOne( 
+        //         { _id: userID },
+        //         {
+        //             $push: { notifications: string },
+        //         },
+        // );
+
         //If tags contains "team"
         if (Array.isArray(tags) && tags.includes("team")) {
-            console.log("Entered tags if");
-                adminID = req.body.adminID;
-                adminID = new ObjectId(adminID);
-
-                const usersCollection = database.collection('employees');
-                const teamCollection = database.collection('teams');
-
-                //get user for that task
-                const user = await usersCollection.findOne({tasks: id});
-                let userID = user._id;
-                userID = new ObjectId(userID);
-                console.log('User id: ', userID);
+                              
 
                 //Check that task isn't already in team
-                const task = await teamCollection.findOne({ tasks: id });
-                if(!task)
+                var team = await teamCollection.findOne({ tasks: id });
+                if(!team)
                 {
                     //Take task from employee and add to team.
+
+                    const user = await usersCollection.findOne({tasks: id});
+                    let userID = user._id;
+                    userID = new ObjectId(userID);
                     
                     const result = await usersCollection.updateOne({_id: userID},{$pull:{ tasks: id }});
                     await teamCollection.updateOne({admin: adminID},{$push:{ tasks: id }});
                 }
 
-                
+                //Get task again just in case it just added above
+                var team = await teamCollection.findOne({ tasks: id });
+
+                //Get employee IDs from team
+                const teamEmployees = team.employees;
+
+                //For each employee, add to their notifications the changes made to task
+                for(const employee of teamEmployees)
+                {
+                    var e_id = new ObjectId(employee);
+
+                    var string = `The task "${title}" was updated!`;
+
+                    await usersCollection.updateOne( 
+                            { _id: e_id },
+                            {
+                                $push: { notifications: string },
+                            },
+                    );
+                }  
+            }
+        else if(key == 'team')
+        {
+            //if not previously in team:
+            const team = await teamCollection.findOne({tasks: id});
+            if(!team)
+            {       
+                 //find the user
+                 const tempUser = await usersCollection.findOne({tasks: id});
+
+                //Remove that task from tasks array
+                await usersCollection.updateOne(
+                {_id: tempUser._id},
+                { $pull: { "tasks": id } }
+                );
+
+                //add task to team
+                await teamCollection.updateOne(
+                    {"admin": adminID},
+                    { $push: { "tasks": id } }
+                    );
+
+                //notify each member in team (task was moved to team)
+                let team = await teamCollection.findOne({"admin": adminID});
+
+                let string = `The task "${title}" was re-assigned to the team.`;
+
+                for(employeeID of team.employees)
+                {
+                    await usersCollection.updateOne({_id: employeeID}, {$push:{notifications: string}});
+                }
+            }
+            else //task already in team
+            {
+                let string = `The task "${title}" was updated.`;
+
+                for(employeeID of team.employees)
+                {
+                    await usersCollection.updateOne({_id: employeeID}, {$push:{notifications: string}});
+                }
+            }
+            
         }
-        else
-            console.log("NOT ENTERED THERE");
+        else //if set to a user
+        {
+            //find the old user for the task
+            const oldUser = await usersCollection.findOne({tasks: id});
+
+            
+            if(oldUser)
+            {
+                //check if user is same or not
+                if(oldUser.email == key)
+                {
+                    let userID = new ObjectId(oldUser._id);
+                    var string = `The task "${title}" was updated!`;
+                    await usersCollection.updateOne( 
+                            { _id: userID },
+                            {
+                                $push: { notifications: string },
+                            },
+                    );
+                }
+                //if user changed:
+                else{
+
+                    //remove task from old user
+                    await usersCollection.updateOne(
+                        {_id: oldUser._id},
+                        { $pull: { "tasks": id } }
+                        );
+
+                    //notify them of removal
+                    var string = `The task "${title}" was assigned to a new employee!`;
+                    await usersCollection.updateOne( 
+                            { _id: oldUser._id },
+                            {
+                                $push: { notifications: string },
+                            },
+                    );
+
+                    //add task to new user
+                    await usersCollection.updateOne( 
+                        { email: key },
+                        {
+                            $push: { tasks: id },
+                        },
+                    );
+
+                    //notify them of addition
+                    var string = `The task "${title}" was added!`;
+                    await usersCollection.updateOne( 
+                            { email: key},
+                            {
+                                $push: { notifications: string },
+                            },
+                    );
+                    
+                }
+            }
+
+            //Task was not in employees, so it is a team task
+            else
+            {
+                //remove task from team
+                await teamCollection.updateOne(
+                    {admin: adminID},
+                    { $pull: { "tasks": id } }
+                    );
+
+                //notify each member of removal
+                let theTeam = await teamCollection.findOne({admin: adminID});
+                let string = `The task "${title}" was re-assigned to a single employee.`;
+
+                for(employeeID of theTeam.employees)
+                {
+                    await usersCollection.updateOne(
+                        {_id: employeeID},
+                        { $push: { notifications: string } }
+                        );
+                }
+
+                //add task to user
+                await usersCollection.updateOne(
+                    {email: key},
+                    { $push: { tasks: id } }
+                    );
+
+                //notify user that task was moved to only their account
+                let string2 = `The task ${title} was re-assigned to your account.`;
+                await usersCollection.updateOne(
+                    {email: key},
+                    { $push: { notifications: string2 } }
+                    );
+            }
+                
+        }   
    
            // Respond with a success message or other appropriate response
            res.status(200).json({ message: 'Task successfully'});
@@ -251,6 +406,10 @@ user.post('/getEmployeeTasks', async (req, res) => {
            // Access the 'task_management' database and 'employees' collection
            const database = client.db('task_management');
            const taskCollection = database.collection('tasks');
+           const teamCollection = database.collection('teams');
+           const usersCollection = database.collection('employees');
+
+           let task = await taskCollection.findOne({_id: id});
   
           await taskCollection.updateOne(
             { _id: id },
@@ -258,6 +417,29 @@ user.post('/getEmployeeTasks', async (req, res) => {
               priority: priority,
             }}
         );
+
+            //notify employee or team
+
+            const user = await usersCollection.findOne({tasks: id});
+            const team = await teamCollection.findOne({tasks: id});
+
+            let string = `The task "${task.title}" was changed to priority: ${priority}`;
+
+            if(user)
+            {
+                await usersCollection.updateOne({tasks: id},
+                {$push: {notifications: string}})
+            }
+            else
+            {
+                for(employeeID of team.employees)
+                {
+                    await usersCollection.updateOne({_id: employeeID},
+                    {$push: {notifications: string}})
+                }
+            }
+
+
         
            res.status(200).json({ message: 'Task priority successfully updated'});
        } catch (error) {
@@ -274,9 +456,20 @@ user.post('/getEmployeeTasks', async (req, res) => {
 
   user.post("/createTask", async (req, res) => {
 
-    //console.log("updateEmployeeDetails entered");
-    let id = req.body.userID;
-    id = new ObjectId(id);
+    let key = req.body.userkey;
+    console.log("KEY EMAIL: ", key);
+    //Get Employee ID and convert to ObjectID for Mongo
+    // if(req.body.userID !== 'team')
+    // {
+    //     id = req.body.userID;
+    //     id = new ObjectId(id);
+    // }
+    // else
+    //     id = 'team';
+
+    //Receive other parameters
+    let adminID = req.body.adminID;
+    adminID = new ObjectId(adminID);
     let title = req.body.task.title;
     let desc = req.body.task.description;
     let priority = req.body.task.priority;
@@ -286,6 +479,7 @@ user.post('/getEmployeeTasks', async (req, res) => {
     let start_date = req.body.task.start_date;
     let due_date = req.body.task.due_date;
 
+    //Create task JSON
     let task = {
         "title": title,
         "description": desc,
@@ -304,29 +498,158 @@ user.post('/getEmployeeTasks', async (req, res) => {
        try {
            await client.connect();
  
-           // Access the 'task_management' database and 'employees' collection
            const database = client.db('task_management');
            const taskCollection = database.collection('tasks');
+           const employeeCollection = database.collection('employees');
 
+           //Insert the task into 'tasks' collection
            await taskCollection.insertOne(task);
 
-           //const lastTask = await taskCollection.find().sort({$natural: -1}).limit(1)
+           //Find that newly inserted task
            const lastTask = await taskCollection.findOne({}, { sort: { $natural: -1 } });
-           const lastTaskID = lastTask._id;
-           console.log("last task id: ", lastTaskID);
 
-           //await taskCollection.findOne({ _id: lastTask._id });
+           //Check if tags includes 'teams'
+           if(key !== 'team')
+           {
+                
+                let tempUser = await employeeCollection.findOne({email: key});
+                let id = tempUser._id;
+                if (Array.isArray(tags) && tags.includes("team")) {
+                        //Add the task ID onto the team
+                        const teamCollection = database.collection('teams');
+                        await teamCollection.updateOne({ employees: id }, { $push: { tasks: lastTask._id } });
 
+                        //Add to employees of team notification of new task
+                        const team = teamCollection.findOne({employees: id});
 
+                        string = `The task "${title}" was added!`;
 
-           if (Array.isArray(tags) && tags.includes("team")) {
+                        for(employee of team.employees)
+                        {
+                            await employeeCollection.updateOne({ _id: employee }, { $push: { notifications: string } });
+                        }
+                }
+                else{
+                        //If a single employee, add task ID onto tasks array
+                        
+                        await employeeCollection.updateOne({ _id: id }, { $push: { tasks: lastTask._id } });
+
+                        //Add notification of new task to single employee
+                        const user = employeeCollection.findOne({_id: id});
+                        string = `The task "${title}" was added!`;
+                        await employeeCollection.updateOne({ _id: id }, { $push: { notifications: string } });
+                }
+            }
+
+            //If tags doesn't have team but you set the task user to be the whole team anyway
+            else
+            {
                 const teamCollection = database.collection('teams');
-                await teamCollection.updateOne({ employees: id }, { $push: { tasks: lastTask._id } });
-           }
-           else{
-                const employeeCollection = database.collection('employees');
-                await employeeCollection.updateOne({ _id: id }, { $push: { tasks: lastTask._id } });
-           }
+                await teamCollection.updateOne({ admin: adminID }, { $push: { tasks: lastTask._id } });
+
+                //Add to employees of team notification of new task
+                const team = await teamCollection.findOne({admin: adminID});
+
+                console.log("TEAM: ", team);
+
+                string = `The task "${title}" was added!`;
+
+                for(employee of team.employees)
+                {
+                    await employeeCollection.updateOne({ _id: employee }, { $push: { notifications: string } });
+                }
+            }
+   
+           // Respond with a success message or other appropriate response
+           res.status(200).json({ message: 'Task successfully'});
+       } catch (error) {
+           console.error('Error updating task:', error);
+   
+           // Respond with an error message or handle the error appropriately
+           res.status(500).json({ error: 'Internal Server Error' });
+       } finally {
+           // Close the MongoDB connection
+           await client.close();
+       }
+   
+  })
+
+  user.post("/createEmployeeTask", async (req, res) => {
+
+    
+    //Get Employee ID and convert to ObjectID for Mongo
+    
+    id = req.body.userID;
+    id = new ObjectId(id);
+
+    //Receive other parameters
+    let adminID = req.body.adminID;
+    adminID = new ObjectId(adminID);
+    let title = req.body.task.title;
+    let desc = req.body.task.description;
+    let priority = req.body.task.priority;
+    let status = req.body.task.statusT;
+    let tags = [req.body.task.tag1, req.body.task.tag2];
+    let file = req.body.task.file;
+    let start_date = req.body.task.start_date;
+    let due_date = req.body.task.due_date;
+
+    //Create task JSON
+    let task = {
+        "title": title,
+        "description": desc,
+        "priority": priority,
+        "status": status,
+        "tags": tags,
+        "file": file,
+        "start_date": start_date,
+        "due_date": due_date
+    }
+
+      
+       // Connect to the MongoDB server
+       const client = new MongoClient('mongodb://0.0.0.0:27017');
+  
+       try {
+           await client.connect();
+ 
+           const database = client.db('task_management');
+           const taskCollection = database.collection('tasks');
+           const employeeCollection = database.collection('employees');
+
+           //Insert the task into 'tasks' collection
+           await taskCollection.insertOne(task);
+
+           //Find that newly inserted task
+           const lastTask = await taskCollection.findOne({}, { sort: { $natural: -1 } });
+
+           //Check if tags includes 'teams'  
+            if (Array.isArray(tags) && tags.includes("team")) {
+                    //Add the task ID onto the team
+                    const teamCollection = database.collection('teams');
+                    await teamCollection.updateOne({ employees: id }, { $push: { tasks: lastTask._id } });
+
+                    //Add to employees of team notification of new task
+                    const team = teamCollection.findOne({employees: id});
+
+                    string = `The task "${title}" was added!`;
+
+                    for(employee of team.employees)
+                    {
+                        await employeeCollection.updateOne({ _id: employee }, { $push: { notifications: string } });
+                    }
+            }
+            else{
+                    //If a single employee, add task ID onto tasks array
+                    
+                    await employeeCollection.updateOne({ _id: id }, { $push: { tasks: lastTask._id } });
+
+                    //Add notification of new task to single employee
+                    const user = employeeCollection.findOne({_id: id});
+                    string = `The task "${title}" was added!`;
+                    await employeeCollection.updateOne({ _id: id }, { $push: { notifications: string } });
+            }
+        
    
            // Respond with a success message or other appropriate response
            res.status(200).json({ message: 'Task successfully'});

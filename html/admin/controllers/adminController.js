@@ -524,6 +524,8 @@ user.post("/createEmployee", async (req, res) => {
           f_name: f_name,
           l_name: l_name,
           status: status,
+          tasks: [],
+          notifications: []
         };
  
          // Access the 'task_management' database and 'employees' collection

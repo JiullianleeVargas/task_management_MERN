@@ -109,7 +109,7 @@
                         <li class="nav-item">
                             <ul>
                                 <li class="nav-item">
-                                    <a href="tasks.html" class="group">
+                                    <a href="/admin/tasks/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                                 class="shrink-0 group-hover:!text-primary"
@@ -136,7 +136,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="accounts.html" class="group">
+                                    <a href="/admin/employees/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -156,7 +156,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="admins.html" class="group">
+                                    <a href="/admin/admins/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -176,7 +176,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="reports.html" class="group">
+                                    <a href="/admin/reports/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -1544,7 +1544,7 @@
                
                     //const userID = getCookie("userID");
                     userID = getCookie("userID");
-                    const response = await fetch("/adminTasks/createTask", {
+                    const response = await fetch("/adminTasks/createEmployeeTask", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1825,12 +1825,10 @@
                      // Method to extract unique non-empty tags from tasks
                         extractUniqueTags() {
                             const allTags = this.allTasks.flatMap(task => [task.tag1, task.tag2]);
-                            console.log("All Tags: ", allTags);
 
                             // Remove any undefined or null values from the array
                             this.uniqueTags = [...new Set(allTags.filter(tag => tag !== undefined && tag !== null && tag !== ""))];
 
-                            console.log("Unique Tags: ", this.uniqueTags);
                         },
                     searchTasks(isResetPage = true) {
                         //Filter through tasks in display
@@ -2033,7 +2031,6 @@
                             title = this.params.title;
                             description = this.params.descriptionText;
                             status = this.params.statusT;
-                            console.log("status being edited: ", status);
                             priority = this.params.priority;
                             if(this.params.tag1)
                                 tag1 = this.params.tag1;
@@ -2094,12 +2091,12 @@
                             file: file_name, 
                             dbid: db_id
                             };
-                            console.log("task2: ", task2);
+                            //console.log("task2: ", task2);
                             if (taskIndex !== -1) {
                                 alpineInstance.allTasks.splice(taskIndex, 1, task2);
                             }
 
-                            console.log("all tasks: ", alpineInstance.allTasks);
+                            //console.log("all tasks: ", alpineInstance.allTasks);
                             //const taskIndex = this.allTasks.findIndex(t => t.dbid === task.dbid);
                             
                             // if (taskIndex !== -1) {
@@ -2123,7 +2120,6 @@
                                 priority = this.params.priority;
                             else
                                 priority = "low";
-                            console.log("Priority that is being added: ", priority);
                             if(this.params.tag1)
                                 tag1 = this.params.tag1;
                             else    
@@ -2149,11 +2145,31 @@
                                 file: file_name,
                                 dbid: db_id
                             }
-                            console.log("try create task");
                             await createTask(task);
-                            console.log('after create task');
 
-                            this.allTasks = [...this.allTasks];
+                            
+                            const alpineInstance = this;
+
+                            // Use this.$set to update the allTasks array
+                            const taskIndex = alpineInstance.allTasks.findIndex(t => t.dbid === task.dbid);
+                            let task2 = {
+                            id: taskIndex,
+                            title: title,
+                            description: description,
+                            descriptionText: description,
+                            dateS: start_date,
+                            date: due_date,
+                            priority: priority,
+                            status: status,
+                            tag1: tag1,
+                            tag2: tag2,
+                            file: file_name, 
+                            dbid: db_id
+                            };
+                            if (taskIndex !== -1) {
+                                alpineInstance.allTasks.splice(taskIndex, 1, task2);
+                            }
+
                             await this.searchTasks();
 
                             this.showMessage('Task has been added successfully!');

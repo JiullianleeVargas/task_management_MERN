@@ -109,7 +109,7 @@
                         <li class="nav-item">
                             <ul>
                                 <li class="nav-item">
-                                    <a href="tasks" class="group">
+                                    <a href="/admin/tasks/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                                 class="shrink-0 group-hover:!text-primary"
@@ -136,7 +136,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="accounts" class="group">
+                                    <a href="/admin/employees/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -156,7 +156,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="admins" class="group">
+                                    <a href="/admin/admins/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -176,7 +176,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="reports" class="group">
+                                    <a href="/admin/reports/" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -439,8 +439,16 @@
                                                 <div class="flex flex-col sm:flex-row" >
                                                     <div class="grid flex-1 grid-cols-1 gap-5 sm:grid-cols-2">
                                                         <div>
-                                                            <label for="email">Email Address</label>
+                                                            <label for="fname">First Name</label>
                                                             <input type='hidden' id="uid">
+                                                            <input id="fname" type="text" placeholder="" class="form-input" />
+                                                        </div>
+                                                        <div>
+                                                            <label for="lname">Last Name</label>
+                                                            <input id="lname" type="text" placeholder="" class="form-input" />
+                                                        </div>
+                                                        <div>
+                                                            <label for="email">Email Address</label>
                                                             <input id="email" type="text" placeholder="" class="form-input" />
                                                         </div>
                                                         <div>
@@ -736,6 +744,8 @@
             $("#uid").val(id);
             $("#email").val(admin.email);
             $("#password").val(admin.password);
+            $("#lname").val(admin.l_name);
+            $("#fname").val(admin.f_name);
             let status = admin.status;
             let html = "";
 
@@ -760,6 +770,8 @@
                "Content-Type": "application/json",
              },
              body: JSON.stringify({
+                f_name: $("#fname").val(),
+                l_name: $("#lname").val(),
                email: $("#email").val(),
                password: $("#password").val(),
                id: $("#uid").val(),

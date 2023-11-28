@@ -372,6 +372,19 @@ user.post('/setStatus', async (req, res) => {
 });
 
 
+user.get("/getFile", async (req, res) => {
+
+  try {
+      const fileName = req.query.file; // Use req.query to get query parameters
+      const filePath = path.join(__dirname, '../../public/uploads', fileName); // Adjust the path if needed
+
+      // Send the file to the client
+      res.sendFile(filePath);
+  } catch (error) {
+      console.error('Error serving file:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+})
 
 user.post('/register', (req, res) => {
   try {

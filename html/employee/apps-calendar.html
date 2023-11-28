@@ -885,6 +885,7 @@
                                                     </form>
                                                 </div>
                                             </div>
+                                                                               
                                         </div>
                                     </div>
                                 </div>
@@ -1075,6 +1076,39 @@
                     console.error("Error:", error);
                 }
             }
+             // Function to get the team Tasks for the emmployee
+             async function fetchDataTeam() {
+                try {
+
+                    // Grabing the ID cookie from browser
+                    const employeeId = document.cookie          
+                        .split('; ')
+                        .find(row => row.startsWith('employeeID='))
+                        .split('=')[1];
+                    
+                    console.log(employeeId)
+
+                    // Sending the cookie in the header for the teq in /getEmployeeTasks
+                    const response = await fetch("/employee/getTeamTasks",
+                     {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Include the cookie in the headers
+                            'Cookie': `employeeID=${employeeId}`
+                          
+                        },
+                    });
+
+                    console.log("inside the fetch in the index", response);
+                    const data = await response.json();
+                    return data;
+
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            }
+
 
                 // Grab user cookies
                 let employeeID = JSON.parse(getCookie('employeeeID'));
@@ -1143,10 +1177,16 @@
                             events: this.events,
                         });
                         
-                        console.log("inside the init")
-                        let tasks = await fetchData();
-                        console.log(tasks)
+                        let employeeTasks= await fetchData();
+                        console.log(employeeTasks)
 
+                        
+                        // Getting the team tasks
+                        const teamTasks = await fetchDataTeam();
+                        console.log("Team", teamTasks)
+
+                        //Joining the arrays
+                        const tasks = employeeTasks.concat(teamTasks)
 
                         for (var i = 0; i < tasks.length; i++) {
                                 this.addEvent(tasks[i]['_id'], tasks[i]['title'], tasks[i]['due_date'],

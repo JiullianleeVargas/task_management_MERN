@@ -956,6 +956,7 @@
                                 email: themail,
                                 password: password,
                                 status: thestatus,
+                                dbid: id,
                             };
                             this.contactList.splice(0, 0, admin);
                             this.searchContacts();
@@ -1005,7 +1006,7 @@
                             //this.setCookie("admins", JSON.stringify(admins));
 
                              // Send the data to the server using Fetch API
-                            let dbid = fetch("/admin/createAdmin", {
+                            let dbid = await fetch("/admin/createAdmin", {
                               method: "POST",
                               headers: {
                                 "Content-Type": "application/json",

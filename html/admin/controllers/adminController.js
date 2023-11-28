@@ -153,7 +153,7 @@ user.post('/createAdmin', async function(req, res) {
 
         if(!employee)
         {
-          const adminToInsert = { "email": email, "password": password, "status":"active", "l_name": l_name, "f_name": f_name};
+          const adminToInsert = { "email": email, "password": password, "status":"active", "l_name": l_name, "f_name": f_name, "notifications": []};
           // Insert the data into the collection
           const result = await usersCollection.insertOne(adminToInsert);
           console.log(`Inserted ${result.insertedCount} document(s)`);
@@ -221,15 +221,15 @@ user.post('/updateAdmin', async function(req, res) {
   adminData.password = '';
   if(req.body.password !== req.body.old_password)
   {
-    adminData.password = (String(req.body.password)).trim();
-    adminData.password = await hashPassword(adminData.password);
+    password = req.body.password.trim();
+    password = await hashPassword(password);
+    console.log("1: ", password);
+    adminData.password = password;
   }
   adminData.f_name = req.body.f_name.trim();
   adminData.l_name = req.body.l_name.trim();
   adminData.status = req.body.status.trim();
-  console.log("admindata: ", adminData);  
   id = id.trim();
-  console.log("id: ", id);
 
   const client = new MongoClient('mongodb://0.0.0.0:27017');
   try{
@@ -238,14 +238,13 @@ user.post('/updateAdmin', async function(req, res) {
       const usersCollection = database.collection('admins');
       console.log("DB connect");
       const admin = await usersCollection.find({_id: new ObjectId(id)}).toArray();
-      console.log("admin db:", admin);
       if(!admin)
       {
         return res.status(404).json({ error: 'User not found' });
       }
       else {
         //chaeck if optional fields exists
-        await console.log("admin exists", admin);
+        console.log("admin exists", admin);
         for (const field in adminData) {
           if (adminData.hasOwnProperty(field) && admin.hasOwnProperty(field)) {
               admin[field] = adminData[field].trim();
@@ -259,13 +258,13 @@ user.post('/updateAdmin', async function(req, res) {
         // Update the password if it was changed
         if(adminData.password !== '')
         {
+          console.log("2: ", adminData.password);
           await usersCollection.updateOne({_id: new ObjectId(id)}, 
           { $set: {password: adminData.password,} });
   
         }
 
         if(updatedAdmin.modifiedCount > 0){
-          console.log("updatedAdmin: ", adminData);
           res.json({adminData});
         }
       }

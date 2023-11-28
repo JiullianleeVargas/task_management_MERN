@@ -1029,7 +1029,8 @@
                               }
                               else{
                                 // Display the response in a window.alert
-                                window.alert(data.error || "A new admin has been created");
+                                if(data.error)
+                                    window.alert(data.error);
                               }
 
                               if(data.id)

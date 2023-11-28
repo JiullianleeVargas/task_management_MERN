@@ -2055,7 +2055,8 @@
 
                         if (this.params.id) {
                             title = this.params.title;
-                            description = this.params.descriptionText;
+                            description = this.quillEditor.getText();
+                            description = description.replace(/<\/?p>/g, '');
                             status = this.params.statusT;
                             priority = this.params.priority;
                             if(this.params.tag1)
@@ -2135,7 +2136,8 @@
 
                             //Add new task
                             title = this.params.title;
-                            description = this.params.descriptionText;
+                            description = this.quillEditor.getText();
+                            description = description.replace(/<\/?p>/g, '');
                             if(this.params.statusT)
                                 statusT = this.params.statusT;
                             else

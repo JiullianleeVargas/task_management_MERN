@@ -102,7 +102,7 @@ user.post('/login', async function(req, res) {
 
       if(admin)
       {
-          let result = comparePassword(String(password), String(admin['password']));
+          let result = await comparePassword(String(password), String(admin['password']));
           if(result)
           {
             console.log("Succesful log in!");
@@ -147,7 +147,8 @@ user.post('/createAdmin', async function(req, res) {
   let f_name = req.body.f_name;
   let l_name = req.body.l_name;
   email = email.trim();
-  password = password.trim();
+  //password = password.trim();
+  password = hashPassword(req.body.password);
   f_name = f_name.trim();
   l_name = l_name.trim();
 

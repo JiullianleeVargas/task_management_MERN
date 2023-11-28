@@ -55,6 +55,7 @@ user.post('/getEmployeeTasks', async (req, res) => {
             tasksArray.push(task);
         }
 
+        console.log("TASKS: ", tasksArray);
 
         res.json({tasks: tasksArray});
         
@@ -186,18 +187,6 @@ user.post('/getEmployeeTasks', async (req, res) => {
               due_date: due_date
             }}
         );
-
-        //Send notification of task change to single employee
-        // const user = await usersCollection.findOne({tasks: id});
-        // let userID = user._id;
-        // userID = new ObjectId(userID);
-        // var string = `The task "${title}" was updated!`;
-        // await usersCollection.updateOne( 
-        //         { _id: userID },
-        //         {
-        //             $push: { notifications: string },
-        //         },
-        // );
 
         //If tags contains "team"
         if (Array.isArray(tags) && tags.includes("team")) {
@@ -457,15 +446,6 @@ user.post('/getEmployeeTasks', async (req, res) => {
   user.post("/createTask", async (req, res) => {
 
     let key = req.body.userkey;
-    console.log("KEY EMAIL: ", key);
-    //Get Employee ID and convert to ObjectID for Mongo
-    // if(req.body.userID !== 'team')
-    // {
-    //     id = req.body.userID;
-    //     id = new ObjectId(id);
-    // }
-    // else
-    //     id = 'team';
 
     //Receive other parameters
     let adminID = req.body.adminID;
@@ -561,7 +541,7 @@ user.post('/getEmployeeTasks', async (req, res) => {
             }
    
            // Respond with a success message or other appropriate response
-           res.status(200).json({ message: 'Task successfully'});
+           res.status(200).json({ message: 'Task successfully', taskID: lastTask._id});
        } catch (error) {
            console.error('Error updating task:', error);
    
@@ -576,7 +556,6 @@ user.post('/getEmployeeTasks', async (req, res) => {
 
   user.post("/createEmployeeTask", async (req, res) => {
 
-    
     //Get Employee ID and convert to ObjectID for Mongo
     
     id = req.body.userID;
@@ -653,6 +632,76 @@ user.post('/getEmployeeTasks', async (req, res) => {
    
            // Respond with a success message or other appropriate response
            res.status(200).json({ message: 'Task successfully'});
+       } catch (error) {
+           console.error('Error updating task:', error);
+   
+           // Respond with an error message or handle the error appropriately
+           res.status(500).json({ error: 'Internal Server Error' });
+       } finally {
+           // Close the MongoDB connection
+           await client.close();
+       }
+   
+  })
+
+  user.post("/deleteTask", async (req, res) => {
+
+    
+    let taskID = req.body.task.dbid;
+    taskID = new ObjectId(taskID);
+    let title = req.body.task.title;
+
+      
+       // Connect to the MongoDB server
+       const client = new MongoClient('mongodb://0.0.0.0:27017');
+  
+       try {
+           await client.connect();
+ 
+           const database = client.db('task_management');
+           const taskCollection = database.collection('tasks');
+           const employeeCollection = database.collection('employees');
+           const teamCollection = database.collection('teams');
+
+           //delete the task
+
+           await taskCollection.deleteOne({_id: taskID});
+
+           //find task in employees
+           let user = await employeeCollection.findOne({tasks: taskID});
+           let string = `The task "${title}" was removed.`;
+           if(user)
+           {
+                //delete task ref from tasks array
+                await employeeCollection.updateOne({_id: user._id},
+                    {$pull:{tasks: taskID}})
+
+                //add notification of deletion
+                await employeeCollection.updateOne({_id: user._id},
+                    {$push:{notifications: string}})
+           }
+           else
+           {
+                //if employee not found, find team
+                let team = await teamCollection.findOne({tasks: taskID});
+
+                //delete task ref from tasks array
+                await teamCollection.updateOne({_id: team._id},
+                    {$pull:{tasks: taskID}})
+
+                //for each employee in team, notify of deletion
+                for(employeeID of team.employees)
+                {
+                    await employeeCollection.updateOne({_id: employeeID},
+                        {$push:{notifications: string}})
+                }
+
+                
+           }
+
+          
+           // Respond with a success message or other appropriate response
+           res.status(200).json({ message: 'Task successfully deleted'});
        } catch (error) {
            console.error('Error updating task:', error);
    

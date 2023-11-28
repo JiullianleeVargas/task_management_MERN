@@ -726,7 +726,7 @@
                                                                 </div>
 
                                                                 <!-- BUTTON FOR ADDING THE TASK -->
-                                                                <button type="button" class="btn btn-primary" @click="addEditTask">
+                                                                <button type="button" class="btn btn-primary" @click="await addEditTask">
                                                                    
                                                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ltr:mr-2 rtl:ml-2">
                                                                         
@@ -915,7 +915,7 @@
                                                                                                     class="whitespace-nowrap ltr:right-0 rtl:left-0"
                                                                                                 >
                                                                                                     <li>
-                                                                                                        <a href="javascript:;" @click="toggle, addEditTask(task)">
+                                                                                                        <a href="javascript:;" @click="toggle, await addEditTask(task)">
                                                                                                             <svg
                                                                                                                 width="24"
                                                                                                                 height="24"
@@ -947,7 +947,7 @@
                                                                                                         </a>
                                                                                                     </li>
                                                                                                     <li>
-                                                                                                        <a href="javascript:;" @click="toggle,  deleteTask(task, 'delete' )">
+                                                                                                        <a href="javascript:;" @click="toggle,  deleteTask(task)">
                                                                                                             <svg
                                                                                                                 width="24"
                                                                                                                 height="24"
@@ -1384,8 +1384,35 @@
                         throw new Error(`HTTP Creating Task error! Status: ${response.status}`);
                     }
 
+                    const data = await response.json();
+
+                    if(data.taskID)
+                        return data.taskID;
                 } catch (error) {
                     console.error('Error creating task:', error);
+                }
+        }
+
+        async function deleteATask(task)
+        {
+            try {
+                    console.log('delete task entered');
+                    const response = await fetch("/adminTasks/deleteTask", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            task,
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP Delete Task error! Status: ${response.status}`);
+                    }
+
+                } catch (error) {
+                    console.error('Error deleting task:', error);
                 }
         }
 
@@ -1666,7 +1693,7 @@
                                 task['description'], task['priority'], task['status'], task['tags'], task['file'], task['user'], task['_id']);
                         });
 
-                        this.extractUniqueTags();
+                        await this.extractUniqueTags();
                     },
                     initEditor() {
                         this.quillEditor = new Quill(this.$refs.editor, {
@@ -1678,7 +1705,7 @@
                         });
                     },
                      // Method to extract unique non-empty tags from tasks
-                        extractUniqueTags() {
+                    async extractUniqueTags() {
                             const allTags = this.allTasks.flatMap(task => [task.tag1, task.tag2]);
 
                             // Remove any undefined or null values from the array
@@ -1823,26 +1850,27 @@
                         this.allTasks = [...this.allTasks];
                     },
 
-                    deleteTask(task, type) {
+                    async deleteTask(task) {
                         reply = window.prompt("Are you sure you want to remove this task from the employee? (Y/N)");
 
                         if(reply == 'Y' || reply == 'y'){
-                            if (type === 'delete') {
-                            task.status = 'trash';
-                            this.allTasks = this.allTasks.filter((d) => d.id != task.id);
-                           
-                            }
 
-                            tasks[task.id-1]['task_user'] = "";
-                            setCookie("tasks", tasks);
-
+                            //Call delete function
+                            await deleteATask(task);
+                            const alpineInstance = this;
                             
-                            if(users[this.user_id-1])
-                            {
-                                notif = `The task titled "${tasks[task.id-1]['task_name']}" has been removed`;
-                                users[this.user_id-1]['notifications'].push(notif);
-                                setCookie("users", users);
+                            //Update the Alpine tasks array
+                            const taskIndex = alpineInstance.allTasks.findIndex(t => t.dbid === task.dbid);
+                            
+                            if (taskIndex !== -1) {
+                                alpineInstance.allTasks.splice(taskIndex, 1);
                             }
+
+                            //update the tags
+                            await this.extractUniqueTags();
+
+                            this.showMessage('Task has been deleted successfully!');
+                            
                         }
 
                         
@@ -1906,13 +1934,25 @@
                                 file_name = "";
                             db_id = this.params.dbid;
                             user = this.params.user;
-                            if(user != 'team')
+                            if(user !== 'team')
                             {
                                 if(tag1 == 'team')
                                     tag1 = '';
                                 if(tag2 == 'team')
                                     tag2 = '';
                             }
+                            else
+                            {
+                                tag2 = tag1;
+                                tag1 = 'team';
+                            }
+                            if(tag1 == "" && tag2 !== "")
+                            {
+                                tag1 = tag2;
+                                tag2 = "";
+                            }
+                            if(tag1 == 'team' && tag2 == 'team')
+                                tag2 = '';
 
                             let task = {
                                 title: title,
@@ -1961,6 +2001,9 @@
                                 alpineInstance.allTasks.splice(taskIndex, 1, task2);
                             }
 
+                            //update the tags
+                            await this.extractUniqueTags();
+
                             await this.searchTasks();
                         } else {
 
@@ -1986,10 +2029,30 @@
                             start_date = this.params.dateS;
                             due_date = this.params.date;
                             file_name = this.params.file;
-                            console.log("PARAMS: ", this.params);
                             user = this.params.user;
-                            console.log("EMPLOYEE: ", user);
                             db_id = this.params.dbid;
+
+                            
+
+                            if(user !== 'team')
+                            {
+                                if(tag1 == 'team')
+                                    tag1 = '';
+                                if(tag2 == 'team')
+                                    tag2 = '';
+                            }
+                            else
+                            {
+                                tag2 = tag1;
+                                tag1 = 'team';
+                            }
+                            if(tag1 == "" && tag2 !== "")
+                            {
+                                tag1 = tag2;
+                                tag2 = "";
+                            }
+                            if(tag1 == 'team' && tag2 == 'team')
+                                tag2 = '';
 
                             let task = {
                                 title: title,
@@ -2005,7 +2068,7 @@
                                 dbid: db_id
                             }
                             console.log("USER TO RECEIVE TASK: ", user);
-                            await createTask(task);
+                            taskID = await createTask(task);
                             const alpineInstance = this;
 
                             // Use this.$set to update the allTasks array
@@ -2022,12 +2085,15 @@
                             tag1: tag1,
                             tag2: tag2,
                             file: file_name, 
-                            dbid: db_id
+                            dbid: taskID
+                            
                             };
+
                             if (taskIndex !== -1) {
                                 alpineInstance.allTasks.splice(taskIndex, 1, task2);
                             }
 
+                            await this.extractUniqueTags();
                             await this.searchTasks();
 
                             this.showMessage('Task has been added successfully!');

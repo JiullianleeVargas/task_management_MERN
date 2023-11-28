@@ -161,18 +161,30 @@ user.post('/createAdmin', async function(req, res) {
         await client.connect();
         const database = client.db('task_management');
         const usersCollection = database.collection('admins');
+        const teamCollection = database.collection('teams');
         console.log("DB connect");
 
         const employee = await usersCollection.findOne({ email });
 
         if(!employee)
         {
-          console.log('no existe el email.');
           const adminToInsert = { "email": email, "password": password, "status":"active", "l_name": l_name, "f_name": f_name};
-          console.log('data: ', adminToInsert);
           // Insert the data into the collection
           const result = await usersCollection.insertOne(adminToInsert);
           console.log(`Inserted ${result.insertedCount} document(s)`);
+
+          const admin = await usersCollection.findOne({email: email});
+
+          let team = 
+          {
+              "admin": admin._id,
+              "tasks": [],
+              "employees": [],
+          }
+
+          await teamCollection.insertOne(team);
+
+          res.json({id: admin._id});
         }
         else {
           console.log("Email already exists");
@@ -226,7 +238,7 @@ user.post('/updateAdmin', async function(req, res) {
   adminData.l_name = req.body.l_name.trim();
   adminData.status = req.body.status.trim();
   console.log("admindata: ", adminData);  
-  adminID = adminID.trim();
+  id = id.trim();
   console.log("id: ", id);
 
   const client = new MongoClient('mongodb://0.0.0.0:27017');
@@ -362,51 +374,6 @@ user.post('/deleteMessage', async (req, res) => {
       await client.close();
   }
 });
-
-
-user.post('/createAdmin', async function(req, res) {
-
-  let email = req.body.email;
-  let password = req.body.password;
-  email = email.trim();
-  password = password.trim();
-
-  if (!email || !password) {
-      console.log("No email or password provided");
-      res.status(400).json({ error: "Both email and password are required." });
-  } else {
-    const client = new MongoClient('mongodb://0.0.0.0:27017');
-    try{
-
-        await client.connect();
-        const database = client.db('task_management');
-        const usersCollection = database.collection('admins');
-        console.log("DB connect");
-
-        const employee = await usersCollection.findOne({ email });
-
-        if(!employee)
-        {
-          console.log('no existe el email.');
-          const adminToInsert = { "email": email, "password": password, "status":"active"};
-          console.log('data: ', adminToInsert);
-          // Insert the data into the collection
-          const result = await usersCollection.insertOne(adminToInsert);
-          console.log(`Inserted ${result.insertedCount} document(s)`);
-        }
-        else {
-          console.log("Email already exists");
-        }
-    } finally {
-      // Close the MongoDB connection
-      await client.close();
-      console.log('Connection closed');
-    }
-
-  }
-
-})
-
 
 user.post("/getEmployees", async (req, res) => {
 
@@ -618,6 +585,50 @@ user.post("/setStatus", async (req, res) => {
  
 })
 
+user.post("/setAdminStatus", async (req, res) => {
+
+  console.log("/setAdminStatus entered");
+  const userID = new ObjectId(req.body.userID);
+  console.log(userID);
+  const status = req.body.status;
+  console.log(status);
+    
+     // Connect to the MongoDB server
+     const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+     try {
+         await client.connect();
+ 
+         // Access the 'task_management' database and 'employees' collection
+         const database = client.db('task_management');
+         const usersCollection = database.collection('admins');
+
+         await usersCollection.updateOne(
+          { _id: userID },
+          {$set:
+            {
+              status: status
+            }
+         }
+        );
+
+        const employee_db = await usersCollection.findOne({ _id: userID });
+        console.log(employee_db.status);
+ 
+         // Respond with a success message or other appropriate response
+         res.status(200).json({ message: 'Employee updated successfully'});
+     } catch (error) {
+         console.error('Error inserting employee:', error);
+ 
+         // Respond with an error message or handle the error appropriately
+         res.status(500).json({ error: 'Internal Server Error' });
+     } finally {
+         // Close the MongoDB connection
+         await client.close();
+     }
+ 
+})
+
 
 
 // user.get('/getTeam/:id', async (req, res) => {
@@ -697,7 +708,7 @@ user.get('/getTeamTasks/:id', async (req, res) => {
       
       //get the team
       const team = await teamCollection.find({admin: new ObjectId(id)}).toArray();
-      //console.log("team tasks" ,team);
+      console.log("team:" ,team);
       
 
       //get the users info

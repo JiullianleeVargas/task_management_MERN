@@ -143,7 +143,7 @@ user.get('/getAdmins', async (req, res) => {
 user.post('/createAdmin', async function(req, res) {
 
   let email = req.body.email;
-  let password = req.body.password;
+  let password = hashPassword(req.body.password.trim());
   let f_name = req.body.f_name;
   let l_name = req.body.l_name;
   email = email.trim();
@@ -221,7 +221,7 @@ user.post('/updateAdmin', async function(req, res) {
   let id = req.body.id;
   const adminData = {};
   adminData.email = req.body.email.trim();
-  adminData.password = req.body.password.trim();
+  adminData.password = hashPassword(req.body.password.trim());
   adminData.f_name = req.body.f_name.trim();
   adminData.l_name = req.body.l_name.trim();
   adminData.status = req.body.status.trim();
@@ -363,49 +363,6 @@ user.post('/deleteMessage', async (req, res) => {
   }
 });
 
-
-user.post('/createAdmin', async function(req, res) {
-
-  let email = req.body.email;
-  let password = req.body.password;
-  email = email.trim();
-  password = password.trim();
-
-  if (!email || !password) {
-      console.log("No email or password provided");
-      res.status(400).json({ error: "Both email and password are required." });
-  } else {
-    const client = new MongoClient('mongodb://0.0.0.0:27017');
-    try{
-
-        await client.connect();
-        const database = client.db('task_management');
-        const usersCollection = database.collection('admins');
-        console.log("DB connect");
-
-        const employee = await usersCollection.findOne({ email });
-
-        if(!employee)
-        {
-          console.log('no existe el email.');
-          const adminToInsert = { "email": email, "password": password, "status":"active"};
-          console.log('data: ', adminToInsert);
-          // Insert the data into the collection
-          const result = await usersCollection.insertOne(adminToInsert);
-          console.log(`Inserted ${result.insertedCount} document(s)`);
-        }
-        else {
-          console.log("Email already exists");
-        }
-    } finally {
-      // Close the MongoDB connection
-      await client.close();
-      console.log('Connection closed');
-    }
-
-  }
-
-})
 
 
 user.post("/getEmployees", async (req, res) => {

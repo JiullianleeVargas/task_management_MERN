@@ -1165,7 +1165,7 @@
             async function fetchTeamTasks(adminID) {
                 try {
                   console.log("adminid: ", adminID);
-                  const response = await fetch(`/adminTasks/getTeamTasks/${adminID}`); 
+                  const response = await fetch(`/admin/getTeamTasks/${adminID}`); 
                   if (!response.ok) {
                     throw new Error(`Error: ${response.status}`);
                   }

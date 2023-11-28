@@ -79,7 +79,7 @@
             >
                 <div class="h-full bg-white dark:bg-[#0e1726]">
                     <div class="flex items-center justify-between px-4 py-3">
-                        <a href="index.html" class="main-logo flex shrink-0 items-center">
+                        <a href="accounts" class="main-logo flex shrink-0 items-center">
                             <img class="ml-[5px] w-8 flex-none" src="/favicon.png" alt="image" />
                             <span style='font-size: 20px'
                             class="align-middle text-2xl font-semibold ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light lg:inline">TechSpire</span>
@@ -471,24 +471,21 @@
                                                 <div class="p-5">
                                                     <form @submit.prevent="saveadmin">
                                                         <div class="mb-5">
+                                                            <label for="f_name">First Name</label>
+                                                            <input id="f_name" type="text" placeholder="First Name" class="form-input" x-model="params.f_name"/>
+                                                        </div>
+                                                        <div class="mb-5">
+                                                            <label for="l_name">Last Name</label>
+                                                            <input id="l_name" type="text" placeholder="Last Name" class="form-input" x-model="params.l_name"/>
+                                                        </div>
+                                                        <div class="mb-5">
                                                             <label for="email">Email</label>
-                                                            <input
-                                                                id="email"
-                                                                type="email"
-                                                                placeholder="yeyo.soto2@upr.edu"
-                                                                class="form-input"
-                                                                x-model="params.email"
-                                                            />
+                                                            <input id="email" type="email" placeholder="Email" class="form-input" x-model="params.email"/>
                                                         </div>
                                                         <div class="mb-5">
                                                             <label for="password">password</label>
-                                                            <input
-                                                                id="password"
-                                                                type="password"
-                                                                placeholder="*********"
-                                                                class="form-input"
-                                                                x-model="params.password"
-                                                            />
+                                                            <input id="password" type="password" placeholder="*********" class="form-input"
+                                                                x-model="params.password" />
                                                         </div>
                                                         
                                                         <div class="mt-8 flex items-center justify-end">
@@ -899,10 +896,20 @@
                             this.showMessage('Password is required.', 'error');
                             return true;
                         }
+                        if (!this.params.f_name) {
+                            this.showMessage('Fitst name is required.', 'error');
+                            return true;
+                        }
+                        if (!this.params.l_name) {
+                            this.showMessage('Last name is required.', 'error');
+                            return true;
+                        }
 
                         if (this.params.id) {
                             //update admin
                             let admin = this.contactList.find((d) => d.id === this.params.id);
+                            admin.f_name = this.params.f_name;
+                            admin.l_name = this.params.l_name;
                             admin.email = this.params.email;
                             admin.password = this.params.password;
                             admin.status = 'active';
@@ -927,6 +934,8 @@
                                 "Content-Type": "application/json",
                               },
                               body: JSON.stringify({
+                                f_name: this.params.f_name,
+                                l_name: this.params.l_name,
                                 email: this.params.email,
                                 password: this.params.password,
                                 adminID: maxadminId + 1,
@@ -951,12 +960,14 @@
                             });
 
 
-                            let admin_ = await fetchAdmin(id);
-                            await console.log("init admins: ", admin_); 
+                            // let admin_ = await fetchAdmin(id);
+                            // await console.log("init admins: ", admin_); 
 
                             let admin = {
-                                id: admin_._id,
+                                //id: admin_._id,
                                 path: 'profile-35.png',
+                                f_name: this.params.f_name,
+                                l_name: this.params.l_name,
                                 email: this.params.email,
                                 password: this.params.password,
                                 status: 'active',

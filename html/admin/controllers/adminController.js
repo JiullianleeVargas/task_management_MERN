@@ -144,10 +144,14 @@ user.post('/createAdmin', async function(req, res) {
 
   let email = req.body.email;
   let password = req.body.password;
+  let f_name = req.body.f_name;
+  let l_name = req.body.l_name;
   email = email.trim();
   password = password.trim();
+  f_name = f_name.trim();
+  l_name = l_name.trim();
 
-  if (!email || !password) {
+  if (!email || !password || !f_name || !l_name) {
       console.log("No email or password provided");
       res.status(400).json({ error: "Both email and password are required." });
   } else {
@@ -164,7 +168,7 @@ user.post('/createAdmin', async function(req, res) {
         if(!employee)
         {
           console.log('no existe el email.');
-          const adminToInsert = { "email": email, "password": password, "status":"active"};
+          const adminToInsert = { "email": email, "password": password, "status":"active", "l_name": l_name, "f_name": f_name};
           console.log('data: ', adminToInsert);
           // Insert the data into the collection
           const result = await usersCollection.insertOne(adminToInsert);
@@ -216,9 +220,11 @@ user.post('/updateAdmin', async function(req, res) {
 
   let id = req.body.id;
   const adminData = {};
-  adminData.email = req.body.email;
-  adminData.password = req.body.password;
-  adminData.status = req.body.status;
+  adminData.email = req.body.email.trim();
+  adminData.password = req.body.password.trim();
+  adminData.f_name = req.body.f_name.trim();
+  adminData.l_name = req.body.l_name.trim();
+  adminData.status = req.body.status.trim();
   console.log("admindata: ", adminData);  
   adminID = adminID.trim();
   console.log("id: ", id);
@@ -245,7 +251,8 @@ user.post('/updateAdmin', async function(req, res) {
         }
 
         // Update the user in the database
-        const updatedAdmin = await usersCollection.updateOne({_id: new ObjectId(id)}, { $set: {email: adminData.email, password: adminData.password, status: adminData.status} });
+        const updatedAdmin = await usersCollection.updateOne({_id: new ObjectId(id)}, 
+        { $set: {email: adminData.email, password: adminData.password, status: adminData.status, f_name: adminData.f_name, l_name: adminData.l_name} });
 
         if(updatedAdmin.modifiedCount > 0){
           console.log("updatedAdmin: ", adminData);
@@ -613,7 +620,69 @@ user.post("/setStatus", async (req, res) => {
 
 
 
-user.get('/getTeam/:id', async (req, res) => {
+// user.get('/getTeam/:id', async (req, res) => {
+//   const id = req.params.id;
+
+//   const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+//   try {
+//       //conncet to db
+//       await client.connect();
+//       const database = client.db('task_management');
+//       const teamCollection = database.collection('teams');
+//       const userCollection = database.collection('employees');
+//       const tasksCollection = database.collection('tasks');
+      
+//       //get the team
+//       const team = await teamCollection.find({admin: new ObjectId(id)}).toArray();
+//       //console.log("team tasks" ,team);
+      
+
+//       //get the users info
+//       let users = [];
+//       for (const user of team[0].employees){
+//         //console.log("user: ", user);
+//         let userInfo = await userCollection.find({_id: user}).project({ _id: 1,email: 1, f_name: 1, l_name: 1, tasks: 1}).toArray();
+//         //console.log("user from team: ", userInfo);
+//         //get the tasks from the user
+//         let tasks = [];
+//         for (const task of userInfo[0].tasks){
+//           let taskInfo = await tasksCollection.find({_id: task}).toArray();
+//           console.log("employee task: ", taskInfo);
+//           tasks.push(taskInfo[0]);  
+//           //console.log("employee task: ", tasks);        
+//         };
+//         userInfo[0].tasks = tasks[0];
+//         //console.log("user tasks: ", userInfo);
+//         let employee = userInfo[0].email;
+//         users.push(userInfo[0]);
+        
+//       };
+
+//       const teamTasks = await tasksCollection.find({ _id: { $in: team[0].tasks } }, (err, tasks) => {
+//         if (err) {
+//           console.error(err);
+//           // Handle the error
+//         } else {
+//           console.log('team tasks:', tasks);
+//           // Handle the found users
+//         }
+//       }).toArray();
+
+//       users.push(teamTasks[0]);
+
+//       //console.log("team tasks: ", teamTasks);
+//       console.log("all users: ", users);
+
+//       res.json(users);
+//   } catch (error) {
+//       res.status(500).json({ error: 'Internal Server Error' });
+//   } finally {
+//       await client.close();
+//   }
+// });
+
+user.get('/getTeamTasks/:id', async (req, res) => {
   const id = req.params.id;
 
   const client = new MongoClient('mongodb://0.0.0.0:27017');
@@ -622,31 +691,30 @@ user.get('/getTeam/:id', async (req, res) => {
       //conncet to db
       await client.connect();
       const database = client.db('task_management');
-      const teamCollection = database.collection('team');
-      const userCollection = database.collection('employee');
-      const tasksCollection = database.collection('task');
+      const teamCollection = database.collection('teams');
+      const userCollection = database.collection('employees');
+      const tasksCollection = database.collection('tasks');
       
       //get the team
       const team = await teamCollection.find({admin: new ObjectId(id)}).toArray();
-      // console.log("team tasks" ,team[0].tasks);
+      //console.log("team tasks" ,team);
       
 
       //get the users info
-      let users = {};
+      let tasks = [];
       for (const user of team[0].employees){
         //console.log("user: ", user);
-        let userInfo = await userCollection.find({_id: user}).toArray();
-        //console.log("user from team: ", userInfo);
-        //get the tasks from the user
-        let tasks = [];
+        let userInfo = await userCollection.find({_id: user}).project({ _id: 1,email: 1, f_name: 1, l_name: 1, tasks: 1}).toArray();
+
         for (const task of userInfo[0].tasks){
           let taskInfo = await tasksCollection.find({_id: task}).toArray();
-          tasks.push(taskInfo[0]);          
+          //console.log("employee task: ", taskInfo);
+          taskInfo[0].email = userInfo[0].email;
+          taskInfo[0].f_name = userInfo[0].f_name;
+          taskInfo[0].l_name = userInfo[0].l_name;
+          tasks.push(taskInfo[0]);  
+          //console.log("employee task: ", tasks);        
         };
-        userInfo[0].tasks = tasks[0];
-        //console.log("user tasks: ", userInfo);
-        let employee = userInfo[0].email;
-        users[employee] = userInfo[0];
         
       };
 
@@ -659,13 +727,18 @@ user.get('/getTeam/:id', async (req, res) => {
           // Handle the found users
         }
       }).toArray();
+      console.log("all tasks: ", tasks);
+      console.log("teamtaskss: ", teamTasks);
 
-      users['teamTasks'] = teamTasks[0];
+      tasks.push(...teamTasks);
+      // for (const task of teamTasks) {
+      //   tasks.push(task);
+      // }
 
       //console.log("team tasks: ", teamTasks);
-      console.log("all users: ", users);
+      console.log("all tasks: ", tasks);
 
-      res.json(users);
+      res.json(tasks);
   } catch (error) {
       res.status(500).json({ error: 'Internal Server Error' });
   } finally {

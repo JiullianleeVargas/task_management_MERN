@@ -749,7 +749,7 @@
 
                                         <!--Priority filters-->
                                         <div class="h-px w-full border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div>
-                                        <div class="px-1 py-3 text-white-dark">Tags</div>
+                                        <div class="px-1 py-3 text-white-dark">Priority Level</div>
                                         
                                         <button type="button"
                                             class="flex h-10 w-full items-center rounded-md p-1 font-medium text-warning duration-300 hover:bg-white-dark/10 ltr:hover:pl-3 rtl:hover:pr-3 dark:hover:bg-[#181F32]"
@@ -792,6 +792,20 @@
                                             </svg>
                                             <div class="ltr:ml-3 rtl:mr-3">High</div>
                                         </button>
+                                    
+                                        
+                                            <!-- Iterate through distinct non-empty tags and create buttons -->
+                                            <div class="h-px w-full border-b border-[#e0e6ed] dark:border-[#1b2e4b]"></div>
+                                            <div class="px-1 py-3 text-white-dark">Tags</div>
+                                            <template x-for="tag in uniqueTags" :key="tag">
+                                                <button
+                                                     type="button"
+                                                    class="badge rounded-3xl capitalize badge-outline-success m-1"
+                                                    @click="searchTasksByTag(tag)"
+                                                >
+                                                <span x-text="tag"></span>
+                                                </button>
+                                            </template>
 
 
                                     </div>
@@ -1141,49 +1155,103 @@
                         </div>
 
 
-                        <div class="fixed inset-0 z-[999] hidden overflow-y-auto bg-[black]/60"
-                            :class="{'!block':viewTaskModal}">
-                            <div class="flex min-h-screen items-center justify-center px-4"
-                                @click.self="viewTaskModal = false">
-                                <div x-show="viewTaskModal" x-transition x-transition.duration.300
-                                    class="panel my-8 w-[90%] max-w-lg overflow-hidden rounded-lg border-0 p-0 md:w-full">
-                                    <button type="button"
+                        <div class="fixed inset-0 z-[999] hidden overflow-y-auto bg-[black]/60" :class="{'!block':viewTaskModal}">
+                            <div class="flex min-h-screen items-center justify-center px-4" @click.self="viewTaskModal = false">
+                                <div
+                                    x-show="viewTaskModal"
+                                    x-transition
+                                    x-transition.duration.300
+                                    class="panel my-8 w-[90%] max-w-lg overflow-hidden rounded-lg border-0 p-0 md:w-full"
+                                >
+                                    <button
+                                        type="button"
                                         class="absolute top-4 text-white-dark hover:text-dark ltr:right-4 rtl:left-4"
-                                        @click="viewTaskModal = false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                                            stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
+                                        @click="viewTaskModal = false"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24px"
+                                            height="24px"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            class="h-6 w-6"
+                                        >
                                             <line x1="18" y1="6" x2="6" y2="18"></line>
                                             <line x1="6" y1="6" x2="18" y2="18"></line>
                                         </svg>
                                     </button>
                                     <div
-                                        class="flex flex-wrap items-center gap-2 bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]">
+                                        class="flex flex-wrap items-center gap-2 bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]"
+                                        >
                                         <div x-text="selectedTask.title"></div>
-                                        <div x-show="selectedTask.priority" x-text="selectedTask.priority"
-                                            class="badge rounded-3xl capitalize" :class="{
+                                    </div>
+                                    <div
+                                        class="flex flex-wrap items-center gap-2 bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]"
+                                    >
+                                    Priority: 
+                                        <div
+                                            x-show="selectedTask.priority"
+                                            x-text="selectedTask.priority"
+                                            class="badge rounded-3xl capitalize"
+                                            :class="{
                                         'badge-outline-primary': selectedTask.priority === 'medium',
                                         'badge-outline-warning ': selectedTask.priority === 'low',
                                         'badge-outline-danger ': selectedTask.priority === 'high',
-                                    }"></div>
-
-                                        <div x-show="selectedTask.tag" x-text="selectedTask.tag"
-                                            class="badge rounded-3xl capitalize" :class="{
-                                        'badge-outline-success ': selectedTask.tag === 'team',
-                                        'badge-outline-info ': selectedTask.tag === 'update',
-                                    }"></div>
+                                    }"
+                                        ></div>
+                                    </div>
+                                    <div
+                                        class="flex flex-wrap items-center gap-2 bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]"
+                                    >
+                                    Status: 
+                                        <div
+                                            x-show="selectedTask.status"
+                                            x-text="selectedTask.status"
+                                            class="badge rounded-3xl capitalize badge-outline-primary"
+                                        ></div>
+                                    </div>
+                                    <div
+                                        class="flex flex-wrap items-center gap-2 bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]"
+                                    >
+                                        Tags: 
+                                        <div
+                                        x-show="selectedTask.tag1"
+                                        x-text="selectedTask.tag1"
+                                        class="badge rounded-3xl capitalize badge-outline-success"
+                                    ></div>
+                                    <div
+                                    x-show="selectedTask.tag2"
+                                    x-text="selectedTask.tag2"
+                                    class="badge rounded-3xl capitalize badge-outline-success"
+                                ></div>
+                                        
+                                    </div>
+                                    <div
+                                        class="flex flex-wrap items-center gap-2 bg-[#fbfbfb] py-3 text-lg font-medium ltr:pl-5 ltr:pr-[50px] rtl:pr-5 rtl:pl-[50px] dark:bg-[#121c2c]"
+                                    >
+                                        Due Date: 
+                                        <div x-text="selectedTask.date"></div>
                                     </div>
                                     <div class="p-5">
                                         <div class="prose text-base" x-html="selectedTask.description"></div>
+                                        <br>
+                                        File: 
+                                        <button @click="openFile(selectedTask.file)" x-html="selectedTask.file"
+                                        class="badge rounded-3xl capitalize badge-outline-primary"
+                                        xx-if="selectedTask.file.trim() !== ''"></button>
 
                                         <div class="mt-8 flex items-center justify-end">
-                                            <button type="button" class="btn btn-outline-danger"
-                                                @click="viewTaskModal = false">Close</button>
+                                            <button type="button" class="btn btn-outline-danger" @click="viewTaskModal = false">Close</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
                     </div>
                 </div>
                 <!-- end main content section -->
@@ -1526,10 +1594,11 @@
                     endIndex: 0,
                 },
                 quillEditor: null,
+                uniqueTags: [],
 
                 async init(){
-                    // this.searchTasks();
-                    // this.initEditor();
+                    this.searchTasks();
+                    this.initEditor();
                
 
                     // Getting personal tasks
@@ -1547,9 +1616,10 @@
                     for (var i = 0; i < task.length; i++) {
                         this.addTask(task[i]['_id'], task[i]['title'], task[i]['due_date'],
                             task[i]['description'], task[i]['priority'], task[i]['status'],
-                            task[i]['655a5b8c70fc2aea0f9a523a']);
+                            task[i]['tags'],task[i]['file']);
                             
                     }
+                    this.extractUniqueTags();
                 },
               
                 initEditor() {
@@ -1576,6 +1646,13 @@
                     this.filteredTasks = res.filter((d) => d.title?.toLowerCase().includes(this.searchTask));
                     this.getPager();
                 },
+
+                searchTasksByTag(tag) {
+                        this.filteredTasks = this.allTasks.filter(
+                            (task) => task.tag1 === tag || task.tag2 === tag
+                        );
+                        this.getPager();
+                },
                 getPager() {
                     setTimeout(() => {
                         if (this.filteredTasks.length) {
@@ -1599,6 +1676,14 @@
                     item.tag = name;
                     this.searchTasks(false);
                 },
+
+                extractUniqueTags() {
+                            const allTags = this.allTasks.flatMap(task => [task.tag1, task.tag2]);
+
+                            // Remove any undefined or null values from the array
+                            this.uniqueTags = [...new Set(allTags.filter(tag => tag !== undefined && tag !== null && tag !== ""))];
+
+             },
 
                 tabChanged(type) {
                     this.selectedTab = type;
@@ -1717,7 +1802,7 @@
                     this.addTaskModal = true;
                 },
 
-                addTask(id, name, date, desc, priority, status, userID) {
+                addTask(id, name, date, desc, priority, status, tags, file) {
                     console.log("Inside the addTask function")
 
                     // let maxid = 0;
@@ -1734,6 +1819,9 @@
                         date: date,
                         priority: priority,
                         status: status,
+                        tag1: tags[0],
+                        tag2: tags[1],
+                        file: file
                     };
 
                     console.log("Task ID in the addTask:",task.id)

@@ -42,26 +42,26 @@ user.use(express.json());
 
 
 
-user.get('/index.html', (req, res) => {
+user.get('/tasks', (req, res) => {
   // console.log("inside the new route function")
   res.type('html').sendFile(path.join(__dirname, '..', 'index2.html'));
   // console.log(__dirname);
 })
 
 
-user.get('/login.html', (req, res) => {
+user.get('/login', (req, res) => {
   // console.log("inside the new route function")
   res.type('html').sendFile(path.join(__dirname, '..', 'login2.html'));
   // console.log(__dirname);
 })
 
-user.get('/apps-calendar.html', (req, res) => {
+user.get('/calendar', (req, res) => {
   // console.log("inside the new route function")
   res.type('html').sendFile(path.join(__dirname, '..', 'apps-calendar.html'));
   // console.log(__dirname);
 })
 
-user.get('/reports.html', (req, res) => {
+user.get('/reports', (req, res) => {
   // console.log("inside the new route function")
   res.type('html').sendFile(path.join(__dirname, '..', 'reports.html'));
   // console.log(__dirname);
@@ -110,7 +110,7 @@ user.post('/login', async function(req, res) {
             console.log("employeeID stored in res.cookie")
             
 
-            res.json({ redirect: '/employee/index.html'});
+            res.json({ redirect: '/employee/tasks'});
            
            
         

@@ -37,6 +37,7 @@ app.use("/assets", express.static(path.join(__dirname, "admin", "assets")));
 app.use("/employee", employeeController);
 app.use(express.static(path.join(__dirname, 'employee')));
 app.use("/assets", express.static(path.join(__dirname, "employee", "assets")));
+app.use("/employeeTasks", employeeController);
 
 
 app.get('/admin/', (req, res) => {

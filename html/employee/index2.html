@@ -270,7 +270,7 @@
                 class="sidebar fixed top-0 bottom-0 z-50 h-full min-h-screen w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] transition-all duration-300">
                 <div class="h-full bg-white dark:bg-[#0e1726]">
                     <div class="flex items-center justify-between px-4 py-3">
-                        <a href="index.html" class="main-logo flex shrink-0 items-center">
+                        <a href="/employee/tasks" class="main-logo flex shrink-0 items-center">
                             <img class="ml-[5px] w-8 flex-none" src="../assets/images/logo.svg" alt="image" />
                             <span
                                 class="align-middle text-2xl font-semibold ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light lg:inline">TechSpire</span>
@@ -294,7 +294,7 @@
 
 
                                 <li class="nav-item">
-                                    <a href="index.html" class="active group">
+                                    <a href="/employee/tasks" class="active group">
                                         <div class="flex items-center">
                                             <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
                                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -314,7 +314,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="apps-calendar.html" class="group">
+                                    <a href="/employee/calendar" class="group">
                                         <div class="flex items-center">
                                             <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
                                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -331,7 +331,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="reports.html" class="group">
+                                    <a href="/employee/reports" class="group">
                                         <div class="flex items-center">
                                             <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
                                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -360,7 +360,7 @@
                 <div class="shadow-sm">
                     <div class="relative flex w-full items-center bg-white px-5 py-2.5 dark:bg-[#0e1726]">
                         <div class="horizontal-logo flex items-center justify-between ltr:mr-2 rtl:ml-2 lg:hidden">
-                            <a href="index.html" class="main-logo flex shrink-0 items-center">
+                            <a href="/employee/tasks" class="main-logo flex shrink-0 items-center">
                                 <img class="inline w-8 ltr:-ml-1 rtl:-mr-1" src="../assets/images/logo.svg" alt="image" />
                                 <span
                                     class="hidden align-middle text-2xl font-semibold transition-all duration-300 ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light md:inline">VRISTO</span>
@@ -571,7 +571,7 @@
                                 <ul x-cloak x-show="open" x-transition x-transition.duration.300ms
                                     class="top-11 w-[230px] !py-0 font-semibold text-dark ltr:right-0 rtl:left-0 dark:text-white-dark dark:text-white-light/90">
                                     <li class="border-t border-white-light dark:border-white-light/10">
-                                        <a href="login.html" class="!py-3 text-danger" @click="toggle">
+                                        <a href="/employee" class="!py-3 text-danger" @click="toggle">
                                             <svg class="h-4.5 w-4.5 rotate-90 ltr:mr-2 rtl:ml-2" width="18" height="18"
                                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                 <path opacity="0.5"
@@ -1029,10 +1029,15 @@
                                                                                 </a>
                                                                             </li>
                                                                             <li>
-                                                                                <a href="javascript:; "  x-data="{status: 'In-Progress'}"
-                                                                                    @click="toggle, status = (status  === 'In-Progress') ? 'Completed' : 'In-Progress'; updateStatus(task, status)">
-                                                                                    <svg fill="#000000"
-                                                                                        class="h-5 w-5 shrink-0 ltr:mr-2 rtl:ml-2"
+                                                                                <a href="javascript:; "  x-data="{status: task.status}"
+
+                                                                                @click="console.log('Before update: ' + status);
+                                                                                status = (status === 'In-Progress' ? 'Completed' : 'In-Progress');
+                                                                                console.log('After update: ' + status);
+                                                                                toggle();
+                                                                                updateStatus(task, status);">                                                                                    <svg fill="#000000"
+                                                                                        
+                                                                                    class="h-5 w-5 shrink-0 ltr:mr-2 rtl:ml-2"
                                                                                         height="24px" width="24px"
                                                                                         version="1.1" id="XMLID_103_"
                                                                                         xmlns="http://www.w3.org/2000/svg"
@@ -1277,6 +1282,16 @@
     <script src="../assets/js/classes.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
     <script>
+
+            async    function openFile(file)
+            {
+
+                const fileUrl = `/employeeTasks/getFile?file=${file}`;
+
+                // Open a new tab/window with the file
+                window.open(fileUrl, '_blank');
+            }
+        
         const defaultParams = {
             id: null,
             title: '',
@@ -1413,7 +1428,8 @@
             }));
 
         
-     
+            
+
             
           // Function tha fetches the data from the database so igt can be used down bellow in the alpine
             async function fetchData() {
@@ -1598,7 +1614,7 @@
 
                 async init(){
                     this.searchTasks();
-                    this.initEditor();
+                    // this.initEditor();
                
 
                     // Getting personal tasks
@@ -1622,11 +1638,11 @@
                     this.extractUniqueTags();
                 },
               
-                initEditor() {
-                    this.quillEditor = new Quill(this.$refs.editor, {
-                        theme: 'snow',
-                    });
-                },
+                // initEditor() {
+                //     this.quillEditor = new Quill(this.$refs.editor, {
+                //         theme: 'snow',
+                //     });
+                // },
 
                 //Filter in tasks array by status or priority
                 searchTasks(isResetPage = true) {
@@ -1764,7 +1780,8 @@
                     return this.allTasks && this.allTasks.filter((d) => d.status != 'trash').length - 1;
                 },
 
-                updateStatus(task, newStatusString) {
+                async updateStatus(task, newStatusString) {
+                    console.log("Entered the update status")
                     // Grabing the taskID
                     const taskID = task.id
 
@@ -1773,12 +1790,12 @@
                     // Storing the status recieved from the html/alpine
 
                     const newStatus = newStatusString
-                    // console.log(taskID)
-                    // console.log(newStatus)
+                    console.log(taskID)
+                    console.log(newStatus)
 
 
                     // Calling the fetch/controller to change the data
-                    setStatusFetch(taskID, newStatus)
+                    await setStatusFetch(taskID, newStatus)
                         .then(data => {
                             // Handle the response data if needed
                             console.log(data);

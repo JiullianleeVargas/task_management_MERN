@@ -374,7 +374,7 @@
                 >
                     <div class="h-full bg-white dark:bg-[#0e1726]">
                         <div class="flex items-center justify-between px-4 py-3">
-                            <a href="index.html" class="main-logo flex shrink-0 items-center">
+                            <a href="/employee/tasks" class="main-logo flex shrink-0 items-center">
                                 <img class="ml-[5px] w-8 flex-none" src="../assets/images/logo.svg" alt="image" />
                                 <span class="align-middle text-2xl font-semibold ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light lg:inline">TechSpire</span>
                             </a>
@@ -405,7 +405,7 @@
 
 
                                 <li class="nav-item">
-                                    <a href="index.html" class="group">
+                                    <a href="/employee/tasks" class="group">
                                         <div class="flex items-center">
                                             <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
                                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -425,7 +425,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="apps-calendar.html" class="active group">
+                                    <a href="/employee/calendar" class="active group">
                                         <div class="flex items-center">
                                             <svg class="shrink-0 group-hover:!text-primary" width="20" height="20"
                                                 viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -442,7 +442,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="reports.html" class="group">
+                                    <a href="/employee/reports" class="group">
                                         <div class="flex items-center">
                                             <svg
                                             class="shrink-0 group-hover:!text-primary"
@@ -474,7 +474,7 @@
                     <div class="shadow-sm">
                         <div class="relative flex w-full items-center bg-white px-5 py-2.5 dark:bg-[#0e1726]">
                             <div class="horizontal-logo flex items-center justify-between ltr:mr-2 rtl:ml-2 lg:hidden">
-                                <a href="index.html" class="main-logo flex shrink-0 items-center">
+                                <a href="/employee/tasks" class="main-logo flex shrink-0 items-center">
                                     <img class="inline w-8 ltr:-ml-1 rtl:-mr-1" src="../assets/images/logo.svg" alt="image" />
                                     <span
                                         class="hidden align-middle text-2xl font-semibold transition-all duration-300 ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light md:inline"
@@ -693,7 +693,7 @@
                                     >
                                         
                                         <li class="border-t border-white-light dark:border-white-light/10">
-                                            <a href="login.html" class="!py-3 text-danger" @click="toggle">
+                                            <a href="/employee" class="!py-3 text-danger" @click="toggle">
                                                 <svg
                                                     class="h-4.5 w-4.5 rotate-90 ltr:mr-2 rtl:ml-2"
                                                     width="18"
@@ -885,6 +885,7 @@
                                                     </form>
                                                 </div>
                                             </div>
+                                                                               
                                         </div>
                                     </div>
                                 </div>
@@ -1075,12 +1076,45 @@
                     console.error("Error:", error);
                 }
             }
+             // Function to get the team Tasks for the emmployee
+             async function fetchDataTeam() {
+                try {
+
+                    // Grabing the ID cookie from browser
+                    const employeeId = document.cookie          
+                        .split('; ')
+                        .find(row => row.startsWith('employeeID='))
+                        .split('=')[1];
+                    
+                    console.log(employeeId)
+
+                    // Sending the cookie in the header for the teq in /getEmployeeTasks
+                    const response = await fetch("/employee/getTeamTasks",
+                     {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Include the cookie in the headers
+                            'Cookie': `employeeID=${employeeId}`
+                          
+                        },
+                    });
+
+                    console.log("inside the fetch in the index", response);
+                    const data = await response.json();
+                    return data;
+
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            }
+
 
                 // Grab user cookies
                 let employeeID = JSON.parse(getCookie('employeeeID'));
 
                 
-                //calendar
+                //employee/calendar
                 Alpine.data('calendar', () => ({
                     isShowTaskMenu: false,
                     defaultParams: {
@@ -1143,10 +1177,16 @@
                             events: this.events,
                         });
                         
-                        console.log("inside the init")
-                        let tasks = await fetchData();
-                        console.log(tasks)
+                        let employeeTasks= await fetchData();
+                        console.log(employeeTasks)
 
+                        
+                        // Getting the team tasks
+                        const teamTasks = await fetchDataTeam();
+                        console.log("Team", teamTasks)
+
+                        //Joining the arrays
+                        const tasks = employeeTasks.concat(teamTasks)
 
                         for (var i = 0; i < tasks.length; i++) {
                                 this.addEvent(tasks[i]['_id'], tasks[i]['title'], tasks[i]['due_date'],

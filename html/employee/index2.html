@@ -978,7 +978,7 @@
 
                                                                             </li>
                                                                             <li>
-                                                                                <a href="javascript:;" 
+                                                                                <a href="javascript:; " x-show="task.status !== 'Pending'"
                                                                                     @click="toggle, updateStatus(task, 'Pending')">
 
                                                                                     <svg width="20px" height="20px"
@@ -1007,15 +1007,16 @@
                                                                                             height="32"
                                                                                             d="M0 0h20v20H0V0z" />
                                                                                     </svg>
-
-                                                                                    <span
-                                                                                        x-text="task.status === 'Pending' ? 'Not Pending' : 'Pending'"
-                                                                                        ></span>
+                                                                                    <span x-show="task.status !== 'Pending'">
+                                                                                        <span
+                                                                                            x-text="task.status === 'Pending' ? 'Not Pending' : 'Pending'"
+                                                                                            ></span>
+                                                                                    </span>
                                                                                 </a>
                                                                             </li>
                                                                             <li>
-                                                                                <a href="javascript:;" 
-                                                                                    @click="toggle, updateStatus(task, 'In-Progress')">
+                                                                                <a href="javascript:; "  x-data="{status: 'In-Progress'}"
+                                                                                    @click="toggle, status = (status  === 'In-Progress') ? 'Completed' : 'In-Progress'; updateStatus(task, status)">
                                                                                     <svg fill="#000000"
                                                                                         class="h-5 w-5 shrink-0 ltr:mr-2 rtl:ml-2"
                                                                                         height="24px" width="24px"

@@ -694,6 +694,56 @@
                     },
                 }));
 
+                async function getMessages(adminID)
+                    {
+                        console.log("Fetch data");
+                        try {
+                            const response = await fetch("/admin/getMessages", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    adminID: adminID
+                                }),
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+
+                            const data = await response.json();
+
+                            // Update the component data with employee data
+                            return data.messages;
+
+                        } catch (error) {
+                            console.error('Error fetching admin notifications:', error);
+                        }
+                    }
+
+                    async function deleteMessage(adminID, message){
+                        try {
+                            const response = await fetch("/admin/deleteMessage", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    adminID: adminID,
+                                    messageID: message.id - 1,
+                                }),
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+
+                        } catch (error) {
+                            console.error('Error deleting message:', error);
+                        }
+                    }
+
                 // header section
                 Alpine.data('header', () => ({
                     init() {
@@ -712,53 +762,49 @@
                             }
                         }
 
-                        //this.addMessages();
+                        this.addMessages();
                     },
 
                     messages: [
                     ],
 
-                    // addMessages() {
-                    //     var admins = JSON.parse(getCookie("admins"));
-                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                    async addMessages() {
+                        var adminID = getCookie("adminID");
+
+                        notifs = await getMessages(adminID);
                         
-                    //     list = admins[adminID-1]['notifications'];
 
-                    //     for(var i = 0; i < list.length; i++)
-                    //     {
-                    //         let maxUserId = this.messages.length
-                    //                 ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
-                    //                 : 0;
+                        for(var i = 0; i < notifs.length; i++)
+                        {
+                            let maxMessageId = this.messages.length
+                                    ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
+                                    : 0;
 
-                    //         let message = {
-                    //             id: maxUserId + 1,
-                    //             message: list[i],
-                    //         }
+                            let notif = {
+                                id: maxMessageId + 1,
+                                message: notifs[i]
+                            }
 
-                    //         this.messages.unshift(message);
-                    //     }
+                            this.messages.unshift(notif);
+                        }
+
                             
-                    // },
+                    },
 
-                    // removeMessage(value) {
-                    //     this.messages = this.messages.filter((d) => d.id !== value);
-                    //     var admins = JSON.parse(getCookie("admins"));
+                    async removeMessage(message) {
+                        var adminID = getCookie("adminID");
 
-                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
-                    //     list = admins[adminID-1]['notifications'];
+                        await deleteMessage(adminID, message);
 
-                    //     for(var i = 0; i < list.length; i++)
-                    //     {
-                    //         if(i == value-1)
-                    //             list = list.splice(i, i);
-                    //     }
-
-                    //     admins[adminID-1]['notifications'] = list;
-                    //     setCookie("admins", admins);
+                        const alpineInstance = this;
+                            
+                        const messageIndex = alpineInstance.messages.findIndex(t => t.id === message.id);
+                        if (messageIndex !== -1) {
+                            alpineInstance.messages.splice(messageIndex, 1);
+                        }
 
 
-
-                    // },
+                    },
                 }));
             });
 

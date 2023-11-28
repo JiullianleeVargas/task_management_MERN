@@ -811,7 +811,7 @@
         const editAccount = (id) => {  
             var uid = id;
 
-            const newUrl = `editadmin.html?id=${uid}`;
+            const newUrl = `../editadmin.html?id=${uid}`;
             console.log("admin id: ", uid);
             console.log("newUrl: ", newUrl);
             window.location.href = newUrl;
@@ -863,6 +863,37 @@
               throw error;
             }
           }  
+
+          async function setUserStatus(userID, status) {
+                console.log("Updating employee status");
+                try {
+                    console.log("USERID: ", userID);
+                    console.log("STATUS: ", status);
+                    const response = await fetch("/admin/setAdminStatus", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            userID: userID,
+                            status: status
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log(data);
+
+                    // Update the component data with employee data
+                    return
+
+                } catch (error) {
+                    console.error('Error updating employee data:', error);
+                }
+            }
 
             //contacts
             Alpine.data('contacts', () => ({
@@ -974,7 +1005,7 @@
                             //this.setCookie("admins", JSON.stringify(admins));
 
                              // Send the data to the server using Fetch API
-                            fetch("/admin/createAdmin", {
+                            let dbid = fetch("/admin/createAdmin", {
                               method: "POST",
                               headers: {
                                 "Content-Type": "application/json",
@@ -1000,6 +1031,11 @@
                                 // Display the response in a window.alert
                                 window.alert(data.error || "A new admin has been created");
                               }
+
+                              if(data.id)
+                              {
+                                return data.id;
+                              }
                             })
                             .catch((error) => {
                               console.error("Error:", error);
@@ -1010,7 +1046,7 @@
                             // await console.log("init admins: ", admin_); 
 
                             let admin = {
-                                //id: admin_._id,
+                                id: dbid,
                                 path: 'profile-35.png',
                                 f_name: this.params.f_name,
                                 l_name: this.params.l_name,
@@ -1018,7 +1054,28 @@
                                 password: this.params.password,
                                 status: 'active',
                             };
-                            this.contactList.splice(0, 0, admin);
+                            const alpineInstance = this;
+
+                            console.log("Contact list: ", alpineInstance.contactList);
+                            alpineInstance.contactList.push(admin);
+
+                            const userIndex = alpineInstance.contactList.findIndex(t => t.id === admin.id);
+                            if (userIndex !== -1) {
+                                // Update the array only if the update operation is successful
+                                try {
+                                    // Perform the update operation here
+
+                                    // If the update is successful, update the array
+                                    alpineInstance.contactList.splice(userIndex, 1, admin);
+                                    this.searchContacts();
+                                } catch (error) {
+                                    console.error('Error updating admin:', error);
+                                    // Handle the error (show an error message, log, etc.)
+                                }
+                            } else {
+                                console.error('Admin not found in contactList');
+                                // Handle the case where the admin is not found (show an error message, log, etc.)
+                            }
                             this.searchContacts();
                         }
 
@@ -1045,22 +1102,22 @@
                         });
                     },
 
-                    setStatus(contact, nombre) {
-                        let item = this.filterdContactsList.find((d) => {
-                            return d.id === contact.id;
+                    async setStatus(contact, nombre) {
+                        await setUserStatus(contact.id, nombre);
+                        const alpineInstance = this;
                             
-                        });
 
-                        if(item)
-                        {
-                            admins[contact.id-1]['status'] = nombre;
-                            let adminsJSON = JSON.stringify(admins);
-                            document.cookie = `admins=${adminsJSON}; path=/`;
-                            item.status = nombre;
+                        // Use this.$set to update the allTasks array
+                        const userIndex = alpineInstance.contactList.findIndex(t => t.id === contact.id);
+                        contact.status = nombre;
+                        if (userIndex !== -1) {
+                            alpineInstance.contactList.splice(userIndex, 1, contact);
                         }
-                        
-                        
+
+                        //this.contactList = [...this.contactList];
                         this.searchContacts(false);
+                        
+                        //location.reload()
                     },
 
                     

@@ -694,6 +694,56 @@
                     },
                 }));
 
+                async function getMessages(adminID)
+                    {
+                        console.log("Fetch data");
+                        try {
+                            const response = await fetch("/admin/getMessages", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    adminID: adminID
+                                }),
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+
+                            const data = await response.json();
+
+                            // Update the component data with employee data
+                            return data.messages;
+
+                        } catch (error) {
+                            console.error('Error fetching admin notifications:', error);
+                        }
+                    }
+
+                    async function deleteMessage(adminID, message){
+                        try {
+                            const response = await fetch("/admin/deleteMessage", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    adminID: adminID,
+                                    messageID: message.id - 1,
+                                }),
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+
+                        } catch (error) {
+                            console.error('Error deleting message:', error);
+                        }
+                    }
+
                 // header section
                 Alpine.data('header', () => ({
                     init() {
@@ -712,53 +762,49 @@
                             }
                         }
 
-                        //this.addMessages();
+                        this.addMessages();
                     },
 
                     messages: [
                     ],
 
-                    // addMessages() {
-                    //     var admins = JSON.parse(getCookie("admins"));
-                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
+                    async addMessages() {
+                        var adminID = getCookie("adminID");
+
+                        notifs = await getMessages(adminID);
                         
-                    //     list = admins[adminID-1]['notifications'];
 
-                    //     for(var i = 0; i < list.length; i++)
-                    //     {
-                    //         let maxUserId = this.messages.length
-                    //                 ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
-                    //                 : 0;
+                        for(var i = 0; i < notifs.length; i++)
+                        {
+                            let maxMessageId = this.messages.length
+                                    ? this.messages.reduce((max, character) => (character.id > max ? character.id : max), this.messages[0].id)
+                                    : 0;
 
-                    //         let message = {
-                    //             id: maxUserId + 1,
-                    //             message: list[i],
-                    //         }
+                            let notif = {
+                                id: maxMessageId + 1,
+                                message: notifs[i]
+                            }
 
-                    //         this.messages.unshift(message);
-                    //     }
+                            this.messages.unshift(notif);
+                        }
+
                             
-                    // },
+                    },
 
-                    // removeMessage(value) {
-                    //     this.messages = this.messages.filter((d) => d.id !== value);
-                    //     var admins = JSON.parse(getCookie("admins"));
+                    async removeMessage(message) {
+                        var adminID = getCookie("adminID");
 
-                    //     var adminID = JSON.parse(sessionStorage.getItem("adminID"));
-                    //     list = admins[adminID-1]['notifications'];
+                        await deleteMessage(adminID, message);
 
-                    //     for(var i = 0; i < list.length; i++)
-                    //     {
-                    //         if(i == value-1)
-                    //             list = list.splice(i, i);
-                    //     }
-
-                    //     admins[adminID-1]['notifications'] = list;
-                    //     setCookie("admins", admins);
+                        const alpineInstance = this;
+                            
+                        const messageIndex = alpineInstance.messages.findIndex(t => t.id === message.id);
+                        if (messageIndex !== -1) {
+                            alpineInstance.messages.splice(messageIndex, 1);
+                        }
 
 
-
-                    // },
+                    },
                 }));
             });
 
@@ -817,6 +863,37 @@
               throw error;
             }
           }  
+
+          async function setUserStatus(userID, status) {
+                console.log("Updating employee status");
+                try {
+                    console.log("USERID: ", userID);
+                    console.log("STATUS: ", status);
+                    const response = await fetch("/admin/setAdminStatus", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            userID: userID,
+                            status: status
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log(data);
+
+                    // Update the component data with employee data
+                    return
+
+                } catch (error) {
+                    console.error('Error updating employee data:', error);
+                }
+            }
 
             //contacts
             Alpine.data('contacts', () => ({
@@ -928,7 +1005,7 @@
                             //this.setCookie("admins", JSON.stringify(admins));
 
                              // Send the data to the server using Fetch API
-                            fetch("/admin/createAdmin", {
+                            let dbid = fetch("/admin/createAdmin", {
                               method: "POST",
                               headers: {
                                 "Content-Type": "application/json",
@@ -954,6 +1031,11 @@
                                 // Display the response in a window.alert
                                 window.alert(data.error || "A new admin has been created");
                               }
+
+                              if(data.id)
+                              {
+                                return data.id;
+                              }
                             })
                             .catch((error) => {
                               console.error("Error:", error);
@@ -964,7 +1046,7 @@
                             // await console.log("init admins: ", admin_); 
 
                             let admin = {
-                                //id: admin_._id,
+                                id: dbid,
                                 path: 'profile-35.png',
                                 f_name: this.params.f_name,
                                 l_name: this.params.l_name,
@@ -972,7 +1054,28 @@
                                 password: this.params.password,
                                 status: 'active',
                             };
-                            this.contactList.splice(0, 0, admin);
+                            const alpineInstance = this;
+
+                            console.log("Contact list: ", alpineInstance.contactList);
+                            alpineInstance.contactList.push(admin);
+
+                            const userIndex = alpineInstance.contactList.findIndex(t => t.id === admin.id);
+                            if (userIndex !== -1) {
+                                // Update the array only if the update operation is successful
+                                try {
+                                    // Perform the update operation here
+
+                                    // If the update is successful, update the array
+                                    alpineInstance.contactList.splice(userIndex, 1, admin);
+                                    this.searchContacts();
+                                } catch (error) {
+                                    console.error('Error updating admin:', error);
+                                    // Handle the error (show an error message, log, etc.)
+                                }
+                            } else {
+                                console.error('Admin not found in contactList');
+                                // Handle the case where the admin is not found (show an error message, log, etc.)
+                            }
                             this.searchContacts();
                         }
 
@@ -999,22 +1102,22 @@
                         });
                     },
 
-                    setStatus(contact, nombre) {
-                        let item = this.filterdContactsList.find((d) => {
-                            return d.id === contact.id;
+                    async setStatus(contact, nombre) {
+                        await setUserStatus(contact.id, nombre);
+                        const alpineInstance = this;
                             
-                        });
 
-                        if(item)
-                        {
-                            admins[contact.id-1]['status'] = nombre;
-                            let adminsJSON = JSON.stringify(admins);
-                            document.cookie = `admins=${adminsJSON}; path=/`;
-                            item.status = nombre;
+                        // Use this.$set to update the allTasks array
+                        const userIndex = alpineInstance.contactList.findIndex(t => t.id === contact.id);
+                        contact.status = nombre;
+                        if (userIndex !== -1) {
+                            alpineInstance.contactList.splice(userIndex, 1, contact);
                         }
-                        
-                        
+
+                        //this.contactList = [...this.contactList];
                         this.searchContacts(false);
+                        
+                        //location.reload()
                     },
 
                     

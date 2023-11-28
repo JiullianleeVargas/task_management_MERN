@@ -541,7 +541,7 @@ user.post('/getEmployeeTasks', async (req, res) => {
             }
    
            // Respond with a success message or other appropriate response
-           res.status(200).json({ message: 'Task successfully'});
+           res.status(200).json({ message: 'Task successfully', taskID: lastTask._id});
        } catch (error) {
            console.error('Error updating task:', error);
    

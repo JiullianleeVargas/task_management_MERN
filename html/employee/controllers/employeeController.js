@@ -34,11 +34,6 @@ async function comparePassword(plaintextPassword, hash) {
 
 user.use(express.json());
 
-// user.get('/new-route', (req, res) => {
-//   console.log("inside the new route function")
-//   res.type('html').sendFile(path.join(__dirname, '..', 'index2.html'));
-//   console.log(__dirname);
-// })
 
 
 
@@ -174,7 +169,7 @@ user.get('/getEmployeeTasks', async (req, res) => {
       const employeeTasks = await taskCollection.find({ "_id": { $in: taskIds } }).toArray();
       //const teamTasks = await teamCollection.find({ "_id": { $in: taskIds2 } }).toArray();
 
-      console.log(employeeTasks)
+      // console.log(employeeTasks)
       // employeeTasks.push(individualTasks);
       // employeeTasks.push(teamTasks);
 
@@ -307,6 +302,8 @@ user.get('/getUserInformation', async (req, res) => {
 });
 
 
+
+
 // Controller that changes the status in the database
 // Recieves in the req the userID, taskID and newStatus
 user.post('/setStatus', async (req, res) => {
@@ -321,6 +318,7 @@ user.post('/setStatus', async (req, res) => {
 
     // Extracting the taskID of the task to change and the new status
     const taskID = req.body.taskID;
+    const objectTaskID = new ObjectId(taskID)
     const newStatus = req.body.newStatus;
 
     console.log("TaskID: ", taskID)
@@ -332,7 +330,10 @@ user.post('/setStatus', async (req, res) => {
     }
 
     // Here I have the parsed ID
-    const employeeID = employeeIdCookie.split('=')[1];
+    const employeeId= employeeIdCookie.split('=')[1];
+    const employeeID = new ObjectId(employeeId);
+
+    console.log("EmployeeID in setStatus: ", employeeID)
 
     await client.connect();
 
@@ -341,20 +342,37 @@ user.post('/setStatus', async (req, res) => {
 
     //Grabing the collection to search for the user
     const employeeCollection = database.collection('employees');
+    const adminCollection = database.collection('admins');
+    const teamCollection = database.collection('teams');
 
     // Grabing the task collection to search for the users tasks
     const taskCollection = database.collection('tasks');
 
+    const teamWithEmployee = await teamCollection.findOne({employees: employeeID})
+
+    const updatedTask = await taskCollection.findOne({"_id": objectTaskID})
+    const adminID = teamWithEmployee.admin
+    console.log("Admin: ", adminID)
+
     // Converting the userID into an obejctID so I can search in the database
-    const employeeId = new ObjectId(employeeID);
-    const employee = await employeeCollection.findOne({ "_id": employeeId });
+   
+    const employee = await employeeCollection.findOne({ "_id": employeeID });
 
     // Update the status of the specified task
     // Also converting the ID to objectID
     await taskCollection.updateOne(
       { "_id": new ObjectId(taskID) },
       { $set: { "status": newStatus } }
+    )
+
+    const notificationString = `${employee.f_name} has updated "${updatedTask.title}" status to ${newStatus}`
+    await adminCollection.updateOne(
+      { "_id": adminID },
+      { $push: {"notifications":  notificationString} }
     );
+
+
+
 
     // Retrieve updated task information if needed
     const updatedTaskIds = employee.tasks.map(taskId => new ObjectId(taskId));
@@ -370,6 +388,107 @@ user.post('/setStatus', async (req, res) => {
     await client.close();
   }
 });
+
+
+user.post('/getMessages', async (req, res) => {
+
+  console.log("Entered getMessages")
+  const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+  try {
+
+    employeeID = req.body.employeeID;
+    employeeID = new ObjectId(employeeID);
+    console.log("UID: ", employeeID);
+
+   
+    await client.connect();
+
+    // Grabing the database
+    const database = client.db('task_management');
+
+    //Grabing the collection to search for the user
+    const employeeCollection = database.collection('employees');
+
+    // Converting the userID into an obejctID so I can search in the database
+ 
+    const employee = await employeeCollection.findOne({ "_id": employeeID });
+
+    
+    res.json({ messages: employee.notifications });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  } finally {
+    await client.close();
+  }
+});
+
+user.post('/deleteMessage', async (req, res) => {
+
+  console.log("Entered deleteMessages")
+  const client = new MongoClient('mongodb://0.0.0.0:27017');
+
+  try {
+
+    employeeID = req.body.employeeID;
+    employeeID = new ObjectId(employeeID);
+    messageID = req.body.messageID;
+    // Extracting the taskID of the task to change and the new status
+
+    messageID = req.body.messageID;
+
+    console.log("Message ID: ", messageID);
+
+
+    if (!employeeID) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+  
+    await client.connect();
+
+    // Grabing the database
+    const database = client.db('task_management');
+
+    //Grabing the collection to search for the user
+    const employeeCollection = database.collection('employees');
+
+    // Grabing the task collection to search for the users tasks
+    const taskCollection = database.collection('tasks');
+
+    // Converting the userID into an obejctID so I can search in the database
+   
+    const employee = await employeeCollection.findOne({ "_id": employeeID });
+
+    // Update the status of the specified task
+    // Also converting the ID to objectID
+    // await taskCollection.updateOne(
+    //   { "_id": new ObjectId(taskID) },
+    //   { $set: { "status": newStatus } }
+    // );
+
+      //Unset the notification
+    const { modifiedCount } = await employeeCollection.updateOne(
+        { "_id": employeeID },
+        { $unset: { [`notifications.${messageID}`]: 1 } }
+     );
+     //Remove that null field from notifications array
+     await employeeCollection.updateOne(
+      { "_id": employeeID },
+      { $pull: { "notifications": null } }
+    );
+    res.status(200).json({ message: 'Notification deleted successfully' });
+   
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  } finally {
+    await client.close();
+  }
+});
+
 
 
 user.get("/getFile", async (req, res) => {

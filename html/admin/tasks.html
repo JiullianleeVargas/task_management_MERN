@@ -1384,6 +1384,10 @@
                         throw new Error(`HTTP Creating Task error! Status: ${response.status}`);
                     }
 
+                    const data = await response.json();
+
+                    if(data.taskID)
+                        return data.taskID;
                 } catch (error) {
                     console.error('Error creating task:', error);
                 }
@@ -2028,6 +2032,8 @@
                             user = this.params.user;
                             db_id = this.params.dbid;
 
+                            
+
                             if(user !== 'team')
                             {
                                 if(tag1 == 'team')
@@ -2062,7 +2068,7 @@
                                 dbid: db_id
                             }
                             console.log("USER TO RECEIVE TASK: ", user);
-                            await createTask(task);
+                            taskID = await createTask(task);
                             const alpineInstance = this;
 
                             // Use this.$set to update the allTasks array
@@ -2079,8 +2085,10 @@
                             tag1: tag1,
                             tag2: tag2,
                             file: file_name, 
-                            dbid: db_id
+                            dbid: taskID
+                            
                             };
+
                             if (taskIndex !== -1) {
                                 alpineInstance.allTasks.splice(taskIndex, 1, task2);
                             }

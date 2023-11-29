@@ -1,0 +1,38 @@
+Dynamic Reflections Settings
+
+X offset = 0
+Y offset = 1
+Reflection Color R: 203
+Reflection Color G: 195
+Refflection Color B: 201
+Reflection Color A: 98
+
+
+
+Name/Speed/AI type/minSize/maxSize-1/start time or start and end time/seasons/weather/? 
+
+.? ? .?/minDepth/.spawnMultiplier/.depthMultiplier/minFishingLevel
+
+
+*The four ? are unused and should be left at default
+*The depthMultiplier is left at .1 for both mods I checked out
+*Gotta see a bit more how to properly work with the spawnMultiplier
+*minDepth is 1-5, the minimum depth of reel distance required for max chance of catching fish
+
+
+
+
+Special Fish ideas:
+
+Wizfish: just a fish with a wizard hat
+-Cindersap Forest
+
+Coal Carp: a carp infused with coal
+-Mines 20F, 60F
+
+Junimo fish: a fish that only spawns after completing CC
+-Secret Woods Pond
+
+Prismatic fish: basically up to par with legendary fish in terms of difficulty
+-Witch's Swamp
+

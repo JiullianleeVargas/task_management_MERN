@@ -96,7 +96,7 @@ user.post('/login', async function(req, res) {
       }
 
       else {
-        console.log("Username or password is incorrect");
+        res.json({ error: 'Login credentials are incorrect.'});
       }
 
     }
@@ -637,68 +637,6 @@ user.post("/setAdminStatus", async (req, res) => {
 })
 
 
-
-// user.get('/getTeam/:id', async (req, res) => {
-//   const id = req.params.id;
-
-//   const client = new MongoClient('mongodb://0.0.0.0:27017');
-
-//   try {
-//       //conncet to db
-//       await client.connect();
-//       const database = client.db('task_management');
-//       const teamCollection = database.collection('teams');
-//       const userCollection = database.collection('employees');
-//       const tasksCollection = database.collection('tasks');
-      
-//       //get the team
-//       const team = await teamCollection.find({admin: new ObjectId(id)}).toArray();
-//       //console.log("team tasks" ,team);
-      
-
-//       //get the users info
-//       let users = [];
-//       for (const user of team[0].employees){
-//         //console.log("user: ", user);
-//         let userInfo = await userCollection.find({_id: user}).project({ _id: 1,email: 1, f_name: 1, l_name: 1, tasks: 1}).toArray();
-//         //console.log("user from team: ", userInfo);
-//         //get the tasks from the user
-//         let tasks = [];
-//         for (const task of userInfo[0].tasks){
-//           let taskInfo = await tasksCollection.find({_id: task}).toArray();
-//           console.log("employee task: ", taskInfo);
-//           tasks.push(taskInfo[0]);  
-//           //console.log("employee task: ", tasks);        
-//         };
-//         userInfo[0].tasks = tasks[0];
-//         //console.log("user tasks: ", userInfo);
-//         let employee = userInfo[0].email;
-//         users.push(userInfo[0]);
-        
-//       };
-
-//       const teamTasks = await tasksCollection.find({ _id: { $in: team[0].tasks } }, (err, tasks) => {
-//         if (err) {
-//           console.error(err);
-//           // Handle the error
-//         } else {
-//           console.log('team tasks:', tasks);
-//           // Handle the found users
-//         }
-//       }).toArray();
-
-//       users.push(teamTasks[0]);
-
-//       //console.log("team tasks: ", teamTasks);
-//       console.log("all users: ", users);
-
-//       res.json(users);
-//   } catch (error) {
-//       res.status(500).json({ error: 'Internal Server Error' });
-//   } finally {
-//       await client.close();
-//   }
-// });
 
 user.get('/getTeamTasks/:id', async (req, res) => {
   const id = req.params.id;

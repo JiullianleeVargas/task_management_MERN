@@ -1,0 +1,68 @@
+[{
+  "_id": {
+    "$oid": "655a63d42b3d3bf6c88c3f83"
+  },
+  "admin": {
+    "$oid": "655664f051e222f85ae0fd0a"
+  },
+  "employees": [
+    {
+      "$oid": "655a5b8c70fc2aea0f9a523a"
+    },
+    {
+      "$oid": "655a5c30a91bc82dead9bde0"
+    },
+    {
+      "$oid": "655a5c88a91bc82dead9bde2"
+    }
+  ],
+  "tasks": [
+    {
+      "$oid": "655a5f3570d7517c72b75c73"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "655f654be1869c9f505ae3c5"
+  },
+  "admin": {
+    "$oid": "655665506bd123de4c74613c"
+  },
+  "employees": [
+    {
+      "$oid": "655a5c5ca91bc82dead9bde1"
+    },
+    {
+      "$oid": "655a5c00a91bc82dead9bddf"
+    },
+    {
+      "$oid": "65668b3452d87f51f8e536b9"
+    },
+    {
+      "$oid": "65668bd352d87f51f8e536ba"
+    },
+    {
+      "$oid": "65668c8752d87f51f8e536bb"
+    }
+  ],
+  "tasks": [
+    {
+      "$oid": "655a5fb670d7517c72b75c74"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "656668a67448e19adbcd0d64"
+  },
+  "admin": {
+    "$oid": "656668a67448e19adbcd0d63"
+  },
+  "tasks": [],
+  "employees": [
+    {
+      "$oid": "65667f2652d87f51f8e536b7"
+    }
+  ]
+}]

@@ -1,0 +1,93 @@
+[{
+  "_id": {
+    "$oid": "655664f051e222f85ae0fd0a"
+  },
+  "email": "javier.quinones3@techspire.com",
+  "password": "enterpass",
+  "adminID": 1,
+  "userlist": [
+    1
+  ],
+  "notifications": [
+    "Elena has finished a task!"
+  ],
+  "status": "active",
+  "f_name": "Javier",
+  "l_name": "Melendez"
+},
+{
+  "_id": {
+    "$oid": "655665506bd123de4c74613c"
+  },
+  "email": "natasha.ramos8@upr.edu",
+  "password": "$2b$10$./z1Ttzpy83T0TCwj8M01e6su.tvBcb.37ePhnrBDNZq3D11ZM8eq",
+  "adminID": 2,
+  "userlist": [
+    {
+      "$oid": "655a5c00a91bc82dead9bddf"
+    },
+    {
+      "$oid": "655a5c5ca91bc82dead9bde1"
+    }
+  ],
+  "status": "active",
+  "f_name": "Natasha",
+  "l_name": "Ramos",
+  "notifications": [
+    "Aerith has updated \"Cybertech Meeting\" status to Completed",
+    "Aerith has updated \"Cybertech Meeting\" status to Completed",
+    "Aerith has updated \"Cybertech Meeting\" status to Completed"
+  ]
+},
+{
+  "_id": {
+    "$oid": "655bc6c7cb88b7012f208501"
+  },
+  "email": "annie.rivera@techspire.com",
+  "password": "admin123",
+  "status": "active",
+  "adminID": 4,
+  "f_name": "Annie",
+  "l_name": "Rivera"
+},
+{
+  "_id": {
+    "$oid": "65649a088dda42afe5670da1"
+  },
+  "email": "gaby.ramos@techspire.com",
+  "password": "admin123",
+  "status": "active",
+  "l_name": "Ramos",
+  "f_name": "Gaby"
+},
+{
+  "_id": {
+    "$oid": "6564d6c99acbcbecea57795b"
+  },
+  "email": "jose.arriaga@techspire.com",
+  "password": "admin123",
+  "status": "active",
+  "l_name": "Arriaga",
+  "f_name": "Jose"
+},
+{
+  "_id": {
+    "$oid": "6564d84f9acbcbecea57795d"
+  },
+  "email": "chloe.ramos@techspire.com",
+  "password": "admin123",
+  "status": "active",
+  "l_name": "Ramos",
+  "f_name": "Chloe"
+},
+{
+  "_id": {
+    "$oid": "656668a67448e19adbcd0d63"
+  },
+  "email": "doty.ramos@techspire.com",
+  "password": "$2b$10$veB0XbRGmoJtnzP96Nabhe9jni8VizBXVYtWZI5GwGnMKYSprLZ.6",
+  "status": "active",
+  "l_name": "Ramos",
+  "f_name": "Doty",
+  "notifications": []
+}]

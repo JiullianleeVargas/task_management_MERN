@@ -1,0 +1,196 @@
+[{
+  "_id": {
+    "$oid": "655a5b8c70fc2aea0f9a523a"
+  },
+  "email": "ernesto@gmail.com",
+  "password": {},
+  "userID": 1,
+  "status": "active",
+  "f_name": "Ernesto",
+  "l_name": "Gómez",
+  "position": "Web Developer",
+  "tasks": [
+    {
+      "$oid": "6564bad98027facff4fee97b"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "655a5c00a91bc82dead9bddf"
+  },
+  "email": "elena.gomez@techspire.com",
+  "password": {},
+  "userID": 2,
+  "status": "active",
+  "f_name": "Elena",
+  "l_name": "Gomez",
+  "position": "Software Engineer",
+  "tasks": [
+    {
+      "$oid": "6560c35ce1869c9f505ae3de"
+    },
+    {
+      "$oid": "65661964ccb0c82607294db6"
+    }
+  ],
+  "notifications": [
+    "The task \"Make presentation\" was added!",
+    "The task \"isafdvvud\" was added!",
+    "The task \"isafdvvud\" was removed.",
+    "The task \"Make presentation\" was updated!"
+  ]
+},
+{
+  "_id": {
+    "$oid": "655a5c30a91bc82dead9bde0"
+  },
+  "email": "reynaldodiaz@gmail.com",
+  "password": {},
+  "userID": 3,
+  "status": "active",
+  "f_name": null,
+  "l_name": null,
+  "position": "Frontend Developer",
+  "tasks": []
+},
+{
+  "_id": {
+    "$oid": "655a5c5ca91bc82dead9bde1"
+  },
+  "email": "javier.melendez@techspire.com",
+  "password": {},
+  "userID": 4,
+  "status": "active",
+  "f_name": "Javier",
+  "l_name": "Melendez",
+  "position": "UX Designer",
+  "tasks": [
+    {
+      "$oid": "6560c1f6e1869c9f505ae3d8"
+    },
+    {
+      "$oid": "65661b19ccb0c82607294db7"
+    },
+    {
+      "$oid": "65661c382feace2163ab12c4"
+    }
+  ],
+  "notifications": [
+    "The task \"Study\" was added!",
+    "The task \"Study for exam\" was added!",
+    "The task \"isafdvvud\" was added!",
+    "The task \"isafdvvud\" was removed.",
+    "The task \"Study for exam\" was updated!",
+    "The task \"Fix bug\" was updated!"
+  ]
+},
+{
+  "_id": {
+    "$oid": "655a5c88a91bc82dead9bde2"
+  },
+  "email": "mariarios@gmail.com",
+  "password": {},
+  "userID": 5,
+  "status": "active",
+  "f_name": null,
+  "l_name": null,
+  "position": "Software Developer",
+  "tasks": []
+},
+{
+  "_id": {
+    "$oid": "655d05823c99a1f28b98b509"
+  },
+  "email": "yeyo.soto@upr.edu",
+  "password": {},
+  "f_name": "Yeyo",
+  "l_name": "Soto",
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "655d08e73a2987a1ec82bf37"
+  },
+  "email": "rodney@upr.edu",
+  "password": {},
+  "f_name": "Rodney",
+  "l_name": "Gomez",
+  "status": "active"
+},
+{
+  "_id": {
+    "$oid": "655d09cd6b12331f4cebe46f"
+  },
+  "email": "carlos.colan@upr.edu",
+  "password": {},
+  "f_name": "Carlos",
+  "l_name": "Colon",
+  "status": "active",
+  "tasks": []
+},
+{
+  "_id": {
+    "$oid": "65667f2652d87f51f8e536b7"
+  },
+  "email": "aurora@upr.edu",
+  "password": "$2b$10$/ciMcecPR/m0CwOUUM2JLe7EvDBpECmgNuw.RE2XfokteX0baIyKm",
+  "f_name": "Aurora",
+  "l_name": "Ramos",
+  "status": "active",
+  "tasks": [
+    {
+      "$oid": "65667f3c52d87f51f8e536b8"
+    }
+  ],
+  "notifications": [
+    "The task \"Study\" was added!"
+  ]
+},
+{
+  "_id": {
+    "$oid": "65668b3452d87f51f8e536b9"
+  },
+  "email": "aerith.gainsborough@techspire.com",
+  "password": "$2b$10$QClfv7277Nht8hd5U42ck.M6xP22Y6zGGoHPg9ytsRuRmF06tXKDq",
+  "f_name": "Aerith",
+  "l_name": "Gainsborough",
+  "status": "active",
+  "tasks": [],
+  "notifications": [
+    "The task \"isafdvvud\" was removed."
+  ]
+},
+{
+  "_id": {
+    "$oid": "65668bd352d87f51f8e536ba"
+  },
+  "email": "cloud.strife@techspire.com",
+  "password": "$2b$10$M/4xx5.yZvJ9dJYaRdurIu8VIgAk/YDHHjCo.KYwUH8yOTAlTqfra",
+  "f_name": "Cloud",
+  "l_name": "Strife",
+  "status": "active",
+  "tasks": [
+    {
+      "$oid": "656695d152d87f51f8e536c0"
+    }
+  ],
+  "notifications": [
+    "The task \"isafdvvud\" was removed.",
+    "The task \"Create filter\" was added!"
+  ]
+},
+{
+  "_id": {
+    "$oid": "65668c8752d87f51f8e536bb"
+  },
+  "email": "barret.wallace@techspire.com",
+  "password": "$2b$10$OpWKIzksmfVRpTQqE9EIQe3cksbffxILrySGJ48xvH3QI4TSBGrGG",
+  "f_name": "Barret",
+  "l_name": "Wallace",
+  "status": "active",
+  "tasks": [],
+  "notifications": [
+    "The task \"isafdvvud\" was removed."
+  ]
+}]

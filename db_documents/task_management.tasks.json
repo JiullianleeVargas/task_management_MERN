@@ -1,0 +1,142 @@
+[{
+  "_id": {
+    "$oid": "655a5f3570d7517c72b75c73"
+  },
+  "title": "Create a web component",
+  "due_date": "2023-11-15",
+  "status": "Completed",
+  "priority": "high",
+  "description": "Create a riveting web component that will change the world",
+  "tags": []
+},
+{
+  "_id": {
+    "$oid": "655a5fb670d7517c72b75c74"
+  },
+  "title": "Cybertech Meeting",
+  "due_date": "2023-11-07",
+  "status": "Completed",
+  "priority": "high",
+  "description": "Do not forget to book the meeting for next week!",
+  "tags": [
+    "Team"
+  ]
+},
+{
+  "_id": {
+    "$oid": "655a5fdd70d7517c72b75c75"
+  },
+  "title": "Call designers for development meeting",
+  "due_date": "2023-11-02",
+  "status": "Pending",
+  "priority": "high",
+  "description": "Do not forget to contact the designers from the development team for our upcoming meeting",
+  "tags": []
+},
+{
+  "_id": {
+    "$oid": "6560c1f6e1869c9f505ae3d8"
+  },
+  "title": "Fix bug",
+  "due_date": "2023-12-02",
+  "status": "In Progress",
+  "priority": "medium",
+  "description": "Fix bug in report's page.\n",
+  "tags": [
+    "b",
+    "u"
+  ],
+  "file": "",
+  "start_date": "2023-11-28"
+},
+{
+  "_id": {
+    "$oid": "6560c35ce1869c9f505ae3de"
+  },
+  "title": "Add links",
+  "due_date": "2023-12-01",
+  "status": "In Progress",
+  "priority": "medium",
+  "description": "Add new links to the navbar.",
+  "tags": "links"
+},
+{
+  "_id": {
+    "$oid": "65661964ccb0c82607294db6"
+  },
+  "title": "Make presentation",
+  "description": "\n",
+  "priority": "medium",
+  "status": "In Progress",
+  "tags": [
+    "presentation",
+    ""
+  ],
+  "file": "",
+  "start_date": "2023-11-28",
+  "due_date": "2023-11-30"
+},
+{
+  "_id": {
+    "$oid": "65661b19ccb0c82607294db7"
+  },
+  "title": "Study",
+  "description": "",
+  "priority": "high",
+  "status": "Pending",
+  "tags": [
+    "exam",
+    ""
+  ],
+  "file": null,
+  "start_date": "2023-11-28",
+  "due_date": "2023-11-30"
+},
+{
+  "_id": {
+    "$oid": "65661c382feace2163ab12c4"
+  },
+  "title": "Study for exam",
+  "description": "Study for the software exam\n\n",
+  "priority": "low",
+  "status": "Completed",
+  "tags": [
+    "exam",
+    ""
+  ],
+  "file": "",
+  "start_date": "2023-11-28",
+  "due_date": "2023-11-30"
+},
+{
+  "_id": {
+    "$oid": "65667f3c52d87f51f8e536b8"
+  },
+  "title": "Study",
+  "description": "gasdfbvgesdb\n",
+  "priority": "high",
+  "status": "Pending",
+  "tags": [
+    "exam",
+    ""
+  ],
+  "file": null,
+  "start_date": "2023-11-28",
+  "due_date": "2023-11-30"
+},
+{
+  "_id": {
+    "$oid": "656695d152d87f51f8e536c0"
+  },
+  "title": "Create filter",
+  "description": "Create filter for tasks table\n",
+  "priority": "medium",
+  "status": "Pending",
+  "tags": [
+    "filter",
+    ""
+  ],
+  "file": null,
+  "start_date": "2023-11-28",
+  "due_date": "2023-11-30"
+}]
